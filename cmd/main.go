@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/spf13/viper"
 	kaspi_qr "kaspi-qr"
 	"kaspi-qr/pkg/handler"
@@ -13,7 +14,8 @@ func main() {
 	if err := initConfig(); err != nil {
 		log.Fatalf("error initializing configs: %s", err.Error())
 	}
-	//asdasd
+	fmt.Print("asd")
+	//asdasd123123
 	repos := repository.NewRepository()
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
