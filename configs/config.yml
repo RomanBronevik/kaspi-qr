@@ -1,0 +1,3 @@
+port: "8000"
+certificate: "./configs/certfile.pfx"
+cerPassword: "asd123456"
