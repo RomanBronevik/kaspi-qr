@@ -14,8 +14,7 @@ func main() {
 	if err := initConfig(); err != nil {
 		log.Fatalf("error initializing configs: %s", err.Error())
 	}
-	fmt.Print("asdasdaasdadssd")
-	//asdasd123123123123123
+	fmt.Print("hello world")
 	repos := repository.NewRepository()
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)
