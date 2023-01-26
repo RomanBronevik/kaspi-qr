@@ -6,14 +6,14 @@ import (
 	"encoding/pem"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/pkcs12"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
-func getHttpClientTsl() (*http.Client, error) {
+func getHttpClientTls() (*http.Client, error) {
 	pfxFile := viper.GetString("certificate")
-	pfxData, err := ioutil.ReadFile(pfxFile)
+	pfxData, err := os.ReadFile(pfxFile)
 
 	if err != nil {
 		log.Fatal(err)

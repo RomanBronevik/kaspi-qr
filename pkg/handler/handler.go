@@ -24,8 +24,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	device := router.Group("/device") // для работы с endpoint со списками и их задачами
 	{
-		device.GET("/:organizationBIN", h.tradepoints)
-		device.POST("/device-registration", h.deviceRegistration)
+		tradePoints := device.Group("/tradepoints")
+		{
+			tradePoints.GET("/:organizationBIN", h.tradePoints)
+		}
+		device.POST("/registration", h.deviceRegistration)
 		device.POST("/delete", h.deleteOrOffDevice)
 	}
 

@@ -1,17 +1,16 @@
 package handler
 
 import (
-	"fmt"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"io"
 	"log"
 )
 
-type tradePoint struct {
-	BIN int
-}
+func (h *Handler) tradePoints(c *gin.Context) {
 
-func (h *Handler) tradepoints(c *gin.Context) {
+	//AuthorizationToken := c.Request.Header["AuthorizationToken"]
 
 	organizationBIN := c.Param("organizationBIN")
 
@@ -30,26 +29,42 @@ func (h *Handler) tradepoints(c *gin.Context) {
 }
 
 func (h *Handler) deviceRegistration(c *gin.Context) {
+	//var bodyRequest tradePointRegistration
 
+	body := c.Request.Body
+	kaspiDeviceRegistration(body)
+
+	//x, err := ioutil.ReadAll(body)
+	//
+	//if err != nil {
+	//	c.JSON(400, gin.H{
+	//		"message": "problems with JSON body - 1",
+	//	})
+	//}
+	//
+	//errJson := json.Unmarshal(x, &bodyRequest)
+	//
+	//if errJson != nil {
+	//	c.JSON(400, gin.H{
+	//		"message": "problems with JSON body - 2",
+	//	})
+	//}
 }
 
 func (h *Handler) deleteOrOffDevice(c *gin.Context) {
 
 }
 
-//type tradePoint struct {
-//	TradePointId int
-//	TradePointName string
-//}
+func kaspiDeviceRegistration(requestBody io.ReadCloser) (RegistrationOutputSt, error) {
+	var bodyRequest RegistrationOutputSt
 
-func kaspiTradePoints(organizationBIN string) ([]byte, error) {
-	client, err := getHttpClientTsl()
+	client, err := getHttpClientTls()
 
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 
-	resp, err := client.Get("https://mtokentest.kaspi.kz:8545/r3/v01/partner/tradepoints/" + organizationBIN)
+	resp, err := client.Get(viper.GetString("kaspiURL") + "device/register/")
 	if err != nil {
 		panic(err)
 	}
@@ -57,21 +72,45 @@ func kaspiTradePoints(organizationBIN string) ([]byte, error) {
 	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err.Error())
-		return nil, err
+		return RegistrationOutputSt{}, err
 	}
 
-	fmt.Println(string(bytes))
+	errJson := json.Unmarshal(bytes, &bodyRequest)
+	if errJson != nil {
+		log.Fatal(err.Error())
+		return RegistrationOutputSt{}, err
+	}
 
-	//jsonErr := json.Unmarshal(body, &people1)
-	//if jsonErr != nil {
-	//	log.Fatal(jsonErr)
-	//}
+	return bodyRequest, nil
+}
 
-	//fmt.Println(people1.Number)
+func kaspiTradePoints(organizationBIN string) (tradePointSt, error) {
 
-	return bytes, nil
+	var bodyRequest tradePointSt
 
-	//testbdy := new(bytes.Buffer)
-	//testbdy.ReadFrom(resp.Body)
-	//fmt.Println(testbdy)
+	client, err := getHttpClientTls()
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	resp, err := client.Get(viper.GetString("kaspiURL") + "partner/tradepoints/" + organizationBIN)
+	if err != nil {
+		panic(err)
+	}
+
+	bytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err.Error())
+		return tradePointSt{}, err
+	}
+
+	errJson := json.Unmarshal(bytes, &bodyRequest)
+	if errJson != nil {
+		log.Fatal(err.Error())
+		return tradePointSt{}, err
+	}
+
+	return bodyRequest, nil
+
 }
