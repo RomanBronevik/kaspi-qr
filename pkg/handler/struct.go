@@ -18,11 +18,10 @@ type tradePointRegistration struct {
 }
 
 type RegistrationOutputSt struct {
-	StatusCode int            `json:"StatusCode"`
-	Message    string         `json:"Message"`
-	Data       []*deviceToken `json:"Data"`
+	Data       DeviceToken `json:"Data"`
+	StatusCode int         `json:"StatusCode"`
 }
 
-type deviceToken struct {
+type DeviceToken struct {
 	DeviceToken string `json:"DeviceToken"`
 }
