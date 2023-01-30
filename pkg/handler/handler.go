@@ -35,7 +35,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	payment := router.Group("/payment") // для работы с endpoint со списками и их задачами
 	{
 		payment.POST("/QR", h.QR)
-		payment.POST("/payment-link", h.paymentLink)
+		payment.POST("/link", h.paymentLink)
 		payment.POST("/status", h.operationStatus)
 	}
 
