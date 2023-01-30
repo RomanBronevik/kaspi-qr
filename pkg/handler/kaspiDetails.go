@@ -86,8 +86,41 @@ func kaspiDeviceRegistration(requestBody io.ReadCloser) (RegistrationOutputSt, e
 	return bodyRequest, nil
 }
 
-func kaspiDeviceDelete(requestBody io.ReadCloser) (RegistrationOutputSt, error) {
-	var bodyRequest RegistrationOutputSt
+func kaspiDeviceDelete(requestBody io.ReadCloser) (DeleteOutputSt, error) {
+	var bodyRequest DeleteOutputSt
+
+	client, err := getHttpClientTls()
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	req, err := http.NewRequest("POST", viper.GetString("kaspiURL")+"device/delete", requestBody)
+	if err != nil {
+		log.Fatal(err.Error())
+		return DeleteOutputSt{}, err
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err.Error())
+		return DeleteOutputSt{}, err
+	}
+
+	bytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err.Error())
+		return DeleteOutputSt{}, err
+	}
+
+	errJson := json.Unmarshal(bytes, &bodyRequest)
+	if errJson != nil {
+		fmt.Println(errJson.Error())
+		log.Fatal(err.Error())
+		return DeleteOutputSt{}, err
+	}
 
 	return bodyRequest, nil
 }

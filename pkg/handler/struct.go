@@ -11,12 +11,6 @@ type tradePoint struct {
 	TradePointName string `json:"TradePointName"`
 }
 
-type tradePointRegistration struct {
-	DeviceId        string `json:"deviceId"`
-	tradePointId    int    `json:"tradePointId"`
-	OrganizationBin string `json:"organizationBin"`
-}
-
 type RegistrationOutputSt struct {
 	Data       DeviceToken `json:"Data"`
 	StatusCode int         `json:"StatusCode"`
@@ -24,4 +18,11 @@ type RegistrationOutputSt struct {
 
 type DeviceToken struct {
 	DeviceToken string `json:"DeviceToken"`
+}
+
+type DeleteOutputSt struct {
+	StatusCode int `json:"StatusCode"`
+}
+
+type QRToken struct {
 }

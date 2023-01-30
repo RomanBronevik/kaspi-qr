@@ -37,7 +37,7 @@ func (h *Handler) deviceRegistration(c *gin.Context) {
 func (h *Handler) deleteOrOffDevice(c *gin.Context) {
 	body := c.Request.Body
 
-	output, err := kaspiDeviceRegistration(body)
+	output, err := kaspiDeviceDelete(body)
 
 	if err != nil {
 		c.JSON(400, gin.H{
