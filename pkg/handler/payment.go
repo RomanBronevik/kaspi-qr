@@ -17,7 +17,17 @@ func (h *Handler) QR(c *gin.Context) {
 }
 
 func (h *Handler) paymentLink(c *gin.Context) {
+	body := c.Request.Body
 
+	output, err := kaspiPaymentLink(body)
+
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": err.Error(),
+		})
+	}
+
+	c.JSON(200, output)
 }
 
 func (h *Handler) operationStatus(c *gin.Context) {
