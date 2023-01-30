@@ -16,13 +16,13 @@ func NewHandler(service *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
 
-	api := router.Group("/return") // для регистрации и авторизации
+	api := router.Group("/return") //operation details and return payment without client
 	{
 		api.GET("/details", h.details)
 		api.POST("/selfreturn", h.selfReturn)
 	}
 
-	device := router.Group("/device") // для работы с endpoint со списками и их задачами
+	device := router.Group("/device") // all movement with device and tradepoints
 	{
 		tradePoints := device.Group("/tradepoints")
 		{
@@ -32,7 +32,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		device.POST("/delete", h.deleteOrOffDevice)
 	}
 
-	payment := router.Group("/payment") // для работы с endpoint со списками и их задачами
+	payment := router.Group("/payment") // qr token generation and payment link
 	{
 		payment.POST("/QR", h.QR)
 		payment.POST("/link", h.paymentLink)
