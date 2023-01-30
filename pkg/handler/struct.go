@@ -65,3 +65,40 @@ type PaymentBehaviorOptions struct {
 	LinkActivationWaitTimeout  int `json:"LinkActivationWaitTimeout"`
 	PaymentConfirmationTimeout int `json:"PaymentConfirmationTimeout"`
 }
+
+type OperationStatus struct {
+	StatusCode int       `json:"StatusCode"`
+	Message    string    `json:"Message"`
+	Data       *StatusSt `json:"Data"`
+}
+
+type StatusSt struct {
+	Status string `json:"Status"`
+}
+
+type OperationGetSt struct {
+	QrPaymentId int    `json:"QrPaymentId"`
+	DeviceToken string `json:"DeviceToken"`
+}
+
+type OperationDetails struct {
+	Data       *OperationDetailsSt `json:"Data"`
+	StatusCode int                 `json:"StatusCode"`
+}
+
+type OperationDetailsSt struct {
+	QrPaymentId           int            `json:"QrPaymentId"`
+	TotalAmount           float64        `json:"TotalAmount"`
+	AvailableReturnAmount float64        `json:"AvailableReturnAmount"`
+	TransactionDate       civil.DateTime `json:"TransactionDate"`
+}
+
+type ReturnSt struct {
+	StatusCode            int                    `json:"StatusCode"`
+	Message               string                 `json:"Message"`
+	ReturnOperationDataSt *ReturnOperationDataSt `json:"ReturnOperationDataSt"`
+}
+
+type ReturnOperationDataSt struct {
+	ReturnOperationId int `json:"ReturnOperationId"`
+}

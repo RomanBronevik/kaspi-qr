@@ -31,5 +31,16 @@ func (h *Handler) paymentLink(c *gin.Context) {
 }
 
 func (h *Handler) operationStatus(c *gin.Context) {
+	QrPaymentId := c.Param("QrPaymentId")
 
+	req, err := operationStatus(QrPaymentId)
+
+	if err != nil {
+		c.JSON(400, gin.H{
+			"message": "Something went wrong",
+			"error":   err.Error(),
+		})
+	}
+
+	c.JSON(200, req)
 }

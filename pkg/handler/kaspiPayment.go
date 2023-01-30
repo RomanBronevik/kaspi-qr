@@ -83,3 +83,41 @@ func kaspiPaymentLink(requestBody io.ReadCloser) (PaymentLink, error) {
 
 	return bodyRequest, nil
 }
+
+func operationStatus(QrPaymentId string) (OperationStatus, error) {
+
+	var bodyRequest OperationStatus
+
+	client, err := getHttpClientTls()
+
+	if err != nil {
+		log.Fatal(err.Error())
+		return OperationStatus{}, err
+	}
+
+	req, err := http.NewRequest("GET", viper.GetString("kaspiURL")+"payment/status/"+QrPaymentId, nil)
+	if err != nil {
+		log.Fatal(err.Error())
+		return OperationStatus{}, err
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatal(err.Error())
+		return OperationStatus{}, err
+	}
+
+	bytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err.Error())
+		return OperationStatus{}, err
+	}
+
+	errJson := json.Unmarshal(bytes, &bodyRequest)
+	if errJson != nil {
+		log.Fatal(err.Error())
+		return OperationStatus{}, err
+	}
+
+	return bodyRequest, nil
+}

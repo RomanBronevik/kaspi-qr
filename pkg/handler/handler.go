@@ -36,7 +36,11 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		payment.POST("/QR", h.QR)
 		payment.POST("/link", h.paymentLink)
-		payment.POST("/status", h.operationStatus)
+
+		status := payment.Group("/status")
+		{
+			status.GET("/:QrPaymentId", h.operationStatus)
+		}
 	}
 
 	return router
