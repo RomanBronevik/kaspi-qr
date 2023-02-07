@@ -1,6 +1,9 @@
 package main
 
 import (
+	"context"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	kaspi_qr "kaspi-qr"
 	"kaspi-qr/pkg/handler"
@@ -14,6 +17,26 @@ func main() {
 		log.Fatalf("error initializing configs: %s", err.Error())
 	}
 	//fmt.Print("hello world")
+
+	if err := godotenv.Load(); err != nil {
+		log.Fatalf("error loading env variables: %s", err.Error())
+	}
+
+	repository.NewClient(context.TODO())
+	//db, err :=
+	//db, err := repository.NewPostgresDB(repository.Config{
+	//	Host:     viper.GetString("db.host"),
+	//	Port:     viper.GetString("db.port"),
+	//	Username: viper.GetString("db.username"),
+	//	Password: os.Getenv("DB_PASSWORD"),
+	//	DBName:   viper.GetString("db.dbname"),
+	//	SSLMode:  viper.GetString("db.sslmode"),
+	//})
+
+	//if err != nil {
+	//	log.Fatalf("failed to initialize DB: %s", err.Error())
+	//}
+	//
 	repos := repository.NewRepository()
 	services := service.NewService(repos)
 	handlers := handler.NewHandler(services)

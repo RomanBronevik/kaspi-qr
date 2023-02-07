@@ -1,30 +1,6 @@
-package handler
+package entities
 
 import "github.com/golang-sql/civil"
-
-type tradePointSt struct {
-	StatusCode int           `json:"StatusCode"`
-	Message    string        `json:"Message"`
-	Data       []*tradePoint `json:"Data"`
-}
-
-type tradePoint struct {
-	TradePointId   int    `json:"TradePointId"`
-	TradePointName string `json:"TradePointName"`
-}
-
-type RegistrationOutputSt struct {
-	Data       DeviceToken `json:"Data"`
-	StatusCode int         `json:"StatusCode"`
-}
-
-type DeviceToken struct {
-	DeviceToken string `json:"DeviceToken"`
-}
-
-type DeleteOutputSt struct {
-	StatusCode int `json:"StatusCode"`
-}
 
 type QRToken struct {
 	StatusCode int       `json:"StatusCode"`
@@ -74,31 +50,4 @@ type OperationStatus struct {
 
 type StatusSt struct {
 	Status string `json:"Status"`
-}
-
-type OperationGetSt struct {
-	QrPaymentId int    `json:"QrPaymentId"`
-	DeviceToken string `json:"DeviceToken"`
-}
-
-type OperationDetails struct {
-	Data       *OperationDetailsSt `json:"Data"`
-	StatusCode int                 `json:"StatusCode"`
-}
-
-type OperationDetailsSt struct {
-	QrPaymentId           int            `json:"QrPaymentId"`
-	TotalAmount           float64        `json:"TotalAmount"`
-	AvailableReturnAmount float64        `json:"AvailableReturnAmount"`
-	TransactionDate       civil.DateTime `json:"TransactionDate"`
-}
-
-type ReturnSt struct {
-	StatusCode            int                    `json:"StatusCode"`
-	Message               string                 `json:"Message"`
-	ReturnOperationDataSt *ReturnOperationDataSt `json:"ReturnOperationDataSt"`
-}
-
-type ReturnOperationDataSt struct {
-	ReturnOperationId int `json:"ReturnOperationId"`
 }

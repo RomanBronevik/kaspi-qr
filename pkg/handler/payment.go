@@ -1,46 +1,47 @@
 package handler
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"kaspi-qr/pkg/errors"
+	provider "kaspi-qr/pkg/handler/provider/kaspi"
+	"net/http"
+)
 
 func (h *Handler) QR(c *gin.Context) {
 	body := c.Request.Body
 
-	output, err := kaspiQR(body)
+	output, err := provider.KaspiQR(body)
 
 	if err != nil {
-		c.JSON(400, gin.H{
-			"message": err.Error(),
-		})
+		errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
 	}
 
-	c.JSON(200, output)
+	c.JSON(http.StatusOK, output)
 }
 
 func (h *Handler) paymentLink(c *gin.Context) {
 	body := c.Request.Body
 
-	output, err := kaspiPaymentLink(body)
+	output, err := provider.KaspiPaymentLink(body)
 
 	if err != nil {
-		c.JSON(400, gin.H{
-			"message": err.Error(),
-		})
+		errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
 	}
 
-	c.JSON(200, output)
+	c.JSON(http.StatusOK, output)
 }
 
 func (h *Handler) operationStatus(c *gin.Context) {
 	QrPaymentId := c.Param("QrPaymentId")
 
-	req, err := operationStatus(QrPaymentId)
+	req, err := provider.OperationStatus(QrPaymentId)
 
 	if err != nil {
-		c.JSON(400, gin.H{
-			"message": "Something went wrong",
-			"error":   err.Error(),
-		})
+		errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
 	}
 
-	c.JSON(200, req)
+	c.JSON(http.StatusOK, req)
 }

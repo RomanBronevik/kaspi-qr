@@ -5,6 +5,10 @@ import "kaspi-qr/pkg/repository"
 type Authorization interface {
 }
 
+type Device interface {
+	CreateDevice()
+}
+
 type Service struct {
 	Authorization
 }

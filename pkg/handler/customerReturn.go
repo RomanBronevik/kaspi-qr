@@ -1,31 +1,34 @@
 package handler
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"kaspi-qr/pkg/errors"
+	provider "kaspi-qr/pkg/handler/provider/kaspi"
+	"net/http"
+)
 
 func (h *Handler) details(c *gin.Context) {
 	body := c.Request.Body
 
-	output, err := kaspiOperationDetails(body)
+	output, err := provider.KaspiOperationDetails(body)
 
 	if err != nil {
-		c.JSON(400, gin.H{
-			"message": err.Error(),
-		})
+		errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
 	}
 
-	c.JSON(200, output)
+	c.JSON(http.StatusOK, output)
 }
 
 func (h *Handler) selfReturn(c *gin.Context) {
 	body := c.Request.Body
 
-	output, err := kaspiReturnWithoutClient(body)
+	output, err := provider.KaspiReturnWithoutClient(body)
 
 	if err != nil {
-		c.JSON(400, gin.H{
-			"message": err.Error(),
-		})
+		errors.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
 	}
 
-	c.JSON(200, output)
+	c.JSON(http.StatusOK, output)
 }
