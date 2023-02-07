@@ -2,8 +2,8 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"kaspi-qr/internal/provider/kaspi"
 	"kaspi-qr/pkg/errors"
-	provider "kaspi-qr/pkg/handler/provider/kaspi"
 	"net/http"
 )
 

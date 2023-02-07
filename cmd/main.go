@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
 	kaspi_qr "kaspi-qr"
-	"kaspi-qr/pkg/handler"
+	"kaspi-qr/internal/handler"
+	organization2 "kaspi-qr/internal/organization"
+	organization "kaspi-qr/internal/organization/db"
 	"kaspi-qr/pkg/repository"
 	"kaspi-qr/pkg/service"
 	"log"
@@ -22,7 +25,30 @@ func main() {
 		log.Fatalf("error loading env variables: %s", err.Error())
 	}
 
-	repository.NewClient(context.TODO())
+	postgreSQLClient, err := repository.NewClient(context.TODO())
+	if err != nil {
+		return
+	}
+
+	repo := organization.NewRepository(postgreSQLClient)
+
+	newOrg := organization2.Organization{
+		Bin: 1337235,
+	}
+
+	err = repo.Create(context.TODO(), &newOrg)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	all, err := repo.FindAll(context.TODO())
+	if err != nil {
+		return
+	}
+
+	for _, ath := range all {
+		fmt.Println(ath)
+	}
 	//db, err :=
 	//db, err := repository.NewPostgresDB(repository.Config{
 	//	Host:     viper.GetString("db.host"),

@@ -1,7 +1,7 @@
 package orders
 
 import (
-	"kaspi-qr/pkg/models/organization"
+	"kaspi-qr/internal/organization"
 )
 
 type Order struct {

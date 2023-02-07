@@ -1,6 +1,8 @@
 package payment
 
-import "kaspi-qr/pkg/models/orders"
+import (
+	"kaspi-qr/internal/orders"
+)
 
 type Payment struct {
 	ID            string       `json:"id"`

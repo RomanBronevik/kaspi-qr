@@ -53,7 +53,7 @@ type Client interface {
 }
 
 func NewClient(ctx context.Context) (pool *pgxpool.Pool, err error) {
-	dsn := fmt.Sprintf("posthresql://%s:%s@%s:%s/%s",
+	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s",
 		viper.GetString("db.username"),
 		os.Getenv("DB_PASSWORD"),
 		viper.GetString("db.host"),
@@ -72,7 +72,7 @@ func NewClient(ctx context.Context) (pool *pgxpool.Pool, err error) {
 		}
 
 		return nil
-	}, viper.GetInt("maxAttempts"), 5*time.Second)
+	}, viper.GetInt("db.maxAttempts"), 5*time.Second)
 
 	if err != nil {
 		log.Fatal("error do with tries postgresql")

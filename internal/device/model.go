@@ -1,8 +1,8 @@
 package device
 
 import (
-	"kaspi-qr/pkg/models/organization"
-	"kaspi-qr/pkg/models/tradePoint"
+	"kaspi-qr/internal/organization"
+	"kaspi-qr/internal/tradePoint"
 )
 
 type Device struct {

@@ -2,11 +2,11 @@ package requestLogs
 
 import (
 	"github.com/golang-sql/civil"
-	"kaspi-qr/pkg/models/orders"
-	"kaspi-qr/pkg/models/organization"
+	"kaspi-qr/internal/orders"
+	"kaspi-qr/internal/organization"
 )
 
-type RequestLog struct {
+type CreateRequestLogDTO struct {
 	Source         string                    `json:"source"`
 	OrderId        orders.Order              `json:"order_id"`
 	OrganizationId organization.Organization `json:"organization_id"`

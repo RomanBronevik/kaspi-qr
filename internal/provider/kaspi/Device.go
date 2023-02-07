@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 	"io"
 	"kaspi-qr/configs"
-	"kaspi-qr/pkg/handler/entities"
+	"kaspi-qr/internal/entities"
 	"log"
 	"net/http"
 )
