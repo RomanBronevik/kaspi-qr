@@ -1,6 +1,9 @@
 package service
 
-import "kaspi-qr/pkg/repository"
+import (
+	"kaspi-qr/internal/adapters/repo/pg"
+	//"kaspi-qr/pkg/repository"
+)
 
 type Authorization interface {
 }
@@ -13,6 +16,6 @@ type Service struct {
 	Authorization
 }
 
-func NewService(repos *repository.Repository) *Service {
+func NewService(repos *pg.St) *Service {
 	return &Service{}
 }

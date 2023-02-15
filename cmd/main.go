@@ -2,75 +2,50 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
-	kaspi_qr "kaspi-qr"
-	"kaspi-qr/internal/handler"
-	organization2 "kaspi-qr/internal/organization"
-	organization "kaspi-qr/internal/organization/db"
-	"kaspi-qr/pkg/repository"
-	"kaspi-qr/pkg/service"
+	"kaspi-qr/internal/adapters/repo/pg"
+	"kaspi-qr/internal/adapters/server"
+	"kaspi-qr/internal/adapters/server/rest"
+	"kaspi-qr/internal/domain/core"
+	"kaspi-qr/internal/domain/usecases"
 	"log"
 )
 
 func main() {
+	app := struct {
+		repo *pg.St
+		core *core.St
+		ucs  *usecases.St
+		srv  *server.St
+	}{}
+
 	if err := initConfig(); err != nil {
 		log.Fatalf("error initializing configs: %s", err.Error())
 	}
-	//fmt.Print("hello world")
 
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("error loading env variables: %s", err.Error())
 	}
 
-	postgreSQLClient, err := repository.NewClient(context.TODO())
+	postgreSQLClient, err := pg.NewClient(context.TODO())
 	if err != nil {
 		return
 	}
 
-	repo := organization.NewRepository(postgreSQLClient)
+	srv := new(server.St)
 
-	newOrg := organization2.Organization{
-		Bin: 1337235,
-	}
+	app.repo = pg.NewRepository(postgreSQLClient)
+	app.ucs = usecases.New(app.repo)
+	app.srv = srv
 
-	err = repo.Create(context.TODO(), &newOrg)
-	if err != nil {
-		fmt.Println(err.Error())
-	}
+	app.core = core.New(app.repo)
+	app.ucs.SetCore(app.core)
 
-	all, err := repo.FindAll(context.TODO())
-	if err != nil {
-		return
-	}
+	handlers := rest.NewHandler(app.ucs)
 
-	for _, ath := range all {
-		fmt.Println(ath)
-	}
-	//db, err :=
-	//db, err := repository.NewPostgresDB(repository.Config{
-	//	Host:     viper.GetString("db.host"),
-	//	Port:     viper.GetString("db.port"),
-	//	Username: viper.GetString("db.username"),
-	//	Password: os.Getenv("DB_PASSWORD"),
-	//	DBName:   viper.GetString("db.dbname"),
-	//	SSLMode:  viper.GetString("db.sslmode"),
-	//})
-
-	//if err != nil {
-	//	log.Fatalf("failed to initialize DB: %s", err.Error())
-	//}
-	//
-	repos := repository.NewRepository()
-	services := service.NewService(repos)
-	handlers := handler.NewHandler(services)
-
-	srv := new(kaspi_qr.Server)
-	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-		log.Fatalf("error occured while running http server: %s", err.Error())
-	}
+	srv.Run(viper.GetString("port"), handlers.InitRoutes())
 }
 
 func initConfig() error {
