@@ -36,11 +36,12 @@ func (r *St) FindAllPayments(ctx context.Context) (u []entities.Payment, err err
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	payments := make([]entities.Payment, 0)
 
 	for rows.Next() {
-		var payment entities.Payment
+		payment := entities.Payment{}
 
 		err := rows.Scan(&payment.ID, &payment.OrderNumber, &payment.PaymentMethod, &payment.PaymentType, &payment.Amount)
 		if err != nil {
@@ -49,7 +50,6 @@ func (r *St) FindAllPayments(ctx context.Context) (u []entities.Payment, err err
 
 		payments = append(payments, payment)
 	}
-
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}

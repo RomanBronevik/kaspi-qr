@@ -10,6 +10,13 @@ import (
 func (h *Handler) QR(c *gin.Context) {
 	body := c.Request.Body
 
+	//var input entities.DeviceInputReg
+	//
+	//if err := c.BindJSON(&input); err != nil {
+	//	errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+	//	return
+	//}
+
 	output, err := kaspi.KaspiQR(body)
 
 	if err != nil {

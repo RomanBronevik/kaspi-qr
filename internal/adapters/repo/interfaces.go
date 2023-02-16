@@ -36,6 +36,12 @@ type Repo interface {
 	//UpdateOrder(ctx context.Context, order *entities.Order) error
 	DeleteOrder(ctx context.Context, orderNumber string) error
 
+	CreateCity(ctx context.Context, order *entities.CreateCityDTO) error
+	FindAllCities(ctx context.Context) (u []entities.City, err error)
+	FindOneCity(ctx context.Context, CityName string) (entities.City, error)
+	//UpdateCity(ctx context.Context, order *entities.City) error
+	DeleteCity(ctx context.Context, id string) error
+
 	//CreateRequestLog(ctx context.Context, order *entities.CreateOrderDTO) error
 	//FindAllRequestLogs(ctx context.Context) (u []entities.Order, err error)
 	//FindOneRequestLog(ctx context.Context, orderNumber int) (entities.Order, error)

@@ -20,6 +20,8 @@ func (h *Handler) tradePoints(c *gin.Context) {
 		return
 	}
 
+	req.Message = h.usc.SetMessageByStatusCode(req.StatusCode)
+
 	c.JSON(http.StatusOK, req)
 }
 
