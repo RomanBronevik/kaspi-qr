@@ -28,8 +28,8 @@ func (s *St) FindAllDevices(ctx *gin.Context) ([]entities.Device, error) {
 	return devices, err
 }
 
-func (s *St) FindOneDevice(ctx *gin.Context, obj *entities.Device) (entities.Device, error) {
-	device, err := s.cr.FindOneDevice(ctx, obj)
+func (s *St) FindOneDevice(ctx *gin.Context, OrganizationBin string) (entities.Device, error) {
+	device, err := s.cr.FindOneDevice(ctx, OrganizationBin)
 
 	return device, err
 }

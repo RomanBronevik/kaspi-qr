@@ -25,13 +25,13 @@ func (s *St) DeleteDevice(ctx *gin.Context, bin string, token string) error {
 //}
 
 func (s *St) FindAllDevices(ctx *gin.Context) ([]entities.Device, error) {
-	err, devices := s.repo.FindAllDevices(ctx)
+	devices, err := s.repo.FindAllDevices(ctx)
 
-	return err, devices
+	return devices, err
 }
 
-func (s *St) FindOneDevice(ctx *gin.Context, obj *entities.Device) (entities.Device, error) {
-	device, err := s.repo.FindOneDevice(ctx, obj.DeviceId)
+func (s *St) FindOneDevice(ctx *gin.Context, OrganizationBin string) (entities.Device, error) {
+	device, err := s.repo.FindOneDevice(ctx, OrganizationBin)
 
 	return device, err
 }

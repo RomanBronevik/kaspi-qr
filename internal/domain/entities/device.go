@@ -5,14 +5,12 @@ type Device struct {
 	DeviceId        string `json:"device_id"`
 	Token           string `json:"token"`
 	OrganizationBin string `json:"organization_bin"`
-	TradePointId    string `json:"trade_point_id"`
 }
 
 type CreateDeviceDTO struct {
 	Token           string `json:"token"`
 	DeviceId        string `json:"device_id"`
 	OrganizationBin string `json:"organization_id"`
-	TradePointId    string `json:"trade_point_id"`
 }
 
 type DeviceInputReg struct {

@@ -12,7 +12,7 @@ import (
 	"net/http"
 )
 
-func KaspiTradePoints(organizationBIN string) (entities.TradePointSt, error) {
+func GetAllTradePoints(organizationBIN string) (entities.TradePointSt, error) {
 
 	var bodyRequest entities.TradePointSt
 
@@ -50,7 +50,7 @@ func KaspiTradePoints(organizationBIN string) (entities.TradePointSt, error) {
 	return bodyRequest, nil
 }
 
-func KaspiDeviceRegistration(input entities.DeviceInputReg) (entities.DeviceOutputReg, error) {
+func DeviceRegistration(input entities.DeviceInputReg) (entities.DeviceOutputReg, error) {
 	var bodyRequest entities.DeviceOutputReg
 
 	client, err := configs.GetHttpClientTls()
@@ -96,7 +96,7 @@ func KaspiDeviceRegistration(input entities.DeviceInputReg) (entities.DeviceOutp
 	return bodyRequest, nil
 }
 
-func KaspiDeviceDelete(input entities.DeviceInputDel) (entities.DeviceOutputDel, error) {
+func DeviceDelete(input entities.DeviceInputDel) (entities.DeviceOutputDel, error) {
 	var bodyRequest entities.DeviceOutputDel
 
 	client, err := configs.GetHttpClientTls()

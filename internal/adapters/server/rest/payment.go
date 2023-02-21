@@ -3,21 +3,41 @@ package rest
 import (
 	"github.com/gin-gonic/gin"
 	"kaspi-qr/internal/adapters/provider/kaspi"
+	"kaspi-qr/internal/domain/entities"
 	"kaspi-qr/internal/domain/errs"
 	"net/http"
 )
 
 func (h *Handler) QR(c *gin.Context) {
-	body := c.Request.Body
 
-	//var input entities.DeviceInputReg
-	//
-	//if err := c.BindJSON(&input); err != nil {
-	//	errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
-	//	return
-	//}
+	var input entities.QrTokenRequestInput
 
-	output, err := kaspi.KaspiQR(body)
+	if err := c.BindJSON(&input); err != nil {
+		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	city, err := h.usc.FindOneCity(c, input.City)
+	if err != nil {
+		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	device, err := h.usc.FindOneDevice(c, city.OrganizationBin)
+
+	if err != nil {
+		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	qrToken := entities.QrTokenInput{
+		OrganizationBin: city.OrganizationBin,
+		DeviceToken:     device.Token,
+		Amount:          input.Amount,
+		ExternalId:      input.OrderNumber,
+	}
+
+	output, err := kaspi.CreateQrToken(qrToken)
 
 	if err != nil {
 		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -30,7 +50,7 @@ func (h *Handler) QR(c *gin.Context) {
 func (h *Handler) paymentLink(c *gin.Context) {
 	body := c.Request.Body
 
-	output, err := kaspi.KaspiPaymentLink(body)
+	output, err := kaspi.CreatePaymentLink(body)
 
 	if err != nil {
 		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())

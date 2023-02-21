@@ -2,6 +2,7 @@ package entities
 
 import (
 	"github.com/golang-sql/civil"
+	"time"
 )
 
 type Payment struct {
@@ -19,15 +20,28 @@ type CreatePaymentDTO struct {
 	Amount        float64 `json:"amount"`
 }
 
-type QRToken struct {
+type QrTokenInput struct {
+	OrganizationBin string  `json:"OrganizationBin"`
+	DeviceToken     string  `json:"DeviceToken"`
+	Amount          float64 `json:"Amount"`
+	ExternalId      string  `json:"ExternalId"`
+}
+
+type QrTokenOutput struct {
 	StatusCode int       `json:"StatusCode"`
 	Message    string    `json:"Message"`
 	Data       *QRStruct `json:"Data"`
 }
 
+type QrTokenRequestInput struct {
+	OrderNumber string  `json:"OrderNumber"`
+	Amount      float64 `json:"Amount"`
+	City        string  `json:"City"`
+}
+
 type QRStruct struct {
 	QRToken                  string                    `json:"QrToken"`
-	ExpireDate               civil.DateTime            `json:"ExpireDate"`
+	ExpireDate               time.Time                 `json:"ExpireDate"`
 	QrPaymentId              int                       `json:"QrPaymentId"`
 	PaymentMethods           []string                  `json:"PaymentMethods"`
 	QrPaymentBehaviorOptions *QrPaymentBehaviorOptions `json:"QrPaymentBehaviorOptions"`

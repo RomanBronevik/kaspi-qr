@@ -1,6 +1,7 @@
 package kaspi
 
 import (
+	bytes2 "bytes"
 	"encoding/json"
 	"github.com/spf13/viper"
 	"io"
@@ -10,8 +11,8 @@ import (
 	"net/http"
 )
 
-func KaspiQR(requestBody io.ReadCloser) (entities.QRToken, error) {
-	var bodyRequest entities.QRToken
+func CreateQrToken(input entities.QrTokenInput) (entities.QrTokenOutput, error) {
+	var bodyRequest entities.QrTokenOutput
 
 	client, err := configs.GetHttpClientTls()
 
@@ -19,10 +20,17 @@ func KaspiQR(requestBody io.ReadCloser) (entities.QRToken, error) {
 		log.Fatal(err.Error())
 	}
 
-	req, err := http.NewRequest("POST", viper.GetString("kaspiURL")+"qr/create", requestBody)
+	requestBody, err := json.Marshal(input)
+
 	if err != nil {
 		log.Fatal(err.Error())
-		return entities.QRToken{}, err
+		return entities.QrTokenOutput{}, err
+	}
+
+	req, err := http.NewRequest("POST", viper.GetString("kaspiURL")+"qr/create", bytes2.NewBuffer(requestBody))
+	if err != nil {
+		log.Fatal(err.Error())
+		return entities.QrTokenOutput{}, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
@@ -30,25 +38,25 @@ func KaspiQR(requestBody io.ReadCloser) (entities.QRToken, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err.Error())
-		return entities.QRToken{}, err
+		return entities.QrTokenOutput{}, err
 	}
 
 	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err.Error())
-		return entities.QRToken{}, err
+		return entities.QrTokenOutput{}, err
 	}
 
 	errJson := json.Unmarshal(bytes, &bodyRequest)
 	if errJson != nil {
 		log.Fatal(err.Error())
-		return entities.QRToken{}, err
+		return entities.QrTokenOutput{}, err
 	}
 
 	return bodyRequest, nil
 }
 
-func KaspiPaymentLink(requestBody io.ReadCloser) (entities.PaymentLink, error) {
+func CreatePaymentLink(requestBody io.ReadCloser) (entities.PaymentLink, error) {
 	var bodyRequest entities.PaymentLink
 
 	client, err := configs.GetHttpClientTls()

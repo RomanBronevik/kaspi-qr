@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"kaspi-qr/internal/adapters/provider/kaspi"
 	"kaspi-qr/internal/domain/entities"
@@ -13,7 +12,7 @@ func (h *Handler) tradePoints(c *gin.Context) {
 
 	organizationBIN := c.Param("organizationBIN")
 
-	req, err := kaspi.KaspiTradePoints(organizationBIN)
+	req, err := kaspi.GetAllTradePoints(organizationBIN)
 
 	if err != nil {
 		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -34,7 +33,7 @@ func (h *Handler) deviceRegistration(c *gin.Context) {
 		return
 	}
 
-	output, err := kaspi.KaspiDeviceRegistration(input)
+	output, err := kaspi.DeviceRegistration(input)
 
 	if err != nil {
 		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -45,16 +44,18 @@ func (h *Handler) deviceRegistration(c *gin.Context) {
 
 	c.JSON(http.StatusOK, output)
 
-	dtoSt := entities.CreateDeviceDTO{
-		Token:           output.Data.DeviceToken,
-		DeviceId:        input.DeviceId,
-		OrganizationBin: input.OrganizationBin,
-		TradePointId:    input.TradePointId,
-	}
+	if output.StatusCode == 0 {
+		dtoSt := entities.CreateDeviceDTO{
+			Token:           output.Data.DeviceToken,
+			DeviceId:        input.DeviceId,
+			OrganizationBin: input.OrganizationBin,
+		}
 
-	err = h.usc.CreateDevice(c, &dtoSt)
-	if err != nil {
-		fmt.Println(err.Error())
+		err = h.usc.CreateDevice(c, &dtoSt)
+		if err != nil {
+			errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
 	}
 }
 
@@ -66,7 +67,7 @@ func (h *Handler) deleteOrOffDevice(c *gin.Context) {
 		return
 	}
 
-	output, err := kaspi.KaspiDeviceDelete(input)
+	output, err := kaspi.DeviceDelete(input)
 
 	if err != nil {
 		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -77,8 +78,11 @@ func (h *Handler) deleteOrOffDevice(c *gin.Context) {
 
 	c.JSON(http.StatusOK, output)
 
-	err = h.usc.DeleteDevice(c, input.OrganizationBin, input.DeviceToken)
-	if err != nil {
-		fmt.Println(err.Error())
+	if output.StatusCode == 0 {
+		err = h.usc.DeleteDevice(c, input.OrganizationBin, input.DeviceToken)
+		if err != nil {
+			errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
 	}
 }

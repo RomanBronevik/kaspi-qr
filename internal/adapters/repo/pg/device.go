@@ -11,13 +11,13 @@ import (
 
 func (r *St) CreateDevice(ctx context.Context, device *entities.CreateDeviceDTO) error {
 	q := `
-		INSERT INTO device (device_id, token, organization_bin, trade_point_id) 
-		VALUES ($1, $2, $3, $4) 
+		INSERT INTO device (device_id, token, organization_bin) 
+		VALUES ($1, $2, $3) 
 		RETURNING id`
 
 	var id string
 
-	if err := r.client.QueryRow(ctx, q, device.DeviceId, device.Token, device.OrganizationBin, device.TradePointId).Scan(&id); err != nil {
+	if err := r.client.QueryRow(ctx, q, device.DeviceId, device.Token, device.OrganizationBin).Scan(&id); err != nil {
 		var pgErr *pgconn.PgError
 		if errors.Is(err, pgErr) {
 			pgErr = err.(*pgconn.PgError)
@@ -33,7 +33,7 @@ func (r *St) CreateDevice(ctx context.Context, device *entities.CreateDeviceDTO)
 
 func (r *St) FindAllDevices(ctx context.Context) (u []entities.Device, err error) {
 	q := `
-		SELECT id, device_id, token,  organization_bin, trade_point_id FROM device`
+		SELECT id, device_id, token,  organization_bin FROM device`
 	rows, err := r.client.Query(ctx, q)
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func (r *St) FindAllDevices(ctx context.Context) (u []entities.Device, err error
 	for rows.Next() {
 		var dev entities.Device
 
-		err := rows.Scan(&dev.ID, &dev.DeviceId, &dev.Token, &dev.OrganizationBin, &dev.TradePointId)
+		err := rows.Scan(&dev.ID, &dev.DeviceId, &dev.Token, &dev.OrganizationBin)
 		if err != nil {
 			return nil, err
 		}
@@ -59,14 +59,14 @@ func (r *St) FindAllDevices(ctx context.Context) (u []entities.Device, err error
 	return devices, nil
 }
 
-func (r *St) FindOneDevice(ctx context.Context, DeviceId string) (entities.Device, error) {
+func (r *St) FindOneDevice(ctx context.Context, OrganizationBin string) (entities.Device, error) {
 	q := `
-		SELECT id, device_id, token, organization_bin, trade_point_id FROM public.device WHERE device_id = &1`
+		SELECT id, device_id, token, organization_bin FROM public.device WHERE organization_bin = $1`
 
 	//Trace
 
 	var dev entities.Device
-	err := r.client.QueryRow(ctx, q, DeviceId).Scan(&dev.ID, &dev.DeviceId, &dev.Token, &dev.OrganizationBin, &dev.TradePointId)
+	err := r.client.QueryRow(ctx, q, OrganizationBin).Scan(&dev.ID, &dev.DeviceId, &dev.Token, &dev.OrganizationBin)
 	if err != nil {
 		return entities.Device{}, err
 	}
