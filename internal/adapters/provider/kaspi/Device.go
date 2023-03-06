@@ -3,7 +3,6 @@ package kaspi
 import (
 	bytes2 "bytes"
 	"encoding/json"
-	"fmt"
 	"github.com/spf13/viper"
 	"io"
 	"kaspi-qr/configs"
@@ -12,7 +11,7 @@ import (
 	"net/http"
 )
 
-func GetAllTradePoints(organizationBIN string) (entities.TradePointSt, error) {
+func (s *St) GetAllTradePoints(organizationBIN string) (entities.TradePointSt, error) {
 
 	var bodyRequest entities.TradePointSt
 
@@ -50,25 +49,23 @@ func GetAllTradePoints(organizationBIN string) (entities.TradePointSt, error) {
 	return bodyRequest, nil
 }
 
-func DeviceRegistration(input entities.DeviceInputReg) (entities.DeviceOutputReg, error) {
+func (s *St) DeviceRegistration(input entities.DeviceInputReg) (entities.DeviceOutputReg, error) {
 	var bodyRequest entities.DeviceOutputReg
 
 	client, err := configs.GetHttpClientTls()
 
 	if err != nil {
-		log.Fatal(err.Error())
+		return entities.DeviceOutputReg{}, err
 	}
 
 	requestBody, err := json.Marshal(input)
 
 	if err != nil {
-		log.Fatal(err.Error())
 		return entities.DeviceOutputReg{}, err
 	}
 
 	req, err := http.NewRequest("POST", viper.GetString("kaspiURL")+"device/register/", bytes2.NewBuffer(requestBody))
 	if err != nil {
-		log.Fatal(err.Error())
 		return entities.DeviceOutputReg{}, err
 	}
 
@@ -76,45 +73,39 @@ func DeviceRegistration(input entities.DeviceInputReg) (entities.DeviceOutputReg
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err.Error())
 		return entities.DeviceOutputReg{}, err
 	}
 
 	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err.Error())
 		return entities.DeviceOutputReg{}, err
 	}
 
 	errJson := json.Unmarshal(bytes, &bodyRequest)
 	if errJson != nil {
-		fmt.Println(errJson.Error())
-		log.Fatal(err.Error())
 		return entities.DeviceOutputReg{}, err
 	}
 
 	return bodyRequest, nil
 }
 
-func DeviceDelete(input entities.DeviceInputDel) (entities.DeviceOutputDel, error) {
+func (s *St) DeviceDelete(input entities.DeviceInputDel) (entities.DeviceOutputDel, error) {
 	var bodyRequest entities.DeviceOutputDel
 
 	client, err := configs.GetHttpClientTls()
 
 	if err != nil {
-		log.Fatal(err.Error())
+		return entities.DeviceOutputDel{}, err
 	}
 
 	requestBody, err := json.Marshal(input)
 
 	if err != nil {
-		log.Fatal(err.Error())
 		return entities.DeviceOutputDel{}, err
 	}
 
 	req, err := http.NewRequest("POST", viper.GetString("kaspiURL")+"device/delete", bytes2.NewBuffer(requestBody))
 	if err != nil {
-		log.Fatal(err.Error())
 		return entities.DeviceOutputDel{}, err
 	}
 
@@ -122,20 +113,16 @@ func DeviceDelete(input entities.DeviceInputDel) (entities.DeviceOutputDel, erro
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err.Error())
 		return entities.DeviceOutputDel{}, err
 	}
 
 	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err.Error())
 		return entities.DeviceOutputDel{}, err
 	}
 
-	errJson := json.Unmarshal(bytes, &bodyRequest)
-	if errJson != nil {
-		fmt.Println(errJson.Error())
-		log.Fatal(err.Error())
+	err = json.Unmarshal(bytes, &bodyRequest)
+	if err != nil {
 		return entities.DeviceOutputDel{}, err
 	}
 

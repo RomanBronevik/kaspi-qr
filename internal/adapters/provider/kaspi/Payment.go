@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-func CreateQrToken(input entities.QrTokenInput) (entities.QrTokenOutput, error) {
+func (s *St) CreateQrToken(input entities.KaspiPaymentInput) (entities.QrTokenOutput, error) {
 	var bodyRequest entities.QrTokenOutput
 
 	client, err := configs.GetHttpClientTls()
@@ -46,7 +46,6 @@ func CreateQrToken(input entities.QrTokenInput) (entities.QrTokenOutput, error) 
 		log.Fatal(err.Error())
 		return entities.QrTokenOutput{}, err
 	}
-
 	errJson := json.Unmarshal(bytes, &bodyRequest)
 	if errJson != nil {
 		log.Fatal(err.Error())
@@ -56,8 +55,8 @@ func CreateQrToken(input entities.QrTokenInput) (entities.QrTokenOutput, error) 
 	return bodyRequest, nil
 }
 
-func CreatePaymentLink(requestBody io.ReadCloser) (entities.PaymentLink, error) {
-	var bodyRequest entities.PaymentLink
+func (s *St) CreatePaymentLink(input entities.KaspiPaymentInput) (entities.PaymentLinkRequestOutput, error) {
+	var bodyRequest entities.PaymentLinkRequestOutput
 
 	client, err := configs.GetHttpClientTls()
 
@@ -65,36 +64,40 @@ func CreatePaymentLink(requestBody io.ReadCloser) (entities.PaymentLink, error) 
 		log.Fatal(err.Error())
 	}
 
-	req, err := http.NewRequest("POST", viper.GetString("kaspiURL")+"qr/create-link", requestBody)
+	requestBody, err := json.Marshal(input)
+
 	if err != nil {
 		log.Fatal(err.Error())
-		return entities.PaymentLink{}, err
+		return entities.PaymentLinkRequestOutput{}, err
+	}
+
+	req, err := http.NewRequest("POST", viper.GetString("kaspiURL")+"qr/create-link", bytes2.NewBuffer(requestBody))
+	if err != nil {
+		log.Fatal(err.Error())
+		return entities.PaymentLinkRequestOutput{}, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err.Error())
-		return entities.PaymentLink{}, err
+		return entities.PaymentLinkRequestOutput{}, err
 	}
 
 	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err.Error())
-		return entities.PaymentLink{}, err
+		return entities.PaymentLinkRequestOutput{}, err
 	}
 
 	errJson := json.Unmarshal(bytes, &bodyRequest)
 	if errJson != nil {
-		log.Fatal(err.Error())
-		return entities.PaymentLink{}, err
+		return entities.PaymentLinkRequestOutput{}, err
 	}
 
 	return bodyRequest, nil
 }
 
-func OperationStatus(QrPaymentId string) (entities.OperationStatus, error) {
+func (s *St) OperationStatus(QrPaymentId string) (entities.OperationStatus, error) {
 
 	var bodyRequest entities.OperationStatus
 

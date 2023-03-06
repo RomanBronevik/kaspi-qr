@@ -1,26 +1,36 @@
 package entities
 
 import (
-	"github.com/golang-sql/civil"
 	"time"
 )
 
 type Payment struct {
-	ID            string  `json:"id"`
-	OrderNumber   string  `json:"order_number"`
-	PaymentMethod string  `json:"payment_method"`
-	PaymentType   string  `json:"payment_type"`
-	Amount        float64 `json:"amount"`
+	Created                    time.Time `json:"created"`
+	Modified                   time.Time `json:"modified"`
+	Status                     string    `json:"status"`
+	OrderNumber                string    `json:"order_number"`
+	PaymentId                  string    `json:"payment_id"`
+	PaymentMethod              string    `json:"payment_method"`
+	WaitTimeout                time.Time `json:"wait_timeout"`
+	PollingInterval            int       `json:"polling_interval"`
+	PaymentConfirmationTimeout int       `json:"payment_confirmation_timeout"`
+	Amount                     float64   `json:"amount"`
 }
 
 type CreatePaymentDTO struct {
-	OrderNumber   string  `json:"order_number"`
-	PaymentMethod string  `json:"payment_method"`
-	PaymentType   string  `json:"payment_type"`
-	Amount        float64 `json:"amount"`
+	Created                    time.Time `json:"created"`
+	Modified                   time.Time `json:"modified"`
+	Status                     string    `json:"status"`
+	OrderNumber                string    `json:"order_number"`
+	PaymentId                  string    `json:"payment_id"`
+	PaymentMethod              string    `json:"payment_method"`
+	WaitTimeout                time.Time `json:"wait_timeout"`
+	PollingInterval            int       `json:"polling_interval"`
+	PaymentConfirmationTimeout int       `json:"payment_confirmation_timeout"`
+	Amount                     float64   `json:"amount"`
 }
 
-type QrTokenInput struct {
+type KaspiPaymentInput struct {
 	OrganizationBin string  `json:"OrganizationBin"`
 	DeviceToken     string  `json:"DeviceToken"`
 	Amount          float64 `json:"Amount"`
@@ -36,7 +46,7 @@ type QrTokenOutput struct {
 type QrTokenRequestInput struct {
 	OrderNumber string  `json:"OrderNumber"`
 	Amount      float64 `json:"Amount"`
-	City        string  `json:"City"`
+	Code        string  `json:"CityCode"`
 }
 
 type QRStruct struct {
@@ -53,7 +63,20 @@ type QrPaymentBehaviorOptions struct {
 	PaymentConfirmationTimeout int `json:"PaymentConfirmationTimeout"`
 }
 
-type PaymentLink struct {
+type PaymentLinkRequestKaspiInput struct {
+	OrganizationBin string  `json:"OrganizationBin"`
+	DeviceToken     string  `json:"DeviceToken"`
+	Amount          float64 `json:"Amount"`
+	ExternalId      string  `json:"ExternalId"`
+}
+
+type PaymentLinkRequestInput struct {
+	OrderNumber string  `json:"OrderNumber"`
+	Amount      float64 `json:"Amount"`
+	Code        string  `json:"Code"`
+}
+
+type PaymentLinkRequestOutput struct {
 	StatusCode int            `json:"StatusCode"`
 	Message    string         `json:"Message"`
 	Data       *PaymentLinkSt `json:"Data"`
@@ -61,7 +84,7 @@ type PaymentLink struct {
 
 type PaymentLinkSt struct {
 	PaymentLink            string                  `json:"PaymentLink"`
-	ExpireDate             civil.DateTime          `json:"ExpireDate"`
+	ExpireDate             time.Time               `json:"ExpireDate"`
 	PaymentId              int                     `json:"PaymentId"`
 	PaymentMethods         []string                `json:"PaymentMethods"`
 	PaymentBehaviorOptions *PaymentBehaviorOptions `json:"PaymentBehaviorOptions"`

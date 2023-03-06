@@ -33,3 +33,9 @@ func (s *St) FindOneDevice(ctx *gin.Context, OrganizationBin string) (entities.D
 
 	return device, err
 }
+
+func (s *St) CreateDeviceRecord(ctx *gin.Context, input entities.DeviceInputReg, output entities.DeviceOutputReg) error {
+	err := s.cr.CreateDeviceRecord(ctx, input, output)
+
+	return err
+}

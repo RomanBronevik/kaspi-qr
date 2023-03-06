@@ -5,6 +5,7 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/spf13/viper"
+	"kaspi-qr/internal/adapters/provider/kaspi"
 	"kaspi-qr/internal/adapters/repo/pg"
 	"kaspi-qr/internal/adapters/server"
 	"kaspi-qr/internal/adapters/server/rest"
@@ -15,10 +16,11 @@ import (
 
 func main() {
 	app := struct {
-		repo *pg.St
-		core *core.St
-		ucs  *usecases.St
-		srv  *server.St
+		repo  *pg.St
+		core  *core.St
+		ucs   *usecases.St
+		srv   *server.St
+		kaspi *kaspi.St
 	}{}
 
 	if err := initConfig(); err != nil {
@@ -40,10 +42,12 @@ func main() {
 	app.ucs = usecases.New(app.repo)
 	app.srv = srv
 
-	app.core = core.New(app.repo)
+	app.kaspi = kaspi.New()
+
+	app.core = core.New(app.repo, app.kaspi)
 	app.ucs.SetCore(app.core)
 
-	handlers := rest.NewHandler(app.ucs)
+	handlers := rest.NewHandler(app.ucs, app.kaspi)
 
 	srv.Run(viper.GetString("port"), handlers.InitRoutes())
 }

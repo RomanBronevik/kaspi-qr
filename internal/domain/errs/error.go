@@ -1,5 +1,5 @@
 package errs
 
-type errorSt struct {
-	Message string `json:"message"`
+type ErrorSt struct {
+	Message string `json:"Error"`
 }

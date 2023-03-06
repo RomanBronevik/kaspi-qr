@@ -28,8 +28,20 @@ func (s *St) FindAllPayments(ctx *gin.Context) ([]entities.Payment, error) {
 	return payments, err
 }
 
-func (s *St) FindOnePayment(ctx *gin.Context, obj *entities.Payment) (entities.Payment, error) {
-	payment, err := s.cr.FindOnePayment(ctx, obj)
+func (s *St) FindOnePaymentByOrderNumber(ctx *gin.Context, orderNumber string) (entities.Payment, error) {
+	payment, err := s.cr.FindOnePaymentByOrderNumber(ctx, orderNumber)
 
 	return payment, err
+}
+
+func (s *St) FindOnePayment(ctx *gin.Context, paymentId string) (entities.Payment, error) {
+	payment, err := s.cr.FindOnePaymentByPaymentId(ctx, paymentId)
+
+	return payment, err
+}
+
+func (s *St) CheckPaymentStatus(ctx *gin.Context) error {
+	err := s.cr.CheckPaymentStatus(ctx)
+
+	return err
 }

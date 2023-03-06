@@ -3,27 +3,17 @@ package pg
 import (
 	"context"
 	"errors"
-	"fmt"
-	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v4"
 	"kaspi-qr/internal/domain/entities"
 )
 
 func (r *St) CreateOrganization(ctx context.Context, organization *entities.CreateOrganizationDTO) error {
 	q := `
 		INSERT INTO organization (name, bin) 
-		VALUES ($1, $2) 
-		RETURNING id`
+		VALUES ($1, $2)`
 
-	var id string
-
-	if err := r.client.QueryRow(ctx, q, organization.Name, organization.Bin).Scan(&id); err != nil {
-		var pgErr *pgconn.PgError
-		if errors.Is(err, pgErr) {
-			newErr := fmt.Errorf(fmt.Sprintf("SQL Error: %s, Detail: %s, Where: %s", pgErr.Message, pgErr.Detail, pgErr.Where))
-			fmt.Println(newErr)
-			return newErr
-		}
-		return err
+	if _, err := r.client.Exec(ctx, q, organization.Name, organization.Bin); err != nil {
+		return r.ErorrHandler(err)
 	}
 
 	return nil
@@ -31,18 +21,19 @@ func (r *St) CreateOrganization(ctx context.Context, organization *entities.Crea
 
 func (r *St) FindAllOrganizations(ctx context.Context) (u []entities.Organization, err error) {
 	q := `
-		SELECT ID, NAME, BIN FROM public.organization`
+		SELECT NAME, BIN FROM public.organization`
 	rows, err := r.client.Query(ctx, q)
-	if err != nil {
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, err
 	}
+	defer rows.Close()
 
 	organizations := make([]entities.Organization, 0)
 
 	for rows.Next() {
 		var org entities.Organization
 
-		err := rows.Scan(&org.ID, &org.Name, &org.Bin)
+		err := rows.Scan(&org.Name, &org.Bin)
 		if err != nil {
 			return nil, err
 		}
@@ -59,13 +50,13 @@ func (r *St) FindAllOrganizations(ctx context.Context) (u []entities.Organizatio
 
 func (r *St) FindOneOrganization(ctx context.Context, bin string) (entities.Organization, error) {
 	q := `
-		SELECT ID, NAME, BIN FROM public.organization WHERE BIN = &1`
+		SELECT NAME, BIN FROM public.organization WHERE BIN = &1`
 
 	//Trace
 
 	var org entities.Organization
-	err := r.client.QueryRow(ctx, q, bin).Scan(&org.ID, &org.Name, &org.Bin)
-	if err != nil {
+	err := r.client.QueryRow(ctx, q, bin).Scan(&org.Name, &org.Bin)
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return entities.Organization{}, err
 	}
 
@@ -83,17 +74,8 @@ func (r *St) DeleteOrganization(ctx context.Context, bin string) error {
 		DELETE FROM organization
 		WHERE bin = $1;`
 
-	var id string
-
-	if err := r.client.QueryRow(ctx, q, bin).Scan(&id); err != nil {
-		var pgErr *pgconn.PgError
-		if errors.Is(err, pgErr) {
-			pgErr = err.(*pgconn.PgError)
-			newErr := fmt.Errorf(fmt.Sprintf("SQL Error: %s, Detail: %s, Where: %s", pgErr.Message, pgErr.Detail, pgErr.Where))
-			fmt.Println(newErr)
-			return newErr
-		}
-		return err
+	if _, err := r.client.Exec(ctx, q, bin); err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return r.ErorrHandler(err)
 	}
 
 	return nil

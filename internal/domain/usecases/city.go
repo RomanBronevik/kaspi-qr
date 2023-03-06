@@ -30,8 +30,26 @@ func (s *St) FindAllCities(ctx *gin.Context) ([]entities.City, error) {
 	return cities, err
 }
 
-func (s *St) FindOneCity(ctx *gin.Context, CityName string) (entities.City, error) {
-	city, err := s.cr.FindOneCity(ctx, CityName)
+func (s *St) FindOneCityByCityCode(ctx *gin.Context, code string) (entities.City, error) {
+	city, err := s.cr.FindOneCityByCityCode(ctx, code)
 
 	return city, err
+}
+
+func (s *St) DeleteCities(ctx *gin.Context) error {
+	err := s.cr.DeleteCities(ctx)
+
+	return err
+}
+
+func (s *St) UpdateCities(ctx *gin.Context, output entities.CityUpdateReqOutput) error {
+	err := s.cr.UpdateCities(ctx, output)
+
+	return err
+}
+
+func (s *St) IsEmptyCity(city entities.City) bool {
+	exist := s.cr.IsEmptyCity(city)
+
+	return exist
 }

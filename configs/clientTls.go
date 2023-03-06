@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"golang.org/x/crypto/pkcs12"
-	"log"
 	"net/http"
 	"os"
 )
@@ -15,13 +14,12 @@ func GetHttpClientTls() (*http.Client, error) {
 	pfxData, err := os.ReadFile(pfxFile)
 
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
 	blocks, err := pkcs12.ToPEM(pfxData, os.Getenv("CERTIFICATE_PASSWORD"))
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	var pemData []byte
 	for _, b := range blocks {

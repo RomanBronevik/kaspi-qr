@@ -3,8 +3,7 @@ package pg
 import (
 	"context"
 	"errors"
-	"fmt"
-	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v4"
 	_ "kaspi-qr/internal/adapters/repo"
 	"kaspi-qr/internal/domain/entities"
 )
@@ -12,20 +11,10 @@ import (
 func (r *St) CreateDevice(ctx context.Context, device *entities.CreateDeviceDTO) error {
 	q := `
 		INSERT INTO device (device_id, token, organization_bin) 
-		VALUES ($1, $2, $3) 
-		RETURNING id`
+		VALUES ($1, $2, $3)`
 
-	var id string
-
-	if err := r.client.QueryRow(ctx, q, device.DeviceId, device.Token, device.OrganizationBin).Scan(&id); err != nil {
-		var pgErr *pgconn.PgError
-		if errors.Is(err, pgErr) {
-			pgErr = err.(*pgconn.PgError)
-			newErr := fmt.Errorf(fmt.Sprintf("SQL Error: %s, Detail: %s, Where: %s", pgErr.Message, pgErr.Detail, pgErr.Where))
-			fmt.Println(newErr)
-			return newErr
-		}
-		return err
+	if _, err := r.client.Exec(ctx, q, device.DeviceId, device.Token, device.OrganizationBin); err != nil {
+		return r.ErorrHandler(err)
 	}
 
 	return nil
@@ -33,18 +22,19 @@ func (r *St) CreateDevice(ctx context.Context, device *entities.CreateDeviceDTO)
 
 func (r *St) FindAllDevices(ctx context.Context) (u []entities.Device, err error) {
 	q := `
-		SELECT id, device_id, token,  organization_bin FROM device`
+		SELECT device_id, token,  organization_bin FROM device`
 	rows, err := r.client.Query(ctx, q)
-	if err != nil {
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, err
 	}
+	defer rows.Close()
 
 	devices := make([]entities.Device, 0)
 
 	for rows.Next() {
 		var dev entities.Device
 
-		err := rows.Scan(&dev.ID, &dev.DeviceId, &dev.Token, &dev.OrganizationBin)
+		err := rows.Scan(&dev.DeviceId, &dev.Token, &dev.OrganizationBin)
 		if err != nil {
 			return nil, err
 		}
@@ -61,13 +51,13 @@ func (r *St) FindAllDevices(ctx context.Context) (u []entities.Device, err error
 
 func (r *St) FindOneDevice(ctx context.Context, OrganizationBin string) (entities.Device, error) {
 	q := `
-		SELECT id, device_id, token, organization_bin FROM public.device WHERE organization_bin = $1`
+		SELECT device_id, token, organization_bin FROM device WHERE organization_bin = $1`
 
 	//Trace
 
 	var dev entities.Device
-	err := r.client.QueryRow(ctx, q, OrganizationBin).Scan(&dev.ID, &dev.DeviceId, &dev.Token, &dev.OrganizationBin)
-	if err != nil {
+	err := r.client.QueryRow(ctx, q, OrganizationBin).Scan(&dev.DeviceId, &dev.Token, &dev.OrganizationBin)
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return entities.Device{}, err
 	}
 
@@ -75,26 +65,13 @@ func (r *St) FindOneDevice(ctx context.Context, OrganizationBin string) (entitie
 
 }
 
-// func (r *St) UpdateDevice(ctx context.Context, token string) error {
-//
-//		panic("implement me")
-//	}
 func (r *St) DeleteDevice(ctx context.Context, bin string, token string) error {
 	q := `
 		DELETE FROM device
 		WHERE organization_bin = $1 AND token = $2;`
 
-	var id string
-
-	if err := r.client.QueryRow(ctx, q, bin, token).Scan(&id); err != nil {
-		var pgErr *pgconn.PgError
-		if errors.Is(err, pgErr) {
-			pgErr = err.(*pgconn.PgError)
-			newErr := fmt.Errorf(fmt.Sprintf("SQL Error: %s, Detail: %s, Where: %s", pgErr.Message, pgErr.Detail, pgErr.Where))
-			fmt.Println(newErr)
-			return newErr
-		}
-		return err
+	if _, err := r.client.Exec(ctx, q, bin, token); err != nil {
+		return r.ErorrHandler(err)
 	}
 
 	return nil

@@ -14,12 +14,12 @@ type CreateTradePointDTO struct {
 }
 
 type TradePointSt struct {
-	StatusCode int           `json:"StatusCode"`
-	Message    string        `json:"Message"`
-	Data       []*tradePoint `json:"Data"`
+	StatusCode int                  `json:"StatusCode"`
+	Message    string               `json:"Message"`
+	Data       []*KaspiTradePointSt `json:"Data"`
 }
 
-type tradePoint struct {
+type KaspiTradePointSt struct {
 	TradePointId   int    `json:"TradePointId"`
 	TradePointName string `json:"TradePointName"`
 }

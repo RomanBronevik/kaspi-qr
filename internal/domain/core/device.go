@@ -17,6 +17,46 @@ func (s *St) DeleteDevice(ctx *gin.Context, bin string, token string) error {
 	return err
 }
 
+func (s *St) DeviceAlredyExist(ctx *gin.Context, token string) (bool, error) {
+	device, err := s.repo.FindOneDevice(ctx, token)
+	if err != nil {
+		return false, err
+	}
+
+	empty := entities.Device{}
+
+	if device == empty {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func (s *St) CreateDeviceRecord(ctx *gin.Context, input entities.DeviceInputReg, output entities.DeviceOutputReg) error {
+	exits, err := s.DeviceAlredyExist(ctx, output.Data.DeviceToken)
+
+	if err != nil {
+		return err
+	}
+
+	if exits {
+		return nil
+	}
+
+	dtoSt := entities.CreateDeviceDTO{
+		Token:           output.Data.DeviceToken,
+		DeviceId:        input.DeviceId,
+		OrganizationBin: input.OrganizationBin,
+	}
+
+	err = s.CreateDevice(ctx, &dtoSt)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 //
 //func (s *St) UpdateDevice(ctx *gin.Context, obj *entities.Device) error {
 //	err := s.repo.UpdateDevice(ctx, obj.Token)

@@ -8,3 +8,7 @@ db:
   dbname: "postgres"
   sslmode: "disable"
   maxAttempts: 5
+
+cityWebPage: "https://www.mechta.kz/api/v2/header/cities"
+
+testBin: "160640004075"

@@ -2,7 +2,6 @@ package rest
 
 import (
 	"github.com/gin-gonic/gin"
-	"kaspi-qr/internal/adapters/provider/kaspi"
 	"kaspi-qr/internal/domain/entities"
 	"kaspi-qr/internal/domain/errs"
 	"net/http"
@@ -12,7 +11,7 @@ func (h *Handler) tradePoints(c *gin.Context) {
 
 	organizationBIN := c.Param("organizationBIN")
 
-	req, err := kaspi.GetAllTradePoints(organizationBIN)
+	req, err := h.kaspi.GetAllTradePoints(organizationBIN)
 
 	if err != nil {
 		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -33,7 +32,7 @@ func (h *Handler) deviceRegistration(c *gin.Context) {
 		return
 	}
 
-	output, err := kaspi.DeviceRegistration(input)
+	output, err := h.kaspi.DeviceRegistration(input)
 
 	if err != nil {
 		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -45,13 +44,7 @@ func (h *Handler) deviceRegistration(c *gin.Context) {
 	c.JSON(http.StatusOK, output)
 
 	if output.StatusCode == 0 {
-		dtoSt := entities.CreateDeviceDTO{
-			Token:           output.Data.DeviceToken,
-			DeviceId:        input.DeviceId,
-			OrganizationBin: input.OrganizationBin,
-		}
-
-		err = h.usc.CreateDevice(c, &dtoSt)
+		err = h.usc.CreateDeviceRecord(c, input, output)
 		if err != nil {
 			errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 			return
@@ -67,7 +60,7 @@ func (h *Handler) deleteOrOffDevice(c *gin.Context) {
 		return
 	}
 
-	output, err := kaspi.DeviceDelete(input)
+	output, err := h.kaspi.DeviceDelete(input)
 
 	if err != nil {
 		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())

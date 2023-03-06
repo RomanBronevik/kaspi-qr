@@ -21,3 +21,10 @@ const (
 	PartialRefundNotAvailableStatus       = -99000020
 	ServiceNotAvailableStatus             = -999
 )
+
+const (
+	//QrTokenCreatedStatus = "QrTokenCreated"
+	WaitStatus      = "Wait"
+	ProcessedStatus = "Processed"
+	ErrorStatus     = "Error"
+)

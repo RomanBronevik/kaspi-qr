@@ -17,29 +17,20 @@ func (s *St) Run(port string, handler http.Handler) *St {
 	s.httpServer = &http.Server{
 		Addr:           ":" + port,
 		Handler:        handler,
-		MaxHeaderBytes: cns.MaxHeaderBytes, // 1 MB
+		MaxHeaderBytes: cns.MaxHeaderBytes,
 		ReadTimeout:    cns.ReadTimeout,
 		WriteTimeout:   cns.WriteTimeout,
 	}
 
-	s.httpServer.ListenAndServe()
+	err := s.httpServer.ListenAndServe()
 
-	return s // Запускает бесконечный цикл и слушает все входящие запросы
+	if err != nil {
+		return nil
+	}
+
+	return s
 }
 
 func (s *St) ShutDown(ctx context.Context) error {
 	return s.httpServer.Shutdown(ctx)
 }
-
-//func NewHttpServer(port string, handler http.Handler) *http.Server {
-//	httpServer := &http.Server{
-//		Addr:           ":" + port,
-//		Handler:        handler,
-//		MaxHeaderBytes: cns.MaxHeaderBytes, // 1 MB
-//		ReadTimeout:    cns.ReadTimeout,
-//		WriteTimeout:   cns.WriteTimeout,
-//	}
-//	return httpServer
-//}
-
-//

@@ -1,7 +1,6 @@
 package entities
 
 type Device struct {
-	ID              string `json:"id"`
 	DeviceId        string `json:"device_id"`
 	Token           string `json:"token"`
 	OrganizationBin string `json:"organization_bin"`
@@ -20,9 +19,9 @@ type DeviceInputReg struct {
 }
 
 type DeviceOutputReg struct {
-	Data       DeviceToken `json:"Data"`
-	Message    string      `json:"Message"`
-	StatusCode int         `json:"StatusCode"`
+	Data       *DeviceToken `json:"Data"`
+	Message    string       `json:"Message"`
+	StatusCode int          `json:"StatusCode"`
 }
 
 type DeviceToken struct {

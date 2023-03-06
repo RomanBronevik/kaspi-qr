@@ -2,7 +2,7 @@ package rest
 
 import (
 	"github.com/gin-gonic/gin"
-	"kaspi-qr/internal/adapters/provider/kaspi"
+	"kaspi-qr/internal/domain/entities"
 	"kaspi-qr/internal/domain/errs"
 	"net/http"
 )
@@ -10,7 +10,7 @@ import (
 func (h *Handler) details(c *gin.Context) {
 	body := c.Request.Body
 
-	output, err := kaspi.KaspiOperationDetails(body)
+	output, err := h.kaspi.KaspiOperationDetails(body)
 
 	if err != nil {
 		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -21,9 +21,14 @@ func (h *Handler) details(c *gin.Context) {
 }
 
 func (h *Handler) selfReturn(c *gin.Context) {
-	body := c.Request.Body
+	var input entities.ReturnRequestInput
 
-	output, err := kaspi.KaspiReturnWithoutClient(body)
+	if err := c.BindJSON(&input); err != nil {
+		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	output, err := h.kaspi.KaspiReturnWithoutClient(input)
 
 	if err != nil {
 		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -31,4 +36,12 @@ func (h *Handler) selfReturn(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, output)
+
+	if output.StatusCode == 0 {
+		err = h.usc.ReturnOrder(c, input.QrPaymentId)
+		if err != nil {
+			errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+			return
+		}
+	}
 }

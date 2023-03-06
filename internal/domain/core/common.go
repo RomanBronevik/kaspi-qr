@@ -1,7 +1,11 @@
 package core
 
 import (
+	"github.com/gin-gonic/gin"
 	"kaspi-qr/internal/adapters/provider/kaspi"
+	"kaspi-qr/internal/cns"
+	"kaspi-qr/internal/domain/entities"
+	"time"
 )
 
 func getKaspiStatusCodeDescription() map[int]string {
@@ -32,4 +36,69 @@ func (s *St) SetMessageByStatusCode(statusCode int) string {
 	statusMessageMap := getKaspiStatusCodeDescription()
 
 	return statusMessageMap[statusCode]
+}
+
+func (s *St) LinkCreateOrderRecords(c *gin.Context, input entities.KaspiPaymentInput, output entities.PaymentLinkRequestOutput) error {
+	currentTime := time.Now().Local()
+
+	err := s.createOrderRecord(c, input)
+
+	if err != nil {
+		return err
+	}
+
+	//err = s.createOrderStatusRecord(c, currentTime, input.ExternalId)
+
+	if err != nil {
+		return err
+	}
+
+	err = s.LinkCreatePaymentRecord(c, currentTime, input, output)
+
+	if err != nil {
+		return err
+	}
+
+	//strPaymentId := strconv.Itoa(output.Data.PaymentId)
+	//err = s.createPaymentStatusRecord(c, currentTime, strPaymentId, kaspi.PaymentCreatedStatus)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *St) QrCreateOrderRecords(c *gin.Context, input entities.KaspiPaymentInput, output entities.QrTokenOutput) error {
+	currentTime := time.Now().Local()
+
+	exist, err := s.orderAlreadyExist(c, input.ExternalId)
+
+	if err != nil {
+		return err
+	}
+
+	if !exist {
+		err = s.createOrderRecord(c, input)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	err = s.QrCreatePaymentRecord(c, currentTime, input, output)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func findCh(lenRes int) int {
+	res := lenRes / cns.UnInteger
+	if lenRes%cns.UnInteger > 0 {
+		res++
+	}
+	return res
 }

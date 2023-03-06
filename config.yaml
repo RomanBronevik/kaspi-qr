@@ -1,0 +1,11 @@
+db:
+    dbname: postgres
+    host: localhost
+    maxattempts: 5
+    port: "5436"
+    username: postgres
+dbname: postgres
+kaspiurl: https://mtokentest.kaspi.kz:8545/r3/v01/
+maxattempts: 5
+port: "8000"
+testbin: "160640004075"
