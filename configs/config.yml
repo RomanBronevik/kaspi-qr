@@ -1,3 +1,14 @@
 port: "8000"
-certificate: "./configs/certfile.pfx"
-cerPassword: "asd123456"
+kaspiUrl: "https://mtokentest.kaspi.kz:8545/r3/v01/"
+
+db:
+  host: "localhost"
+  port: "5436"
+  username: "postgres"
+  dbname: "postgres"
+  sslmode: "disable"
+  maxAttempts: 5
+
+cityWebPage: "https://www.mechta.kz/api/v2/header/cities"
+
+testBin: "160640004075"

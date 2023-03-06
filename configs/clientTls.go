@@ -1,28 +1,25 @@
-package handler
+package configs
 
 import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
-	"github.com/spf13/viper"
 	"golang.org/x/crypto/pkcs12"
-	"io/ioutil"
-	"log"
 	"net/http"
+	"os"
 )
 
-func getHttpClientTsl() (*http.Client, error) {
-	pfxFile := viper.GetString("certificate")
-	pfxData, err := ioutil.ReadFile(pfxFile)
+func GetHttpClientTls() (*http.Client, error) {
+	pfxFile := os.Getenv("CERTIFICATE_PATH")
+	pfxData, err := os.ReadFile(pfxFile)
 
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
-	blocks, err := pkcs12.ToPEM(pfxData, viper.GetString("cerPassword")) // Change according to your setup
+	blocks, err := pkcs12.ToPEM(pfxData, os.Getenv("CERTIFICATE_PASSWORD"))
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	var pemData []byte
 	for _, b := range blocks {
