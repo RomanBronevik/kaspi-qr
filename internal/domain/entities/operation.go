@@ -18,3 +18,8 @@ type OperationDetailsSt struct {
 	AvailableReturnAmount float64        `json:"AvailableReturnAmount"`
 	TransactionDate       civil.DateTime `json:"TransactionDate"`
 }
+
+type OperationDetailsInput struct {
+	QrPaymentId     int    `json:"QrPaymentId"`
+	OrganizationBin string `json:"OrganizationBin"`
+}

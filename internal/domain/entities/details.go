@@ -16,3 +16,9 @@ type ReturnRequestInput struct {
 	QrPaymentId     int     `json:"QrPaymentId"`
 	Amount          float64 `json:"Amount"`
 }
+
+type ReturnInput struct {
+	OrganizationBin string  `json:"OrganizationBin"`
+	QrPaymentId     int     `json:"QrPaymentId"`
+	Amount          float64 `json:"Amount"`
+}

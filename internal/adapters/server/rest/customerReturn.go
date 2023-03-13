@@ -8,9 +8,26 @@ import (
 )
 
 func (h *Handler) details(c *gin.Context) {
-	body := c.Request.Body
+	var inputRest entities.OperationDetailsInput
 
-	output, err := h.kaspi.KaspiOperationDetails(body)
+	if err := c.BindJSON(&inputRest); err != nil {
+		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	device, err := h.usc.FindOneDevice(c, inputRest.OrganizationBin)
+
+	if err != nil {
+		errs.NewErrorResponse(c, http.StatusBadRequest, "Device not exist")
+		return
+	}
+
+	input := entities.OperationGetSt{
+		QrPaymentId: inputRest.QrPaymentId,
+		DeviceToken: device.Token,
+	}
+
+	output, err := h.kaspi.KaspiOperationDetails(input)
 
 	if err != nil {
 		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -21,11 +38,25 @@ func (h *Handler) details(c *gin.Context) {
 }
 
 func (h *Handler) selfReturn(c *gin.Context) {
-	var input entities.ReturnRequestInput
+	var inputRest entities.ReturnInput
 
-	if err := c.BindJSON(&input); err != nil {
+	if err := c.BindJSON(&inputRest); err != nil {
 		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
+	}
+
+	device, err := h.usc.FindOneDevice(c, inputRest.OrganizationBin)
+
+	if err != nil {
+		errs.NewErrorResponse(c, http.StatusBadRequest, "Device not exist")
+		return
+	}
+
+	input := entities.ReturnRequestInput{
+		DeviceToken:     device.Token,
+		OrganizationBin: inputRest.OrganizationBin,
+		QrPaymentId:     inputRest.QrPaymentId,
+		Amount:          inputRest.Amount,
 	}
 
 	output, err := h.kaspi.KaspiReturnWithoutClient(input)
