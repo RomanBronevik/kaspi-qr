@@ -3,7 +3,7 @@ package entities
 type ReturnSt struct {
 	StatusCode            int                    `json:"StatusCode"`
 	Message               string                 `json:"Message"`
-	ReturnOperationDataSt *ReturnOperationDataSt `json:"ReturnOperationDataSt"`
+	ReturnOperationDataSt *ReturnOperationDataSt `json:"Data"`
 }
 
 type ReturnOperationDataSt struct {
