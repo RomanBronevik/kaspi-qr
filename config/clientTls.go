@@ -1,12 +1,13 @@
-package configs
+package config
 
 import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
-	"golang.org/x/crypto/pkcs12"
 	"net/http"
 	"os"
+
+	"golang.org/x/crypto/pkcs12"
 )
 
 func GetHttpClientTls() (*http.Client, error) {

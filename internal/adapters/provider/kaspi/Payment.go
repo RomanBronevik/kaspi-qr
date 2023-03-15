@@ -3,12 +3,14 @@ package kaspi
 import (
 	bytes2 "bytes"
 	"encoding/json"
-	"github.com/spf13/viper"
 	"io"
-	"kaspi-qr/configs"
-	"kaspi-qr/internal/domain/entities"
 	"log"
 	"net/http"
+
+	"kaspi-qr/config"
+	"kaspi-qr/internal/domain/entities"
+
+	"github.com/spf13/viper"
 )
 
 func (s *St) CreateQrToken(input entities.KaspiPaymentInput) (entities.QrTokenOutput, error) {

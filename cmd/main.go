@@ -2,16 +2,19 @@ package main
 
 import (
 	"context"
-	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
-	"github.com/spf13/viper"
+	"log"
+
+	"kaspi-qr/config"
 	"kaspi-qr/internal/adapters/provider/kaspi"
 	"kaspi-qr/internal/adapters/repo/pg"
 	"kaspi-qr/internal/adapters/server"
 	"kaspi-qr/internal/adapters/server/rest"
 	"kaspi-qr/internal/domain/core"
 	"kaspi-qr/internal/domain/usecases"
-	"log"
+
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
+	"github.com/spf13/viper"
 )
 
 func main() {
@@ -22,6 +25,8 @@ func main() {
 		srv   *server.St
 		kaspi *kaspi.St
 	}{}
+
+	conf := config.Load()
 
 	if err := initConfig(); err != nil {
 		log.Fatalf("error initializing configs: %s", err.Error())
@@ -50,10 +55,4 @@ func main() {
 	handlers := rest.NewHandler(app.ucs, app.kaspi)
 
 	srv.Run(viper.GetString("port"), handlers.InitRoutes())
-}
-
-func initConfig() error {
-	viper.AddConfigPath("configs")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig() // считывает значение конфиги и записывает их во внутренний объект вайпера и возвращает ошибку
 }
