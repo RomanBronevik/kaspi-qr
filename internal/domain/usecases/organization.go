@@ -1,12 +1,13 @@
 package usecases
 
 import (
-	"github.com/gin-gonic/gin"
 	"kaspi-qr/internal/domain/entities"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (s *St) CreateOrganization(ctx *gin.Context, obj *entities.CreateOrganizationDTO) error {
-	err := s.cr.CreateOrganization(ctx, obj)
+func (u *St) CreateOrganization(ctx *gin.Context, obj *entities.CreateOrganizationDTO) error {
+	err := u.cr.CreateOrganization(ctx, obj)
 
 	return err
 }
@@ -16,20 +17,20 @@ func (s *St) CreateOrganization(ctx *gin.Context, obj *entities.CreateOrganizati
 //
 //		return err
 //	}
-func (s *St) DeleteOrganization(ctx *gin.Context, bin string) error {
-	err := s.cr.DeleteOrganization(ctx, bin)
+func (u *St) DeleteOrganization(ctx *gin.Context, bin string) error {
+	err := u.cr.DeleteOrganization(ctx, bin)
 
 	return err
 }
 
-func (s *St) FindAllOrganizations(ctx *gin.Context) ([]entities.Organization, error) {
-	organizations, err := s.cr.FindAllOrganizations(ctx)
+func (u *St) FindAllOrganizations(ctx *gin.Context) ([]entities.Organization, error) {
+	organizations, err := u.cr.FindAllOrganizations(ctx)
 
 	return organizations, err
 }
 
-func (s *St) FindOneOrganization(ctx *gin.Context, obj *entities.Organization) (entities.Organization, error) {
-	organization, err := s.cr.FindOneOrganization(ctx, obj)
+func (u *St) FindOneOrganization(ctx *gin.Context, obj *entities.Organization) (entities.Organization, error) {
+	organization, err := u.cr.FindOneOrganization(ctx, obj)
 
 	return organization, err
 }

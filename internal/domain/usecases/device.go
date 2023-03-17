@@ -1,12 +1,13 @@
 package usecases
 
 import (
-	"github.com/gin-gonic/gin"
 	"kaspi-qr/internal/domain/entities"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (s *St) CreateDevice(ctx *gin.Context, obj *entities.CreateDeviceDTO) error {
-	err := s.cr.CreateDevice(ctx, obj)
+func (u *St) CreateDevice(ctx *gin.Context, obj *entities.CreateDeviceDTO) error {
+	err := u.cr.CreateDevice(ctx, obj)
 
 	return err
 }
@@ -16,26 +17,26 @@ func (s *St) CreateDevice(ctx *gin.Context, obj *entities.CreateDeviceDTO) error
 //
 //		return err
 //	}
-func (s *St) DeleteDevice(ctx *gin.Context, bin string, token string) error {
-	err := s.cr.DeleteDevice(ctx, bin, token)
+func (u *St) DeleteDevice(ctx *gin.Context, bin string, token string) error {
+	err := u.cr.DeleteDevice(ctx, bin, token)
 
 	return err
 }
 
-func (s *St) FindAllDevices(ctx *gin.Context) ([]entities.Device, error) {
-	devices, err := s.cr.FindAllDevices(ctx)
+func (u *St) FindAllDevices(ctx *gin.Context) ([]entities.Device, error) {
+	devices, err := u.cr.FindAllDevices(ctx)
 
 	return devices, err
 }
 
-func (s *St) FindOneDevice(ctx *gin.Context, OrganizationBin string) (entities.Device, error) {
-	device, err := s.cr.FindOneDevice(ctx, OrganizationBin)
+func (u *St) FindOneDevice(ctx *gin.Context, OrganizationBin string) (entities.Device, error) {
+	device, err := u.cr.FindOneDevice(ctx, OrganizationBin)
 
 	return device, err
 }
 
-func (s *St) CreateDeviceRecord(ctx *gin.Context, input entities.DeviceInputReg, output entities.DeviceOutputReg) error {
-	err := s.cr.CreateDeviceRecord(ctx, input, output)
+func (u *St) CreateDeviceRecord(ctx *gin.Context, input entities.DeviceInputReg, output entities.DeviceOutputReg) error {
+	err := u.cr.CreateDeviceRecord(ctx, input, output)
 
 	return err
 }

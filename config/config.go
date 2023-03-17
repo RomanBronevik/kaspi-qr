@@ -11,7 +11,7 @@ type confSt struct {
 	HttpCors    bool   `mapstructure:"HTTP_CORS"`
 	PgDsn       string `mapstructure:"PG_DSN"`
 	KaspiApiUrl string `mapstructure:"KASPI_API_URL"`
-	SiteApiUrl  string `mapstructure:"SITE_API_URL"`
+	StgApiUrl   string `mapstructure:"STG_API_URL"`
 }
 
 func Load() *confSt {
@@ -21,7 +21,7 @@ func Load() *confSt {
 	viper.SetDefault("LOG_LEVEL", "info")
 	viper.SetDefault("HTTP_LISTEN", ":80")
 	viper.SetDefault("KASPI_API_URL", "https://mtokentest.kaspi.kz:8545/r3/v01")
-	viper.SetDefault("SITE_API_URL", "https://www.mechta.kz/api/v2")
+	viper.SetDefault("STG_API_URL", "https://api.mechta.market/stg")
 
 	viper.SetConfigFile("conf.yml")
 	_ = viper.ReadInConfig()

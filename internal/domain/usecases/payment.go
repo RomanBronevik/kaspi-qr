@@ -1,12 +1,13 @@
 package usecases
 
 import (
-	"github.com/gin-gonic/gin"
 	"kaspi-qr/internal/domain/entities"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (s *St) CreatePayment(ctx *gin.Context, obj *entities.CreatePaymentDTO) error {
-	err := s.cr.CreatePayment(ctx, obj)
+func (u *St) CreatePayment(ctx *gin.Context, obj *entities.CreatePaymentDTO) error {
+	err := u.cr.CreatePayment(ctx, obj)
 
 	return err
 }
@@ -16,32 +17,32 @@ func (s *St) CreatePayment(ctx *gin.Context, obj *entities.CreatePaymentDTO) err
 //
 //		return err
 //	}
-func (s *St) DeletePayment(ctx *gin.Context, orderNumber string) error {
-	err := s.cr.DeletePayment(ctx, orderNumber)
+func (u *St) DeletePayment(ctx *gin.Context, orderNumber string) error {
+	err := u.cr.DeletePayment(ctx, orderNumber)
 
 	return err
 }
 
-func (s *St) FindAllPayments(ctx *gin.Context) ([]entities.Payment, error) {
-	payments, err := s.cr.FindAllPayments(ctx)
+func (u *St) FindAllPayments(ctx *gin.Context) ([]entities.Payment, error) {
+	payments, err := u.cr.FindAllPayments(ctx)
 
 	return payments, err
 }
 
-func (s *St) FindOnePaymentByOrderNumber(ctx *gin.Context, orderNumber string) (entities.Payment, error) {
-	payment, err := s.cr.FindOnePaymentByOrderNumber(ctx, orderNumber)
+func (u *St) FindOnePaymentByOrderNumber(ctx *gin.Context, orderNumber string) (entities.Payment, error) {
+	payment, err := u.cr.FindOnePaymentByOrderNumber(ctx, orderNumber)
 
 	return payment, err
 }
 
-func (s *St) FindOnePayment(ctx *gin.Context, paymentId string) (entities.Payment, error) {
-	payment, err := s.cr.FindOnePaymentByPaymentId(ctx, paymentId)
+func (u *St) FindOnePayment(ctx *gin.Context, paymentId string) (entities.Payment, error) {
+	payment, err := u.cr.FindOnePaymentByPaymentId(ctx, paymentId)
 
 	return payment, err
 }
 
-func (s *St) CheckPaymentStatus(ctx *gin.Context) error {
-	err := s.cr.CheckPaymentStatus(ctx)
+func (u *St) CheckPaymentStatus(ctx *gin.Context) error {
+	err := u.cr.CheckPaymentStatus(ctx)
 
 	return err
 }

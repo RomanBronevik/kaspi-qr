@@ -50,16 +50,6 @@ func New(lg logger.WarnAndError, opts OptionsSt) (*St, error) {
 	}, nil
 }
 
-func (d *St) getCon(ctx context.Context) db.Connection {
-	// if context has transaction, then use it
-	if txW := d.getContextTransaction(ctx); txW != nil {
-		return txW
-	}
-
-	// else use base connection
-	return d
-}
-
 // transaction
 
 func (d *St) RenewTransaction(ctx context.Context) (context.Context, error) {
@@ -93,8 +83,8 @@ func (d *St) TransactionFn(ctx context.Context, f func(context.Context) error) e
 	return d.commitContextTransaction(ctx)
 }
 
-func (d *St) getContextTransaction(ctx context.Context) *TransactionWrapper {
-	return ctx.Value(transactionCtxKey).(*TransactionWrapper)
+func (d *St) getContextTransaction(ctx context.Context) pgx.Tx {
+	return ctx.Value(transactionCtxKey).(pgx.Tx)
 }
 
 func (d *St) contextWithTransaction(ctx context.Context) (context.Context, error) {
@@ -103,7 +93,7 @@ func (d *St) contextWithTransaction(ctx context.Context) (context.Context, error
 		return ctx, d.HErr(err)
 	}
 
-	return context.WithValue(ctx, transactionCtxKey, &TransactionWrapper{tx: tx}), nil
+	return context.WithValue(ctx, transactionCtxKey, tx), nil
 }
 
 func (d *St) commitContextTransaction(ctx context.Context) error {
@@ -112,11 +102,11 @@ func (d *St) commitContextTransaction(ctx context.Context) error {
 		return nil
 	}
 
-	err := tx.tx.Commit(ctx)
+	err := tx.Commit(ctx)
 	if err != nil {
 		if err != pgx.ErrTxClosed &&
 			err != pgx.ErrTxCommitRollback {
-			_ = tx.tx.Rollback(ctx)
+			_ = tx.Rollback(ctx)
 
 			return d.HErr(err)
 		}
@@ -131,23 +121,37 @@ func (d *St) rollbackContextTransaction(ctx context.Context) {
 		return
 	}
 
-	_ = tx.tx.Rollback(ctx)
+	_ = tx.Rollback(ctx)
 }
 
 // query
 
 func (d *St) Exec(ctx context.Context, sql string, args ...any) error {
-	err := d.getCon(ctx).Exec(ctx, sql, args...)
+	if tx := d.getContextTransaction(ctx); tx != nil {
+		_, err := tx.Exec(ctx, sql, args...)
+		return d.HErr(err)
+	}
+
+	_, err := d.Con.Exec(ctx, sql, args...)
 	return d.HErr(err)
 }
 
 func (d *St) Query(ctx context.Context, sql string, args ...any) (db.Rows, error) {
-	rows, err := d.getCon(ctx).Query(ctx, sql, args...)
-	return rowsSt{Rows: rows, db: d}, d.HErr(err)
+	if tx := d.getContextTransaction(ctx); tx != nil {
+		rows, err := tx.Query(ctx, sql, args...)
+		return rows, d.HErr(err)
+	}
+
+	rows, err := d.Con.Query(ctx, sql, args...)
+	return rows, d.HErr(err)
 }
 
 func (d *St) QueryRow(ctx context.Context, sql string, args ...any) db.Row {
-	return rowSt{Row: d.getCon(ctx).QueryRow(ctx, sql, args...), db: d}
+	if tx := d.getContextTransaction(ctx); tx != nil {
+		return tx.QueryRow(ctx, sql, args...)
+	}
+
+	return d.Con.QueryRow(ctx, sql, args...)
 }
 
 func (d *St) HErr(err error) error {
@@ -155,7 +159,7 @@ func (d *St) HErr(err error) error {
 	case err == nil:
 		return nil
 	case errors.Is(err, pgx.ErrNoRows), errors.Is(err, sql.ErrNoRows):
-		err = dopErrs.NoRows
+		err = db.ErrNoRows
 	default:
 		d.lg.Errorw(ErrPrefix, err)
 	}

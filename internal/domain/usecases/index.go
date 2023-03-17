@@ -1,21 +1,21 @@
 package usecases
 
 import (
-	"kaspi-qr/internal/adapters/repo/pg"
+	"kaspi-qr/internal/adapters/db"
+	"kaspi-qr/internal/adapters/logger"
 	"kaspi-qr/internal/domain/core"
 )
 
 type St struct {
-	db *pg.St
+	lg logger.Lite
+	db db.Transaction
 	cr *core.St
 }
 
-func New(db *pg.St) *St {
+func New(lg logger.Lite, db db.Transaction, cr *core.St) *St {
 	return &St{
+		lg: lg,
 		db: db,
+		cr: cr,
 	}
-}
-
-func (u *St) SetCore(core *core.St) {
-	u.cr = core
 }

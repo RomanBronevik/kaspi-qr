@@ -9,8 +9,10 @@ require (
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/joho/godotenv v1.4.0
 	github.com/lib/pq v1.10.7
+	github.com/rs/cors/wrapper/gin v0.0.0-20230301160956-5c2b877d2a03
 	github.com/spf13/viper v1.15.0
 	github.com/stretchr/testify v1.8.1
+	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.5.0
 )
 
@@ -39,12 +41,15 @@ require (
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.6 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/rs/cors v1.8.3 // indirect
 	github.com/spf13/afero v1.9.3 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/ugorji/go/codec v1.2.8 // indirect
+	go.uber.org/atomic v1.9.0 // indirect
+	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/net v0.5.0 // indirect
 	golang.org/x/sys v0.4.0 // indirect
 	golang.org/x/text v0.6.0 // indirect

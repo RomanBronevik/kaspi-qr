@@ -1,10 +1,12 @@
-package rest
+package h_gin
 
 import (
-	"github.com/gin-gonic/gin"
+	"net/http"
+
 	"kaspi-qr/internal/domain/entities"
 	"kaspi-qr/internal/domain/errs"
-	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func (h *Handler) details(c *gin.Context) {

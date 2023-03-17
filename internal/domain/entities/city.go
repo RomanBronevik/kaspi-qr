@@ -14,7 +14,7 @@ type City struct {
 
 type CityUpdateReqOutput struct {
 	Result bool `json:"result"`
-	//Errors *Errors     `json:"errors"`
+	// Errors *Errors     `json:"errors"`
 	Data *Cities `json:"data"`
 }
 

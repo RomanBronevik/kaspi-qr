@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+
 	"kaspi-qr/internal/domain/entities"
 )
 

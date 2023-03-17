@@ -1,6 +1,8 @@
 package core
 
 import (
+	"sync"
+
 	"kaspi-qr/internal/adapters/provider/kaspi"
 	"kaspi-qr/internal/adapters/repo"
 	"kaspi-qr/internal/adapters/repo/pg"
@@ -9,6 +11,8 @@ import (
 type St struct {
 	repo  repo.Repo
 	kaspi *kaspi.St
+
+	wg sync.WaitGroup
 }
 
 func New(repo *pg.St, kaspi *kaspi.St) *St {
@@ -16,4 +20,8 @@ func New(repo *pg.St, kaspi *kaspi.St) *St {
 		repo:  repo,
 		kaspi: kaspi,
 	}
+}
+
+func (s *St) WaitJobs() {
+	s.wg.Wait()
 }

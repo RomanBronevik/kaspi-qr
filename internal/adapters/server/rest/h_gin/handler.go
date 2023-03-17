@@ -1,28 +1,39 @@
-package rest
+package h_gin
 
 import (
-	"github.com/gin-gonic/gin"
-	"kaspi-qr/internal/adapters/provider/kaspi"
+	"kaspi-qr/internal/adapters/logger"
 	"kaspi-qr/internal/domain/usecases"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Handler struct {
-	usc   *usecases.St
-	kaspi *kaspi.St
-	//server *pg.Service
+	lg  logger.Lite
+	usc *usecases.St
 }
 
-func NewHandler(usc *usecases.St, kaspi *kaspi.St) *Handler {
+func NewHandler(lg logger.Lite, usc *usecases.St) *Handler {
 	return &Handler{
-		usc:   usc,
-		kaspi: kaspi,
+		lg:  lg,
+		usc: usc,
 	}
 }
 
-func (h *Handler) InitRoutes() *gin.Engine {
+func (h *Handler) InitRoutes(withCors bool) *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
+
 	router := gin.New()
 
-	api := router.Group("/return") //operation details and return payment without client
+	// middlewares
+
+	router.Use(MwRecovery(h.lg, nil))
+	if withCors {
+		router.Use(MwCors())
+	}
+
+	// handlers
+
+	api := router.Group("/return") // operation details and return payment without client
 	{
 		api.GET("/details", h.details)
 		api.POST("/selfreturn", h.selfReturn)

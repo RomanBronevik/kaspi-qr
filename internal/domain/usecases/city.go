@@ -1,55 +1,56 @@
 package usecases
 
 import (
-	"github.com/gin-gonic/gin"
 	"kaspi-qr/internal/domain/entities"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (s *St) CreateCity(ctx *gin.Context, obj *entities.CreateCityDTO) error {
-	err := s.cr.CreateCity(ctx, obj)
+func (u *St) CreateCity(ctx *gin.Context, obj *entities.CreateCityDTO) error {
+	err := u.cr.CreateCity(ctx, obj)
 
 	return err
 }
 
-func (s *St) DeleteCity(ctx *gin.Context, id string) error {
-	err := s.cr.DeleteCity(ctx, id)
+func (u *St) DeleteCity(ctx *gin.Context, id string) error {
+	err := u.cr.DeleteCity(ctx, id)
 
 	return err
 }
 
 //
-//func (s *St) UpdateDevice(ctx *gin.Context, obj *entities.Device) error {
+// func (s *St) UpdateDevice(ctx *gin.Context, obj *entities.Device) error {
 //	err := s.cr.UpdateDevice(ctx, obj.Token)
 //
 //	return err
-//}
+// }
 
-func (s *St) FindAllCities(ctx *gin.Context) ([]entities.City, error) {
-	cities, err := s.cr.FindAllCities(ctx)
+func (u *St) FindAllCities(ctx *gin.Context) ([]entities.City, error) {
+	cities, err := u.cr.FindAllCities(ctx)
 
 	return cities, err
 }
 
-func (s *St) FindOneCityByCityCode(ctx *gin.Context, code string) (entities.City, error) {
-	city, err := s.cr.FindOneCityByCityCode(ctx, code)
+func (u *St) FindOneCityByCityCode(ctx *gin.Context, code string) (entities.City, error) {
+	city, err := u.cr.FindOneCityByCityCode(ctx, code)
 
 	return city, err
 }
 
-func (s *St) DeleteCities(ctx *gin.Context) error {
-	err := s.cr.DeleteCities(ctx)
+func (u *St) DeleteCities(ctx *gin.Context) error {
+	err := u.cr.DeleteCities(ctx)
 
 	return err
 }
 
-func (s *St) UpdateCities(ctx *gin.Context, output entities.CityUpdateReqOutput) error {
-	err := s.cr.UpdateCities(ctx, output)
+func (u *St) UpdateCities(ctx *gin.Context, output entities.CityUpdateReqOutput) error {
+	err := u.cr.UpdateCities(ctx, output)
 
 	return err
 }
 
-func (s *St) IsEmptyCity(city entities.City) bool {
-	exist := s.cr.IsEmptyCity(city)
+func (u *St) IsEmptyCity(city entities.City) bool {
+	exist := u.cr.IsEmptyCity(city)
 
 	return exist
 }

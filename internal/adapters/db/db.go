@@ -4,6 +4,20 @@ import (
 	"context"
 )
 
+// Errors
+
+type Err string
+
+func (e Err) Error() string {
+	return string(e)
+}
+
+const (
+	ErrNoRows = Err("no_rows")
+)
+
+// Interfaces
+
 type DB interface {
 	Connection
 	Transaction
