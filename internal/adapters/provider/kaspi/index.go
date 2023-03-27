@@ -5,11 +5,13 @@ import (
 )
 
 type St struct {
-	lg logger.Full
+	lg       logger.Full
+	kaspiUrl string
 }
 
-func New(lg logger.Full) *St {
+func New(lg logger.Full, kaspiUrl string) *St {
 	return &St{
-		lg: lg,
+		lg:       lg,
+		kaspiUrl: kaspiUrl,
 	}
 }

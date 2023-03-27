@@ -48,7 +48,7 @@ func main() {
 	}
 
 	// kaspi
-	app.kaspi = kaspi.New(app.lg)
+	app.kaspi = kaspi.New(app.lg, conf.KaspiApiUrl)
 
 	// repo
 	app.repo = repoPg.New(app.lg, app.db)

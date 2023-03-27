@@ -9,14 +9,12 @@ import (
 
 	"kaspi-qr/config"
 	"kaspi-qr/internal/domain/entities"
-
-	"github.com/spf13/viper"
 )
 
 func (s *St) CreateQrToken(input entities.KaspiPaymentInput) (entities.QrTokenOutput, error) {
 	var bodyRequest entities.QrTokenOutput
 
-	client, err := configs.GetHttpClientTls()
+	client, err := config.GetHttpClientTls()
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -29,7 +27,7 @@ func (s *St) CreateQrToken(input entities.KaspiPaymentInput) (entities.QrTokenOu
 		return entities.QrTokenOutput{}, err
 	}
 
-	req, err := http.NewRequest("POST", viper.GetString("kaspiURL")+"qr/create", bytes2.NewBuffer(requestBody))
+	req, err := http.NewRequest("POST", s.kaspiUrl+"qr/create", bytes2.NewBuffer(requestBody))
 	if err != nil {
 		log.Fatal(err.Error())
 		return entities.QrTokenOutput{}, err
@@ -60,7 +58,7 @@ func (s *St) CreateQrToken(input entities.KaspiPaymentInput) (entities.QrTokenOu
 func (s *St) CreatePaymentLink(input entities.KaspiPaymentInput) (entities.PaymentLinkRequestOutput, error) {
 	var bodyRequest entities.PaymentLinkRequestOutput
 
-	client, err := configs.GetHttpClientTls()
+	client, err := config.GetHttpClientTls()
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -73,7 +71,7 @@ func (s *St) CreatePaymentLink(input entities.KaspiPaymentInput) (entities.Payme
 		return entities.PaymentLinkRequestOutput{}, err
 	}
 
-	req, err := http.NewRequest("POST", viper.GetString("kaspiURL")+"qr/create-link", bytes2.NewBuffer(requestBody))
+	req, err := http.NewRequest("POST", s.kaspiUrl+"qr/create-link", bytes2.NewBuffer(requestBody))
 	if err != nil {
 		log.Fatal(err.Error())
 		return entities.PaymentLinkRequestOutput{}, err
@@ -103,14 +101,14 @@ func (s *St) OperationStatus(QrPaymentId string) (entities.OperationStatus, erro
 
 	var bodyRequest entities.OperationStatus
 
-	client, err := configs.GetHttpClientTls()
+	client, err := config.GetHttpClientTls()
 
 	if err != nil {
 		log.Fatal(err.Error())
 		return entities.OperationStatus{}, err
 	}
 
-	req, err := http.NewRequest("GET", viper.GetString("kaspiURL")+"payment/status/"+QrPaymentId, nil)
+	req, err := http.NewRequest("GET", s.kaspiUrl+"payment/status/"+QrPaymentId, nil)
 	if err != nil {
 		log.Fatal(err.Error())
 		return entities.OperationStatus{}, err

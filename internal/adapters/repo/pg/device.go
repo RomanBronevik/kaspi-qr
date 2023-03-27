@@ -13,7 +13,7 @@ func (r *St) CreateDevice(ctx context.Context, device *entities.CreateDeviceDTO)
 		INSERT INTO device (device_id, token, organization_bin) 
 		VALUES ($1, $2, $3)`
 
-	if _, err := r.client.Exec(ctx, q, device.DeviceId, device.Token, device.OrganizationBin); err != nil {
+	if err := r.db.Exec(ctx, q, device.DeviceId, device.Token, device.OrganizationBin); err != nil {
 		return r.ErorrHandler(err)
 	}
 
@@ -23,7 +23,7 @@ func (r *St) CreateDevice(ctx context.Context, device *entities.CreateDeviceDTO)
 func (r *St) FindAllDevices(ctx context.Context) (u []entities.Device, err error) {
 	q := `
 		SELECT device_id, token,  organization_bin FROM device`
-	rows, err := r.client.Query(ctx, q)
+	rows, err := r.db.Query(ctx, q)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (r *St) FindOneDevice(ctx context.Context, OrganizationBin string) (entitie
 	//Trace
 
 	var dev entities.Device
-	err := r.client.QueryRow(ctx, q, OrganizationBin).Scan(&dev.DeviceId, &dev.Token, &dev.OrganizationBin)
+	err := r.db.QueryRow(ctx, q, OrganizationBin).Scan(&dev.DeviceId, &dev.Token, &dev.OrganizationBin)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return entities.Device{}, err
 	}
@@ -70,7 +70,7 @@ func (r *St) DeleteDevice(ctx context.Context, bin string, token string) error {
 		DELETE FROM device
 		WHERE organization_bin = $1 AND token = $2;`
 
-	if _, err := r.client.Exec(ctx, q, bin, token); err != nil {
+	if err := r.db.Exec(ctx, q, bin, token); err != nil {
 		return r.ErorrHandler(err)
 	}
 

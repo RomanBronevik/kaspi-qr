@@ -10,20 +10,18 @@ import (
 
 	"kaspi-qr/config"
 	"kaspi-qr/internal/domain/entities"
-
-	"github.com/spf13/viper"
 )
 
 func (s *St) KaspiOperationDetails(input entities.OperationGetSt) (entities.OperationDetails, error) {
 	var bodyRequest entities.OperationDetails
 
-	client, err := configs.GetHttpClientTls()
+	client, err := config.GetHttpClientTls()
 
 	if err != nil {
 		return entities.OperationDetails{}, err
 	}
 
-	req, err := http.NewRequest("GET", viper.GetString("kaspiURL")+"payment/details?QrPaymentId="+fmt.Sprint(input.QrPaymentId)+"&DeviceToken="+input.DeviceToken, nil)
+	req, err := http.NewRequest("GET", s.kaspiUrl+"payment/details?QrPaymentId="+fmt.Sprint(input.QrPaymentId)+"&DeviceToken="+input.DeviceToken, nil)
 	if err != nil {
 		return entities.OperationDetails{}, err
 	}
@@ -51,7 +49,7 @@ func (s *St) KaspiOperationDetails(input entities.OperationGetSt) (entities.Oper
 func (s *St) KaspiReturnWithoutClient(input entities.ReturnRequestInput) (entities.ReturnSt, error) {
 	var bodyRequest entities.ReturnSt
 
-	client, err := configs.GetHttpClientTls()
+	client, err := config.GetHttpClientTls()
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -63,7 +61,7 @@ func (s *St) KaspiReturnWithoutClient(input entities.ReturnRequestInput) (entiti
 		return entities.ReturnSt{}, err
 	}
 
-	req, err := http.NewRequest("POST", viper.GetString("kaspiURL")+"payment/return", bytes2.NewBuffer(requestBody))
+	req, err := http.NewRequest("POST", s.kaspiUrl+"payment/return", bytes2.NewBuffer(requestBody))
 	if err != nil {
 		return entities.ReturnSt{}, err
 	}

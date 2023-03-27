@@ -13,10 +13,10 @@ func (h *Handler) tradePoints(c *gin.Context) {
 
 	organizationBIN := c.Param("organizationBIN")
 
-	req, err := h.kaspi.GetAllTradePoints(organizationBIN)
+	req, err := h.usc.GetAllTradePoints(organizationBIN)
 
 	if err != nil {
-		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadStatusCode, err.Error())
 		return
 	}
 
@@ -30,14 +30,14 @@ func (h *Handler) deviceRegistration(c *gin.Context) {
 	var input entities.DeviceInputReg
 
 	if err := c.BindJSON(&input); err != nil {
-		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadJson, err.Error())
 		return
 	}
 
-	output, err := h.kaspi.DeviceRegistration(input)
+	output, err := h.usc.DeviceRegistration(input)
 
 	if err != nil {
-		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadStatusCode, err.Error())
 		return
 	}
 
@@ -48,7 +48,7 @@ func (h *Handler) deviceRegistration(c *gin.Context) {
 	if output.StatusCode == 0 {
 		err = h.usc.CreateDeviceRecord(c, input, output)
 		if err != nil {
-			errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+			errs.NewErrorResponse(c, http.StatusBadRequest, errs.NotImplemented, err.Error())
 			return
 		}
 	}
@@ -58,14 +58,14 @@ func (h *Handler) deleteOrOffDevice(c *gin.Context) {
 	var input entities.DeviceInputDel
 
 	if err := c.BindJSON(&input); err != nil {
-		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadJson, err.Error())
 		return
 	}
 
-	output, err := h.kaspi.DeviceDelete(input)
+	output, err := h.usc.DeleteOrOffDevice(input)
 
 	if err != nil {
-		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadStatusCode, err.Error())
 		return
 	}
 
@@ -76,7 +76,7 @@ func (h *Handler) deleteOrOffDevice(c *gin.Context) {
 	if output.StatusCode == 0 {
 		err = h.usc.DeleteDevice(c, input.OrganizationBin, input.DeviceToken)
 		if err != nil {
-			errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+			errs.NewErrorResponse(c, http.StatusBadRequest, errs.NotImplemented, err.Error())
 			return
 		}
 	}

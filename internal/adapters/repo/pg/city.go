@@ -13,7 +13,7 @@ func (r *St) CreateCity(ctx context.Context, city *entities.CreateCityDTO) error
 		INSERT INTO city (name, organization_bin, code) 
 		VALUES ($1, $2, $3)`
 
-	if _, err := r.client.Exec(ctx, q, city.Name, city.OrganizationBin, city.Code); err != nil {
+	if err := r.db.Exec(ctx, q, city.Name, city.OrganizationBin, city.Code); err != nil {
 		return r.ErorrHandler(err)
 	}
 
@@ -23,7 +23,7 @@ func (r *St) CreateCity(ctx context.Context, city *entities.CreateCityDTO) error
 func (r *St) FindAllCities(ctx context.Context) (u []entities.City, err error) {
 	q := `
 		SELECT code, name,  organization_bin FROM city`
-	rows, err := r.client.Query(ctx, q)
+	rows, err := r.db.Query(ctx, q)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (r *St) FindOneCityByCityCode(ctx context.Context, code string) (entities.C
 
 	//Trace
 	var city entities.City
-	err := r.client.QueryRow(ctx, q, code).Scan(&city.Code, &city.Name, &city.OrganizationBin)
+	err := r.db.QueryRow(ctx, q, code).Scan(&city.Code, &city.Name, &city.OrganizationBin)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return entities.City{}, err
 	}
@@ -68,7 +68,7 @@ func (r *St) DeleteCity(ctx context.Context, id string) error {
 		DELETE FROM city
 		WHERE id = $1;`
 
-	if _, err := r.client.Exec(ctx, q, id); err != nil {
+	if err := r.db.Exec(ctx, q, id); err != nil {
 		return r.ErorrHandler(err)
 	}
 
@@ -79,7 +79,7 @@ func (r *St) DeleteCities(ctx context.Context) error {
 	q := `
 		TRUNCATE TABLE city;`
 
-	if _, err := r.client.Exec(ctx, q); err != nil {
+	if err := r.db.Exec(ctx, q); err != nil {
 		return r.ErorrHandler(err)
 	}
 

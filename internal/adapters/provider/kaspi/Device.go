@@ -9,22 +9,20 @@ import (
 
 	"kaspi-qr/config"
 	"kaspi-qr/internal/domain/entities"
-
-	"github.com/spf13/viper"
 )
 
 func (s *St) GetAllTradePoints(organizationBIN string) (entities.TradePointSt, error) {
 
 	var bodyRequest entities.TradePointSt
 
-	client, err := configs.GetHttpClientTls()
+	client, err := config.GetHttpClientTls()
 
 	if err != nil {
 		log.Fatal(err.Error())
 		return entities.TradePointSt{}, err
 	}
 
-	req, err := http.NewRequest("GET", viper.GetString("kaspiURL")+"partner/tradepoints/"+organizationBIN, nil)
+	req, err := http.NewRequest("GET", s.kaspiUrl+"partner/tradepoints/"+organizationBIN, nil)
 	if err != nil {
 		log.Fatal(err.Error())
 		return entities.TradePointSt{}, err
@@ -54,7 +52,7 @@ func (s *St) GetAllTradePoints(organizationBIN string) (entities.TradePointSt, e
 func (s *St) DeviceRegistration(input entities.DeviceInputReg) (entities.DeviceOutputReg, error) {
 	var bodyRequest entities.DeviceOutputReg
 
-	client, err := configs.GetHttpClientTls()
+	client, err := config.GetHttpClientTls()
 
 	if err != nil {
 		return entities.DeviceOutputReg{}, err
@@ -66,7 +64,7 @@ func (s *St) DeviceRegistration(input entities.DeviceInputReg) (entities.DeviceO
 		return entities.DeviceOutputReg{}, err
 	}
 
-	req, err := http.NewRequest("POST", viper.GetString("kaspiURL")+"device/register/", bytes2.NewBuffer(requestBody))
+	req, err := http.NewRequest("POST", s.kaspiUrl+"device/register/", bytes2.NewBuffer(requestBody))
 	if err != nil {
 		return entities.DeviceOutputReg{}, err
 	}
@@ -94,7 +92,7 @@ func (s *St) DeviceRegistration(input entities.DeviceInputReg) (entities.DeviceO
 func (s *St) DeviceDelete(input entities.DeviceInputDel) (entities.DeviceOutputDel, error) {
 	var bodyRequest entities.DeviceOutputDel
 
-	client, err := configs.GetHttpClientTls()
+	client, err := config.GetHttpClientTls()
 
 	if err != nil {
 		return entities.DeviceOutputDel{}, err
@@ -106,7 +104,7 @@ func (s *St) DeviceDelete(input entities.DeviceInputDel) (entities.DeviceOutputD
 		return entities.DeviceOutputDel{}, err
 	}
 
-	req, err := http.NewRequest("POST", viper.GetString("kaspiURL")+"device/delete", bytes2.NewBuffer(requestBody))
+	req, err := http.NewRequest("POST", s.kaspiUrl+"device/delete", bytes2.NewBuffer(requestBody))
 	if err != nil {
 		return entities.DeviceOutputDel{}, err
 	}

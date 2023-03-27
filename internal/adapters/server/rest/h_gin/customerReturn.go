@@ -13,14 +13,14 @@ func (h *Handler) details(c *gin.Context) {
 	var inputRest entities.OperationDetailsInput
 
 	if err := c.BindJSON(&inputRest); err != nil {
-		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadJson, err.Error())
 		return
 	}
 
 	device, err := h.usc.FindOneDevice(c, inputRest.OrganizationBin)
 
 	if err != nil {
-		errs.NewErrorResponse(c, http.StatusBadRequest, "Device not exist")
+		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadStatusCode, "Device not exist")
 		return
 	}
 
@@ -29,10 +29,10 @@ func (h *Handler) details(c *gin.Context) {
 		DeviceToken: device.Token,
 	}
 
-	output, err := h.kaspi.KaspiOperationDetails(input)
+	output, err := h.usc.OperationDetails(input)
 
 	if err != nil {
-		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadStatusCode, err.Error())
 		return
 	}
 
@@ -43,14 +43,14 @@ func (h *Handler) selfReturn(c *gin.Context) {
 	var inputRest entities.ReturnInput
 
 	if err := c.BindJSON(&inputRest); err != nil {
-		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadJson, err.Error())
 		return
 	}
 
 	device, err := h.usc.FindOneDevice(c, inputRest.OrganizationBin)
 
 	if err != nil {
-		errs.NewErrorResponse(c, http.StatusBadRequest, "Device not exist")
+		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadStatusCode, "Device not exist")
 		return
 	}
 
@@ -61,10 +61,10 @@ func (h *Handler) selfReturn(c *gin.Context) {
 		Amount:          inputRest.Amount,
 	}
 
-	output, err := h.kaspi.KaspiReturnWithoutClient(input)
+	output, err := h.usc.ReturnWithoutClient(input)
 
 	if err != nil {
-		errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadStatusCode, err.Error())
 		return
 	}
 
@@ -73,7 +73,7 @@ func (h *Handler) selfReturn(c *gin.Context) {
 	if output.StatusCode == 0 {
 		err = h.usc.ReturnOrder(c, input.QrPaymentId)
 		if err != nil {
-			errs.NewErrorResponse(c, http.StatusBadRequest, err.Error())
+			errs.NewErrorResponse(c, http.StatusBadRequest, errs.NotImplemented, err.Error())
 			return
 		}
 	}
