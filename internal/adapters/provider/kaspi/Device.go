@@ -15,7 +15,7 @@ func (s *St) GetAllTradePoints(organizationBIN string) (entities.TradePointSt, e
 
 	var bodyRequest entities.TradePointSt
 
-	client, err := config.GetHttpClientTls()
+	client, err := config.GetHttpClientTls(s.certPath, s.certPassword)
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -52,7 +52,7 @@ func (s *St) GetAllTradePoints(organizationBIN string) (entities.TradePointSt, e
 func (s *St) DeviceRegistration(input entities.DeviceInputReg) (entities.DeviceOutputReg, error) {
 	var bodyRequest entities.DeviceOutputReg
 
-	client, err := config.GetHttpClientTls()
+	client, err := config.GetHttpClientTls(s.certPath, s.certPassword)
 
 	if err != nil {
 		return entities.DeviceOutputReg{}, err
@@ -92,7 +92,7 @@ func (s *St) DeviceRegistration(input entities.DeviceInputReg) (entities.DeviceO
 func (s *St) DeviceDelete(input entities.DeviceInputDel) (entities.DeviceOutputDel, error) {
 	var bodyRequest entities.DeviceOutputDel
 
-	client, err := config.GetHttpClientTls()
+	client, err := config.GetHttpClientTls(s.certPath, s.certPassword)
 
 	if err != nil {
 		return entities.DeviceOutputDel{}, err

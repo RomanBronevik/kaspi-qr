@@ -10,15 +10,15 @@ import (
 	"golang.org/x/crypto/pkcs12"
 )
 
-func GetHttpClientTls() (*http.Client, error) {
-	pfxFile := os.Getenv("CERTIFICATE_PATH")
+func GetHttpClientTls(CertPath string, CertPassword string) (*http.Client, error) {
+	pfxFile := CertPath
 	pfxData, err := os.ReadFile(pfxFile)
 
 	if err != nil {
 		return nil, err
 	}
 
-	blocks, err := pkcs12.ToPEM(pfxData, os.Getenv("CERTIFICATE_PASSWORD"))
+	blocks, err := pkcs12.ToPEM(pfxData, CertPassword)
 	if err != nil {
 		return nil, err
 	}

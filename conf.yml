@@ -1,5 +1,5 @@
 debug: true
-http_listen: ":9090"
+http_listen: ":8000"
 http_cors: true
 pg_dsn: "postgres://localhost/kaspi_qr"
 #testBin: "160640004075"

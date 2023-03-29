@@ -5,13 +5,16 @@ import (
 )
 
 type confSt struct {
-	Debug       bool   `mapstructure:"DEBUG"`
-	LogLevel    string `mapstructure:"LOG_LEVEL"`
-	HttpListen  string `mapstructure:"HTTP_LISTEN"`
-	HttpCors    bool   `mapstructure:"HTTP_CORS"`
-	PgDsn       string `mapstructure:"PG_DSN"`
-	KaspiApiUrl string `mapstructure:"KASPI_API_URL"`
-	StgApiUrl   string `mapstructure:"STG_API_URL"`
+	Debug        bool   `mapstructure:"DEBUG"`
+	LogLevel     string `mapstructure:"LOG_LEVEL"`
+	HttpListen   string `mapstructure:"HTTP_LISTEN"`
+	HttpCors     bool   `mapstructure:"HTTP_CORS"`
+	PgDsn        string `mapstructure:"PG_DSN"`
+	KaspiApiUrl  string `mapstructure:"KASPI_API_URL"`
+	StgApiUrl    string `mapstructure:"STG_API_URL"`
+	DbPassword   string `mapstructure:"DB_PASSWORD"`
+	CertPath     string `mapstructure:"CERTIFICATE_PATH"`
+	CertPassword string `mapstructure:"CERTIFICATE_PASSWORD"`
 }
 
 func Load() *confSt {

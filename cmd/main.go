@@ -48,7 +48,7 @@ func main() {
 	}
 
 	// kaspi
-	app.kaspi = kaspi.New(app.lg, conf.KaspiApiUrl)
+	app.kaspi = kaspi.New(app.lg, conf.KaspiApiUrl, conf.CertPath, conf.CertPassword)
 
 	// repo
 	app.repo = repoPg.New(app.lg, app.db)

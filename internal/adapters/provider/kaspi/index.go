@@ -5,13 +5,17 @@ import (
 )
 
 type St struct {
-	lg       logger.Full
-	kaspiUrl string
+	lg           logger.Full
+	kaspiUrl     string
+	certPath     string
+	certPassword string
 }
 
-func New(lg logger.Full, kaspiUrl string) *St {
+func New(lg logger.Full, kaspiUrl string, certPath string, certPassword string) *St {
 	return &St{
-		lg:       lg,
-		kaspiUrl: kaspiUrl,
+		lg:           lg,
+		kaspiUrl:     kaspiUrl,
+		certPath:     certPath,
+		certPassword: certPassword,
 	}
 }
