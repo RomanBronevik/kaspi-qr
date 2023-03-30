@@ -44,8 +44,6 @@ func (h *Handler) deviceRegistration(c *gin.Context) {
 
 	output.Message = h.usc.SetMessageByStatusCode(output.StatusCode)
 
-	c.JSON(http.StatusOK, output)
-
 	if output.StatusCode == 0 {
 		err = h.usc.CreateDeviceRecord(context.Background(), input, output)
 		if err != nil {
@@ -53,6 +51,8 @@ func (h *Handler) deviceRegistration(c *gin.Context) {
 			return
 		}
 	}
+
+	c.JSON(http.StatusOK, output)
 }
 
 func (h *Handler) deleteOrOffDevice(c *gin.Context) {
