@@ -84,7 +84,10 @@ func (d *St) TransactionFn(ctx context.Context, f func(context.Context) error) e
 }
 
 func (d *St) getContextTransaction(ctx context.Context) pgx.Tx {
-	return ctx.Value(transactionCtxKey).(pgx.Tx)
+	if v := ctx.Value(transactionCtxKey); v != nil {
+		return v.(pgx.Tx)
+	}
+	return nil
 }
 
 func (d *St) contextWithTransaction(ctx context.Context) (context.Context, error) {
