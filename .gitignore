@@ -1,3 +1,5 @@
 .idea
 .env
+conf.yml
+config.yaml
 config/certfile.pfx
