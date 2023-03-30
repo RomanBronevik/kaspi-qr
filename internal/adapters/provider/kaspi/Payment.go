@@ -7,14 +7,13 @@ import (
 	"log"
 	"net/http"
 
-	"kaspi-qr/config"
 	"kaspi-qr/internal/domain/entities"
 )
 
 func (s *St) CreateQrToken(input entities.KaspiPaymentInput) (entities.QrTokenOutput, error) {
 	var bodyRequest entities.QrTokenOutput
 
-	client, err := config.GetHttpClientTls(s.certPath, s.certPassword)
+	client, err := GetHttpClientTls(s.certPath, s.certPassword)
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -58,7 +57,7 @@ func (s *St) CreateQrToken(input entities.KaspiPaymentInput) (entities.QrTokenOu
 func (s *St) CreatePaymentLink(input entities.KaspiPaymentInput) (entities.PaymentLinkRequestOutput, error) {
 	var bodyRequest entities.PaymentLinkRequestOutput
 
-	client, err := config.GetHttpClientTls(s.certPath, s.certPassword)
+	client, err := GetHttpClientTls(s.certPath, s.certPassword)
 
 	if err != nil {
 		log.Fatal(err.Error())
@@ -101,7 +100,7 @@ func (s *St) OperationStatus(QrPaymentId string) (entities.OperationStatus, erro
 
 	var bodyRequest entities.OperationStatus
 
-	client, err := config.GetHttpClientTls(s.certPath, s.certPassword)
+	client, err := GetHttpClientTls(s.certPath, s.certPassword)
 
 	if err != nil {
 		log.Fatal(err.Error())

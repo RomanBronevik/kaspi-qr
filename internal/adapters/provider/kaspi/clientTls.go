@@ -1,4 +1,4 @@
-package config
+package kaspi
 
 import (
 	"crypto/tls"

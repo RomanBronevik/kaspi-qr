@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"context"
 	"kaspi-qr/internal/domain/entities"
 
 	"github.com/gin-gonic/gin"
@@ -35,7 +36,7 @@ func (u *St) FindOneDevice(ctx *gin.Context, OrganizationBin string) (entities.D
 	return device, err
 }
 
-func (u *St) CreateDeviceRecord(ctx *gin.Context, input entities.DeviceInputReg, output entities.DeviceOutputReg) error {
+func (u *St) CreateDeviceRecord(ctx context.Context, input entities.DeviceInputReg, output entities.DeviceOutputReg) error {
 	err := u.cr.CreateDeviceRecord(ctx, input, output)
 
 	return err

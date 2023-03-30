@@ -8,14 +8,13 @@ import (
 	"log"
 	"net/http"
 
-	"kaspi-qr/config"
 	"kaspi-qr/internal/domain/entities"
 )
 
 func (s *St) KaspiOperationDetails(input entities.OperationGetSt) (entities.OperationDetails, error) {
 	var bodyRequest entities.OperationDetails
 
-	client, err := config.GetHttpClientTls(s.certPath, s.certPassword)
+	client, err := GetHttpClientTls(s.certPath, s.certPassword)
 
 	if err != nil {
 		return entities.OperationDetails{}, err
@@ -49,7 +48,7 @@ func (s *St) KaspiOperationDetails(input entities.OperationGetSt) (entities.Oper
 func (s *St) KaspiReturnWithoutClient(input entities.ReturnRequestInput) (entities.ReturnSt, error) {
 	var bodyRequest entities.ReturnSt
 
-	client, err := config.GetHttpClientTls(s.certPath, s.certPassword)
+	client, err := GetHttpClientTls(s.certPath, s.certPassword)
 
 	if err != nil {
 		log.Fatal(err.Error())

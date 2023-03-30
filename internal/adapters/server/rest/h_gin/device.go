@@ -1,6 +1,7 @@
 package h_gin
 
 import (
+	"context"
 	"net/http"
 
 	"kaspi-qr/internal/domain/entities"
@@ -46,7 +47,7 @@ func (h *Handler) deviceRegistration(c *gin.Context) {
 	c.JSON(http.StatusOK, output)
 
 	if output.StatusCode == 0 {
-		err = h.usc.CreateDeviceRecord(c, input, output)
+		err = h.usc.CreateDeviceRecord(context.Background(), input, output)
 		if err != nil {
 			errs.NewErrorResponse(c, http.StatusBadRequest, errs.NotImplemented, err.Error())
 			return

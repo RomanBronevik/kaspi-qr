@@ -49,14 +49,14 @@ func (r *St) FindAllDevices(ctx context.Context) (u []entities.Device, err error
 	return devices, nil
 }
 
-func (r *St) FindOneDevice(ctx context.Context, OrganizationBin string) (entities.Device, error) {
+func (r *St) FindOneDevice(ctx context.Context, token string) (entities.Device, error) {
 	q := `
-		SELECT device_id, token, organization_bin FROM device WHERE organization_bin = $1`
+		SELECT device_id, token, organization_bin FROM device WHERE token = $1`
 
 	//Trace
 
 	var dev entities.Device
-	err := r.db.QueryRow(ctx, q, OrganizationBin).Scan(&dev.DeviceId, &dev.Token, &dev.OrganizationBin)
+	err := r.db.QueryRow(ctx, q, token).Scan(&dev.DeviceId, &dev.Token, &dev.OrganizationBin)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return entities.Device{}, err
 	}

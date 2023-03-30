@@ -1,11 +1,12 @@
 package core
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"kaspi-qr/internal/domain/entities"
 )
 
-func (s *St) CreateDevice(ctx *gin.Context, obj *entities.CreateDeviceDTO) error {
+func (s *St) CreateDevice(ctx context.Context, obj *entities.CreateDeviceDTO) error {
 	err := s.repo.CreateDevice(ctx, obj)
 
 	return err
@@ -17,7 +18,7 @@ func (s *St) DeleteDevice(ctx *gin.Context, bin string, token string) error {
 	return err
 }
 
-func (s *St) DeviceAlredyExist(ctx *gin.Context, token string) (bool, error) {
+func (s *St) DeviceAlredyExist(ctx context.Context, token string) (bool, error) {
 	device, err := s.repo.FindOneDevice(ctx, token)
 	if err != nil {
 		return false, err
@@ -32,7 +33,7 @@ func (s *St) DeviceAlredyExist(ctx *gin.Context, token string) (bool, error) {
 	return true, nil
 }
 
-func (s *St) CreateDeviceRecord(ctx *gin.Context, input entities.DeviceInputReg, output entities.DeviceOutputReg) error {
+func (s *St) CreateDeviceRecord(ctx context.Context, input entities.DeviceInputReg, output entities.DeviceOutputReg) error {
 	exits, err := s.DeviceAlredyExist(ctx, output.Data.DeviceToken)
 
 	if err != nil {
