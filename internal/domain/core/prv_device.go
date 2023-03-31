@@ -1,6 +1,8 @@
 package core
 
-import "kaspi-qr/internal/domain/entities"
+import (
+	"kaspi-qr/internal/domain/entities"
+)
 
 func (s *St) GetAllTradePoints(organizationBin string) (entities.TradePointSt, error) {
 	tradePoints, err := s.kaspi.GetAllTradePoints(organizationBin)

@@ -76,3 +76,22 @@ func (s *St) FindOneDevice(ctx *gin.Context, OrganizationBin string) (entities.D
 
 	return device, err
 }
+
+func (s *St) CreateDeviceTwoSystems(input entities.DeviceInputReg) (*entities.DeviceOutputReg, error) {
+	output, err := s.DeviceRegistration(input)
+
+	if err != nil {
+		return nil, err
+	}
+
+	output.Message = s.SetMessageByStatusCode(output.StatusCode)
+
+	if output.StatusCode == 0 {
+		err = s.CreateDeviceRecord(context.Background(), input, output)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &output, err
+}

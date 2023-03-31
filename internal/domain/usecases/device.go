@@ -41,3 +41,9 @@ func (u *St) CreateDeviceRecord(ctx context.Context, input entities.DeviceInputR
 
 	return err
 }
+
+func (u *St) CreateDeviceTwoSystems(input entities.DeviceInputReg) (*entities.DeviceOutputReg, error) {
+	output, err := u.cr.CreateDeviceTwoSystems(input)
+
+	return output, err
+}

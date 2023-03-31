@@ -1,7 +1,6 @@
 package h_gin
 
 import (
-	"context"
 	"net/http"
 
 	"kaspi-qr/internal/domain/entities"
@@ -35,21 +34,11 @@ func (h *Handler) deviceRegistration(c *gin.Context) {
 		return
 	}
 
-	output, err := h.usc.DeviceRegistration(input)
+	output, err := h.usc.CreateDeviceTwoSystems(input)
 
 	if err != nil {
-		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadStatusCode, err.Error())
+		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadJson, err.Error())
 		return
-	}
-
-	output.Message = h.usc.SetMessageByStatusCode(output.StatusCode)
-
-	if output.StatusCode == 0 {
-		err = h.usc.CreateDeviceRecord(context.Background(), input, output)
-		if err != nil {
-			errs.NewErrorResponse(c, http.StatusBadRequest, errs.NotImplemented, err.Error())
-			return
-		}
 	}
 
 	c.JSON(http.StatusOK, output)
@@ -72,8 +61,6 @@ func (h *Handler) deleteOrOffDevice(c *gin.Context) {
 
 	output.Message = h.usc.SetMessageByStatusCode(output.StatusCode)
 
-	c.JSON(http.StatusOK, output)
-
 	if output.StatusCode == 0 {
 		err = h.usc.DeleteDevice(c, input.OrganizationBin, input.DeviceToken)
 		if err != nil {
@@ -81,4 +68,6 @@ func (h *Handler) deleteOrOffDevice(c *gin.Context) {
 			return
 		}
 	}
+
+	c.JSON(http.StatusOK, output)
 }
