@@ -7,6 +7,12 @@ import (
 )
 
 type Repo interface {
+	CreateCity(ctx context.Context, city *entities.CreateCityDTO) error
+	FindAllCities(ctx context.Context) (u []*entities.City, err error)
+	FindOneCityByCityCode(ctx context.Context, code string) (*entities.City, error)
+	DeleteCity(ctx context.Context, id string) error
+	DeleteCities(ctx context.Context) error
+
 	CreateDevice(ctx context.Context, device *entities.CreateDeviceDTO) error
 	FindAllDevices(ctx context.Context) (u []entities.Device, err error)
 	FindOneDevice(ctx context.Context, OrganizationBin string) (entities.Device, error)
@@ -33,10 +39,4 @@ type Repo interface {
 	DeleteOrder(ctx context.Context, orderNumber string) error
 	FindAllPaidOrders(ctx context.Context) (u []entities.PaidOrder, err error)
 	UpdateOrderStatus(ctx context.Context, orderNumber string, status string) error
-
-	CreateCity(ctx context.Context, city *entities.CreateCityDTO) error
-	FindAllCities(ctx context.Context) (u []entities.City, err error)
-	FindOneCityByCityCode(ctx context.Context, code string) (entities.City, error)
-	DeleteCity(ctx context.Context, id string) error
-	DeleteCities(ctx context.Context) error
 }

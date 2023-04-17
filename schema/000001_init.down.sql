@@ -1,4 +1,3 @@
-
 DROP TABLE payment;
 DROP TABLE orders;
 DROP TABLE device;

@@ -58,7 +58,7 @@ func (s *St) createOrderRecord(c *gin.Context, input entities.KaspiPaymentInput)
 		Modified:        curTime,
 		OrderNumber:     input.ExternalId,
 		OrganizationBin: input.OrganizationBin,
-		Status:          cns.CreatedStatus,
+		Status:          cns.StatusCreated,
 	}
 
 	err = s.CreateOrder(c, &dtoSt)
@@ -116,13 +116,13 @@ func (s *St) ReturnOrder(c *gin.Context, paymentId int) error {
 		return errors.New("Order not paid or already refunded")
 	}
 
-	err = s.UpdateOrderStatus(c, orderNumber, cns.RefundStatus)
+	err = s.UpdateOrderStatus(c, orderNumber, cns.StatusRefund)
 
 	if err != nil {
 		return err
 	}
 
-	err = s.UpdatePaymentStatus(c, strPaymentId, cns.RefundStatus)
+	err = s.UpdatePaymentStatus(c, strPaymentId, cns.StatusRefund)
 
 	if err != nil {
 		return err

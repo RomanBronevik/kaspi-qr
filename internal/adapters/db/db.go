@@ -21,8 +21,7 @@ const (
 type DB interface {
 	Connection
 	Transaction
-
-	HErr(err error) error
+	HErr
 }
 
 type Connection interface {
@@ -34,6 +33,10 @@ type Connection interface {
 type Transaction interface {
 	TransactionFn(ctx context.Context, f func(context.Context) error) error
 	RenewTransaction(ctx context.Context) (context.Context, error)
+}
+
+type HErr interface {
+	HErr(err error) error
 }
 
 type Rows interface {

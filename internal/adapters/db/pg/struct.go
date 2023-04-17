@@ -1,6 +1,8 @@
 package pg
 
 import (
+	"github.com/jackc/pgx/v4"
+	"kaspi-qr/internal/adapters/db"
 	"time"
 )
 
@@ -35,4 +37,26 @@ func (o *OptionsSt) mergeWithDefaults() {
 	if o.HealthCheckPeriod == 0 {
 		o.HealthCheckPeriod = defaultOptions.HealthCheckPeriod
 	}
+}
+
+type rowsSt struct {
+	pgx.Rows
+	db db.HErr
+}
+
+func (o *rowsSt) Err() error {
+	return o.db.HErr(o.Rows.Err())
+}
+
+func (o *rowsSt) Scan(dest ...any) error {
+	return o.db.HErr(o.Rows.Scan(dest...))
+}
+
+type rowSt struct {
+	pgx.Row
+	db db.HErr
+}
+
+func (o *rowSt) Scan(dest ...any) error {
+	return o.db.HErr(o.Row.Scan(dest...))
 }

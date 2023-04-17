@@ -44,28 +44,28 @@ func (s *St) FindOnePaymentByPaymentId(ctx *gin.Context, paymentId string) (enti
 }
 
 func (s *St) StatusPaid(status string) bool {
-	if status == cns.ProcessedStatus {
+	if status == cns.StatusProcessed {
 		return true
 	}
 	return false
 }
 
 func (s *St) StatusWait(status string) bool {
-	if status == cns.WaitStatus {
+	if status == cns.StatusWait {
 		return true
 	}
 	return false
 }
 
 func (s *St) StatusCreated(status string) bool {
-	if status == cns.CreatedStatus {
+	if status == cns.StatusCreated {
 		return true
 	}
 	return false
 }
 
 func (s *St) StatusCanceled(status string) bool {
-	if status == cns.ErrorStatus {
+	if status == cns.StatusError {
 		return true
 	}
 	return false
@@ -119,7 +119,7 @@ func (s *St) QrCreatePaymentRecord(c *gin.Context, currTime time.Time, input ent
 	paymentDtoSt := entities.CreatePaymentDTO{
 		Created:                    currTime,
 		Modified:                   currTime,
-		Status:                     cns.CreatedStatus,
+		Status:                     cns.StatusCreated,
 		OrderNumber:                input.ExternalId,
 		PaymentId:                  paymentId,
 		PaymentMethod:              cns.QrPayment,
@@ -149,7 +149,7 @@ func (s *St) LinkCreatePaymentRecord(c *gin.Context, currTime time.Time, input e
 	paymentDtoSt := entities.CreatePaymentDTO{
 		Created:                    currTime,
 		Modified:                   currTime,
-		Status:                     cns.CreatedStatus,
+		Status:                     cns.StatusCreated,
 		OrderNumber:                input.ExternalId,
 		PaymentId:                  paymentId,
 		PaymentMethod:              cns.LinkPayment,
@@ -231,13 +231,13 @@ func (s *St) checkUnpaid(ctx *gin.Context, mutex *sync.Mutex, isLocked bool, ord
 		}
 
 		if s.StatusCreated(payment.Status) && payment.WaitTimeout.Before(time.Now().Local()) {
-			err = s.UpdatePaymentStatus(ctx, value.PaymentId, cns.ErrorStatus)
+			err = s.UpdatePaymentStatus(ctx, value.PaymentId, cns.StatusError)
 		}
 
 		if s.StatusWait(payment.Status) {
 			ConfirmationTimeout := payment.Modified.Add(time.Duration(payment.PaymentConfirmationTimeout) * time.Second)
 			if time.Now().Local().After(ConfirmationTimeout) {
-				err = s.UpdatePaymentStatus(ctx, value.PaymentId, cns.ErrorStatus)
+				err = s.UpdatePaymentStatus(ctx, value.PaymentId, cns.StatusError)
 			}
 		}
 
@@ -258,11 +258,11 @@ func (s *St) checkUnpaid(ctx *gin.Context, mutex *sync.Mutex, isLocked bool, ord
 
 		switch operationStatus {
 		case kaspi.WaitStatus:
-			err = s.UpdatePaymentStatus(ctx, value.PaymentId, cns.WaitStatus)
+			err = s.UpdatePaymentStatus(ctx, value.PaymentId, cns.StatusWait)
 		case kaspi.ProcessedStatus:
-			err = s.UpdatePaymentStatus(ctx, value.PaymentId, cns.ProcessedStatus)
+			err = s.UpdatePaymentStatus(ctx, value.PaymentId, cns.StatusProcessed)
 		case kaspi.ErrorStatus:
-			err = s.UpdatePaymentStatus(ctx, value.PaymentId, cns.ErrorStatus)
+			err = s.UpdatePaymentStatus(ctx, value.PaymentId, cns.StatusError)
 		default:
 			continue
 		}
@@ -277,7 +277,7 @@ func (s *St) checkUnpaid(ctx *gin.Context, mutex *sync.Mutex, isLocked bool, ord
 
 func (s *St) checkOrderActivity(c *gin.Context, orderNumber string, created time.Time) (bool, error) {
 	if time.Now().Local().After(created.Add(time.Duration(cns.HoursQuantity) * time.Hour)) {
-		err := s.UpdateOrderStatus(c, orderNumber, cns.ErrorStatus)
+		err := s.UpdateOrderStatus(c, orderNumber, cns.StatusError)
 		if err != nil {
 			return false, err
 		}

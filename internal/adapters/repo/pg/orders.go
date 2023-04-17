@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
+	"kaspi-qr/internal/cns"
 	"kaspi-qr/internal/domain/entities"
 	"time"
 )
@@ -15,39 +16,26 @@ func (r *St) CreateOrder(ctx context.Context, order *entities.CreateOrderDTO) er
 		INSERT INTO orders (created, modified, order_number, organization_bin, status)
 		VALUES ($1, $2, $3, $4, $5)`
 
-	if err := r.db.Exec(ctx, q, order.Created, order.Modified, order.OrderNumber, order.OrganizationBin, order.Status); err != nil {
-		return r.ErorrHandler(err)
-	}
-	return nil
+	return r.db.Exec(ctx, q, order.Created, order.Modified, order.OrderNumber, order.OrganizationBin, order.Status)
 }
 
-func (r *St) FindAllOrders(ctx context.Context) (u []entities.Order, err error) {
+func (r *St) FindAllOrders(ctx context.Context) (u []*entities.Order, err error) {
 	q := `
-		SELECT CREATED, MODIFIED, ORDER_NUMBER, ORGANIZATION_BIN, STATUS FROM orders`
-	u, err = r.ListOrders(ctx, q)
-	return u, err
-}
+		SELECT CREATED, MODIFIED, ORDER_NUMBER, ORGANIZATION_BIN, STATUS
+		FROM orders`
 
-func (r *St) FindAllUnpaidOrders(ctx context.Context) (u []entities.UnPaidOrder, err error) {
-	q := `
-			SELECT o.CREATED, o.ORDER_NUMBER, o.ORGANIZATION_BIN , p.PAYMENT_ID
-			FROM orders o
-         		LEFT JOIN payment p
-                	   ON o.ORDER_NUMBER = p.ORDER_NUMBER
-			WHERE p.status = 'Created' OR p.status = 'Wait'
-			`
 	rows, err := r.db.Query(ctx, q)
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	orders := make([]entities.UnPaidOrder, 0)
+	orders := make([]*entities.Order, 0)
 
 	for rows.Next() {
-		var order entities.UnPaidOrder
+		order := &entities.Order{}
 
-		err := rows.Scan(&order.Created, &order.OrderNumber, &order.OrganizationBin, &order.PaymentId)
+		err = rows.Scan(&order.Created, &order.Modified, &order.OrderNumber, &order.OrganizationBin, &order.Status)
 		if err != nil {
 			return nil, err
 		}
@@ -55,22 +43,56 @@ func (r *St) FindAllUnpaidOrders(ctx context.Context) (u []entities.UnPaidOrder,
 		orders = append(orders, order)
 	}
 
-	if err := rows.Err(); err != nil {
+	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
 	return orders, nil
 }
 
-func (r *St) FindAllPaidOrders(ctx context.Context) (u []entities.PaidOrder, err error) {
+func (r *St) FindAllUnpaidOrders(ctx context.Context) ([]*entities.UnPaidOrder, error) {
 	q := `
-			SELECT o.ORDER_NUMBER, o.ORGANIZATION_BIN , p.PAYMENT_ID
-			FROM orders o
-         		LEFT JOIN payment p
-                	   ON o.ORDER_NUMBER = p.ORDER_NUMBER
-			WHERE p.status = 'Success'
-			`
-	rows, err := r.db.Query(ctx, q)
+		SELECT o.CREATED, o.ORDER_NUMBER, o.ORGANIZATION_BIN , p.PAYMENT_ID
+		FROM orders o
+			LEFT JOIN payment p
+				   ON o.ORDER_NUMBER = p.ORDER_NUMBER
+		WHERE p.status = $1 OR p.status = $2`
+
+	rows, err := r.db.Query(ctx, q, cns.StatusCreated, cns.StatusWait)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	orders := make([]*entities.UnPaidOrder, 0)
+
+	for rows.Next() {
+		order := &entities.UnPaidOrder{}
+
+		err = rows.Scan(&order.Created, &order.OrderNumber, &order.OrganizationBin, &order.PaymentId)
+		if err != nil {
+			return nil, err
+		}
+
+		orders = append(orders, order)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return orders, nil
+}
+
+func (r *St) FindAllPaidOrders(ctx context.Context) ([]*entities.PaidOrder, error) {
+	q := `
+		SELECT o.CREATED, o.ORDER_NUMBER, o.ORGANIZATION_BIN , p.PAYMENT_ID
+		FROM orders o
+			LEFT JOIN payment p
+				   ON o.ORDER_NUMBER = p.ORDER_NUMBER
+		WHERE p.status = $1`
+
+	rows, err := r.db.Query(ctx, q, cns.StatusSuccess)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, err
 	}
@@ -140,31 +162,4 @@ func (r *St) DeleteOrder(ctx context.Context, orderNumber string) error {
 	}
 
 	return nil
-}
-
-func (r *St) ListOrders(ctx context.Context, query string) (u []entities.Order, err error) {
-	rows, err := r.db.Query(ctx, query)
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return nil, err
-	}
-	defer rows.Close()
-
-	orders := make([]entities.Order, 0)
-
-	for rows.Next() {
-		var order entities.Order
-
-		err := rows.Scan(&order.Created, &order.Modified, &order.OrderNumber, &order.OrganizationBin, &order.Status)
-		if err != nil {
-			return nil, err
-		}
-
-		orders = append(orders, order)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return orders, nil
 }

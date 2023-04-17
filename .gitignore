@@ -1,5 +1,12 @@
+*.log
+*.tar
+*.tar.gz
+*.tar.bz2
 .idea
-.env
+go.work
+go.work.sum
+release/*
+build/
 conf.yml
-config.yaml
-config/certfile.pfx
+.migrate_scripts
+/svc

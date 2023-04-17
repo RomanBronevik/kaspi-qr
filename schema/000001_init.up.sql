@@ -1,44 +1,57 @@
-CREATE TABLE organization (
-                        name varchar(255) not null unique,
-                        bin varchar(255) not null unique primary key
+CREATE TABLE organization
+(
+    bin  text
+        primary key,
+    name text not null default ''
 );
 
-CREATE TABLE city (
-                      code varchar(255) not null unique primary key,
-                      name varchar(255) not null unique,
-                      organization_bin varchar(255) references organization(bin) on delete cascade not null
+CREATE TABLE city
+(
+    code             text
+        primary key,
+    name             text not null default '',
+    organization_bin text not null
+        constraint city_fk_organization_bin references organization (bin) on delete cascade on update cascade
 );
 
-CREATE TABLE device (
-                        device_id varchar(255) not null unique primary key,
-                        token varchar(255) not null unique,
-                        organization_bin varchar(255) references organization (bin) on delete cascade
-
-);
-CREATE TABLE orders (
-                        created timestamp default null,
-                        modified timestamp default null,
-                        order_number varchar(255) not null unique primary key,
-                        organization_bin varchar(255) references organization (bin) on delete cascade not null,
-                        status varchar(255) not null
+CREATE TABLE device
+(
+    device_id        text
+        primary key,
+    token            text not null default '',
+    organization_bin text not null
+        constraint device_fk_organization_bin references organization (bin) on delete cascade on update cascade
 );
 
-CREATE TABLE payment (
-                         created timestamp default null,
-                         modified timestamp default null,
-                         status varchar(255) not null,
-                         order_number varchar(255) references orders (order_number) on delete cascade not null,
-                         payment_id varchar(255) not null unique primary key,
-                         payment_method varchar(255) not null,
-                         wait_timeout timestamp default null,
-                         polling_interval int default 5,
-                         payment_confirmation_timeout int default 65,
-                         amount float
+CREATE TABLE orders
+(
+    order_number     text
+        primary key,
+    created          timestamptz not null default now(),
+    modified         timestamptz not null default now(),
+    organization_bin text        not null
+        constraint orders_fk_organization_bin references organization (bin) on delete cascade on update cascade,
+    status           text        not null
+);
+
+CREATE TABLE payment
+(
+    payment_id                   text
+        primary key,
+    created                      timestamptz not null default now(),
+    modified                     timestamptz not null default now(),
+    order_number                 text
+        constraint payment_fk_order_number references orders (order_number) on delete cascade on update cascade,
+    status                       text        not null,
+    payment_method               text        not null,
+    amount                       numeric not null default 0
 );
 
 
-INSERT INTO organization (name, bin) VALUES ('Test', '160640004075');
-INSERT INTO city (name, organization_bin, code) VALUES ('Test', '160640004075', 'test');
+INSERT INTO organization (name, bin)
+VALUES ('Test', '160640004075');
+INSERT INTO city (name, organization_bin, code)
+VALUES ('Test', '160640004075', 'test');
 
 
 

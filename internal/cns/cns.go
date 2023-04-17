@@ -3,11 +3,12 @@ package cns
 const UnInteger = 1000
 
 const (
-	CreatedStatus   = "Created"
-	WaitStatus      = "Wait"
-	ProcessedStatus = "Processed"
-	ErrorStatus     = "Error"
-	RefundStatus    = "Refunded"
+	StatusCreated   = "Created"
+	StatusWait      = "Wait"
+	StatusProcessed = "Processed"
+	StatusSuccess   = "Success"
+	StatusError     = "Error"
+	StatusRefund    = "Refunded"
 )
 
 const (

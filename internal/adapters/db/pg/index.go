@@ -143,21 +143,28 @@ func (d *St) Exec(ctx context.Context, sql string, args ...any) error {
 }
 
 func (d *St) Query(ctx context.Context, sql string, args ...any) (db.Rows, error) {
+	var err error
+	var rows pgx.Rows
+
 	if tx := d.getContextTransaction(ctx); tx != nil {
-		rows, err := tx.Query(ctx, sql, args...)
-		return rows, d.HErr(err)
+		rows, err = tx.Query(ctx, sql, args...)
+	} else {
+		rows, err = d.Con.Query(ctx, sql, args...)
 	}
 
-	rows, err := d.Con.Query(ctx, sql, args...)
-	return rows, d.HErr(err)
+	return &rowsSt{Rows: rows, db: d}, d.HErr(err)
 }
 
 func (d *St) QueryRow(ctx context.Context, sql string, args ...any) db.Row {
+	var row pgx.Row
+
 	if tx := d.getContextTransaction(ctx); tx != nil {
-		return tx.QueryRow(ctx, sql, args...)
+		row = tx.QueryRow(ctx, sql, args...)
+	} else {
+		row = d.Con.QueryRow(ctx, sql, args...)
 	}
 
-	return d.Con.QueryRow(ctx, sql, args...)
+	return &rowSt{Row: row, db: d}
 }
 
 func (d *St) HErr(err error) error {
