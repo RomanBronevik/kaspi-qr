@@ -1,6 +1,7 @@
 package main
 
 import (
+	"kaspi-qr/internal/adapters/server/rest"
 	"os"
 	"os/signal"
 	"syscall"
@@ -11,8 +12,7 @@ import (
 	"kaspi-qr/internal/adapters/logger/zap"
 	"kaspi-qr/internal/adapters/provider/kaspi"
 	repoPg "kaspi-qr/internal/adapters/repo/pg"
-	"kaspi-qr/internal/adapters/server/rest"
-	"kaspi-qr/internal/adapters/server/rest/h_gin"
+	"kaspi-qr/internal/adapters/server"
 	"kaspi-qr/internal/domain/core"
 	"kaspi-qr/internal/domain/usecases"
 
@@ -23,14 +23,13 @@ func main() {
 	var err error
 
 	app := struct {
-		lg          *zap.St
-		db          *dbPg.St
-		repo        *repoPg.St
-		core        *core.St
-		ucs         *usecases.St
-		restHandler *h_gin.Handler
-		restSrv     *rest.St
-		kaspi       *kaspi.St
+		lg    *zap.St
+		db    *dbPg.St
+		repo  *repoPg.St
+		core  *core.St
+		ucs   *usecases.St
+		srv   *server.St
+		kaspi *kaspi.St
 	}{}
 
 	// load config
@@ -59,24 +58,21 @@ func main() {
 	// usecases
 	app.ucs = usecases.New(app.lg, app.db, app.core)
 
-	// rest handler
-	app.restHandler = h_gin.NewHandler(app.lg, app.ucs)
-
 	// START
 
 	app.lg.Infow("Starting")
 
-	app.restSrv = rest.Start(
+	app.srv = server.Start(
 		app.lg,
 		conf.HttpListen,
-		app.restHandler.InitRoutes(conf.HttpCors),
+		rest.GetHandler(app.lg, app.ucs, conf.HttpCors),
 	)
 
 	var exitCode int
 
 	select {
 	case <-stopSignal():
-	case <-app.restSrv.Wait():
+	case <-app.srv.Wait():
 		exitCode = 1
 	}
 
@@ -84,7 +80,7 @@ func main() {
 
 	app.lg.Infow("Shutting down...")
 
-	if !app.restSrv.Shutdown(20 * time.Second) {
+	if !app.srv.Shutdown(20 * time.Second) {
 		exitCode = 1
 	}
 

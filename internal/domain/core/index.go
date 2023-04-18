@@ -12,10 +12,12 @@ type St struct {
 	repo  repo.Repo
 	kaspi *kaspi.St
 
-	wg sync.WaitGroup
+	wg           sync.WaitGroup
+	Organisation *Organisation
 }
 
 func New(repo *pg.St, kaspi *kaspi.St) *St {
+	c.Organisation = NewOrganisation(c)
 	return &St{
 		repo:  repo,
 		kaspi: kaspi,

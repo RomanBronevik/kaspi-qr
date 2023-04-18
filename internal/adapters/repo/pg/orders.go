@@ -11,20 +11,20 @@ import (
 	"time"
 )
 
-func (r *St) CreateOrder(ctx context.Context, order *entities.CreateOrderDTO) error {
+func (d *St) CreateOrder(ctx context.Context, order *entities.CreateOrderDTO) error {
 	q := `
 		INSERT INTO orders (created, modified, order_number, organization_bin, status)
 		VALUES ($1, $2, $3, $4, $5)`
 
-	return r.db.Exec(ctx, q, order.Created, order.Modified, order.OrderNumber, order.OrganizationBin, order.Status)
+	return d.db.Exec(ctx, q, order.Created, order.Modified, order.OrderNumber, order.OrganizationBin, order.Status)
 }
 
-func (r *St) FindAllOrders(ctx context.Context) (u []*entities.Order, err error) {
+func (d *St) FindAllOrders(ctx context.Context) (u []*entities.Order, err error) {
 	q := `
 		SELECT CREATED, MODIFIED, ORDER_NUMBER, ORGANIZATION_BIN, STATUS
 		FROM orders`
 
-	rows, err := r.db.Query(ctx, q)
+	rows, err := d.db.Query(ctx, q)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (r *St) FindAllOrders(ctx context.Context) (u []*entities.Order, err error)
 	return orders, nil
 }
 
-func (r *St) FindAllUnpaidOrders(ctx context.Context) ([]*entities.UnPaidOrder, error) {
+func (d *St) FindAllUnpaidOrders(ctx context.Context) ([]*entities.UnPaidOrder, error) {
 	q := `
 		SELECT o.CREATED, o.ORDER_NUMBER, o.ORGANIZATION_BIN , p.PAYMENT_ID
 		FROM orders o
@@ -58,7 +58,7 @@ func (r *St) FindAllUnpaidOrders(ctx context.Context) ([]*entities.UnPaidOrder, 
 				   ON o.ORDER_NUMBER = p.ORDER_NUMBER
 		WHERE p.status = $1 OR p.status = $2`
 
-	rows, err := r.db.Query(ctx, q, cns.StatusCreated, cns.StatusWait)
+	rows, err := d.db.Query(ctx, q, cns.StatusCreated, cns.StatusWait)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (r *St) FindAllUnpaidOrders(ctx context.Context) ([]*entities.UnPaidOrder, 
 	return orders, nil
 }
 
-func (r *St) FindAllPaidOrders(ctx context.Context) ([]*entities.PaidOrder, error) {
+func (d *St) FindAllPaidOrders(ctx context.Context) ([]*entities.PaidOrder, error) {
 	q := `
 		SELECT o.CREATED, o.ORDER_NUMBER, o.ORGANIZATION_BIN , p.PAYMENT_ID
 		FROM orders o
@@ -92,7 +92,7 @@ func (r *St) FindAllPaidOrders(ctx context.Context) ([]*entities.PaidOrder, erro
 				   ON o.ORDER_NUMBER = p.ORDER_NUMBER
 		WHERE p.status = $1`
 
-	rows, err := r.db.Query(ctx, q, cns.StatusSuccess)
+	rows, err := d.db.Query(ctx, q, cns.StatusSuccess)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, err
 	}
@@ -118,14 +118,14 @@ func (r *St) FindAllPaidOrders(ctx context.Context) ([]*entities.PaidOrder, erro
 	return orders, nil
 }
 
-func (r *St) FindOneOrder(ctx context.Context, orderNumber string) (entities.Order, error) {
+func (d *St) FindOneOrder(ctx context.Context, orderNumber string) (entities.Order, error) {
 	q := `
 		SELECT CREATED, MODIFIED, ORDER_NUMBER, ORGANIZATION_BIN, STATUS FROM orders WHERE ORDER_NUMBER = $1`
 
 	//Trace
 
 	var order entities.Order
-	err := r.db.QueryRow(ctx, q, orderNumber).Scan(&order.Created, &order.Modified, &order.OrderNumber, &order.OrganizationBin, &order.Status)
+	err := d.db.QueryRow(ctx, q, orderNumber).Scan(&order.Created, &order.Modified, &order.OrderNumber, &order.OrganizationBin, &order.Status)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return entities.Order{}, err
 	}
@@ -134,12 +134,12 @@ func (r *St) FindOneOrder(ctx context.Context, orderNumber string) (entities.Ord
 
 }
 
-func (r *St) UpdateOrderStatus(ctx context.Context, orderNumber string, status string) error {
+func (d *St) UpdateOrderStatus(ctx context.Context, orderNumber string, status string) error {
 	q := `
 		UPDATE orders SET status = $1, modified = $2 
 		               WHERE order_number = $3;`
 
-	if err := r.db.Exec(ctx, q, status, time.Now().Local(), orderNumber); err != nil {
+	if err := d.db.Exec(ctx, q, status, time.Now().Local(), orderNumber); err != nil {
 		var pgErr *pgconn.PgError
 		if errors.Is(err, pgErr) {
 			pgErr = err.(*pgconn.PgError)
@@ -152,13 +152,13 @@ func (r *St) UpdateOrderStatus(ctx context.Context, orderNumber string, status s
 	return nil
 }
 
-func (r *St) DeleteOrder(ctx context.Context, orderNumber string) error {
+func (d *St) DeleteOrder(ctx context.Context, orderNumber string) error {
 	q := `
 		DELETE FROM orders
 		WHERE order_number = $1;`
 
-	if err := r.db.Exec(ctx, q, orderNumber); err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return r.ErorrHandler(err)
+	if err := d.db.Exec(ctx, q, orderNumber); err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return d.ErorrHandler(err)
 	}
 
 	return nil

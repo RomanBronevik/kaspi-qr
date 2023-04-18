@@ -1,4 +1,4 @@
-package h_gin
+package handlers
 
 import (
 	"kaspi-qr/internal/adapters/logger"
@@ -59,11 +59,6 @@ func (h *Handler) InitRoutes(withCors bool) *gin.Engine {
 			status.GET("/:QrPaymentId", h.operationStatus)
 			status.POST("/checkOrdersForPayment", h.checkOrdersForPayment)
 		}
-	}
-
-	city := router.Group("/city")
-	{
-		city.POST("update", h.UpdateCities)
 	}
 
 	return router

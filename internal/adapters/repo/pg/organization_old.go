@@ -8,19 +8,19 @@ import (
 	"kaspi-qr/internal/domain/entities"
 )
 
-func (r *St) CreateOrganization(ctx context.Context, organization *entities.CreateOrganizationDTO) error {
+func (d *St) CreateOrganization(ctx context.Context, organization *entities.CreateOrganizationDTO) error {
 	q := `
 		INSERT INTO organization (name, bin) 
 		VALUES ($1, $2)`
 
-	return r.db.Exec(ctx, q, organization.Name, organization.Bin)
+	return d.db.Exec(ctx, q, organization.Name, organization.Bin)
 }
 
-func (r *St) FindAllOrganizations(ctx context.Context) (u []entities.Organization, err error) {
+func (d *St) FindAllOrganizations(ctx context.Context) (u []entities.Organization, err error) {
 	q := `
 		SELECT name, bin FROM organization`
 
-	rows, err := r.db.Query(ctx, q)
+	rows, err := d.db.Query(ctx, q)
 	if err != nil {
 		return nil, err
 	}
@@ -33,27 +33,27 @@ func (r *St) FindAllOrganizations(ctx context.Context) (u []entities.Organizatio
 
 		err = rows.Scan(&org.Name, &org.Bin)
 		if err != nil {
-			return nil, r.db.HErr(err)
+			return nil, d.db.HErr(err)
 		}
 
 		organizations = append(organizations, org)
 	}
 	if err = rows.Err(); err != nil {
-		return nil, r.db.HErr(err)
+		return nil, d.db.HErr(err)
 	}
 
 	return organizations, nil
 }
 
-func (r *St) FindOneOrganization(ctx context.Context, bin string) (entities.Organization, error) {
+func (d *St) FindOneOrganization(ctx context.Context, bin string) (entities.Organization, error) {
 	q := `
 		SELECT NAME, BIN FROM organization WHERE BIN = &1`
 
 	var org entities.Organization
 
-	err := r.db.QueryRow(ctx, q, bin).Scan(&org.Name, &org.Bin)
+	err := d.db.QueryRow(ctx, q, bin).Scan(&org.Name, &org.Bin)
 	if err != nil {
-		err = r.db.HErr(err)
+		err = d.db.HErr(err)
 		if !errors.Is(err, db.ErrNoRows) {
 			return entities.Organization{}, err
 		}
@@ -67,12 +67,12 @@ func (r *St) FindOneOrganization(ctx context.Context, bin string) (entities.Orga
 //	panic("implement me")
 // }
 
-func (r *St) DeleteOrganization(ctx context.Context, bin string) error {
+func (d *St) DeleteOrganization(ctx context.Context, bin string) error {
 	q := `
 		DELETE FROM organization
 		WHERE bin = $1;`
 
-	if err := r.db.Exec(ctx, q, bin); err != nil {
+	if err := d.db.Exec(ctx, q, bin); err != nil {
 		return err
 	}
 

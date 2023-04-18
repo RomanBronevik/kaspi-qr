@@ -1,6 +1,7 @@
 package pg
 
 import (
+	"regexp"
 	"time"
 )
 
@@ -19,3 +20,7 @@ var defaultOptions = OptionsSt{
 	MaxConnIdleTime:   10 * time.Minute,
 	HealthCheckPeriod: 20 * time.Second,
 }
+
+var (
+	queryParamRegexp = regexp.MustCompile(`(?si)\$\{[^}]+\}`)
+)

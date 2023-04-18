@@ -1,12 +1,12 @@
-package h_gin
+package handlers
 
 import (
 	"errors"
 	"fmt"
+	"kaspi-qr/internal/adapters/server"
 	"net/http"
 
 	"kaspi-qr/internal/adapters/logger"
-	"kaspi-qr/internal/adapters/server/rest"
 	"kaspi-qr/internal/domain/errs"
 
 	"github.com/gin-gonic/gin"
@@ -81,11 +81,11 @@ func MwRecovery(lg logger.WarnAndError, handler func(*gin.Context, error)) gin.H
 
 			switch cErr := err.(type) {
 			case errs.Err:
-				c.AbortWithStatusJSON(http.StatusBadRequest, rest.ErrRep{
+				c.AbortWithStatusJSON(http.StatusBadRequest, server.ErrRep{
 					ErrorCode: cErr.Error(),
 				})
 			case errs.ErrWithDesc:
-				c.AbortWithStatusJSON(http.StatusBadRequest, rest.ErrRep{
+				c.AbortWithStatusJSON(http.StatusBadRequest, server.ErrRep{
 					ErrorCode: cErr.Err.Error(),
 					Desc:      cErr.Desc,
 				})

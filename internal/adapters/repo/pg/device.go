@@ -8,20 +8,20 @@ import (
 	"kaspi-qr/internal/domain/entities"
 )
 
-func (r *St) CreateDevice(ctx context.Context, device *entities.CreateDeviceDTO) error {
+func (d *St) CreateDevice(ctx context.Context, device *entities.CreateDeviceDTO) error {
 	q := `
 		INSERT INTO device (device_id, token, organization_bin) 
 		VALUES ($1, $2, $3)`
 
-	return r.db.Exec(ctx, q, device.DeviceId, device.Token, device.OrganizationBin)
+	return d.db.Exec(ctx, q, device.DeviceId, device.Token, device.OrganizationBin)
 }
 
-func (r *St) FindAllDevices(ctx context.Context) ([]*entities.Device, error) {
+func (d *St) FindAllDevices(ctx context.Context) ([]*entities.Device, error) {
 	q := `
 		SELECT device_id, token,  organization_bin
 		FROM device`
 
-	rows, err := r.db.Query(ctx, q)
+	rows, err := d.db.Query(ctx, q)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (r *St) FindAllDevices(ctx context.Context) ([]*entities.Device, error) {
 	return devices, nil
 }
 
-func (r *St) FindOneDevice(ctx context.Context, token string) (*entities.Device, error) {
+func (d *St) FindOneDevice(ctx context.Context, token string) (*entities.Device, error) {
 	q := `
 		SELECT device_id, token, organization_bin
 		FROM device
@@ -55,7 +55,7 @@ func (r *St) FindOneDevice(ctx context.Context, token string) (*entities.Device,
 
 	dev := &entities.Device{}
 
-	err := r.db.QueryRow(ctx, q, token).Scan(&dev.DeviceId, &dev.Token, &dev.OrganizationBin)
+	err := d.db.QueryRow(ctx, q, token).Scan(&dev.DeviceId, &dev.Token, &dev.OrganizationBin)
 	if err != nil {
 		if errors.Is(err, db.ErrNoRows) {
 			return nil, nil
@@ -66,10 +66,10 @@ func (r *St) FindOneDevice(ctx context.Context, token string) (*entities.Device,
 	return dev, nil
 }
 
-func (r *St) DeleteDevice(ctx context.Context, bin string, token string) error {
+func (d *St) DeleteDevice(ctx context.Context, bin string, token string) error {
 	q := `
 		DELETE FROM device
 		WHERE organization_bin = $1 AND token = $2;`
 
-	return r.db.Exec(ctx, q, bin, token)
+	return d.db.Exec(ctx, q, bin, token)
 }

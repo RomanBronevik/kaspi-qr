@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strconv"
+	"strings"
 
 	"kaspi-qr/internal/adapters/db"
 	"kaspi-qr/internal/adapters/logger"
@@ -14,13 +16,14 @@ import (
 )
 
 type St struct {
-	lg   logger.WarnAndError
-	opts OptionsSt
+	debug bool
+	lg    logger.WarnAndError
+	opts  OptionsSt
 
 	Con *pgxpool.Pool
 }
 
-func New(lg logger.WarnAndError, opts OptionsSt) (*St, error) {
+func New(debug bool, lg logger.WarnAndError, opts OptionsSt) (*St, error) {
 	opts.mergeWithDefaults()
 
 	cfg, err := pgxpool.ParseConfig(opts.Dsn)
@@ -44,9 +47,10 @@ func New(lg logger.WarnAndError, opts OptionsSt) (*St, error) {
 	}
 
 	return &St{
-		lg:   lg,
-		opts: opts,
-		Con:  dbPool,
+		debug: debug,
+		lg:    lg,
+		opts:  opts,
+		Con:   dbPool,
 	}, nil
 }
 
@@ -166,6 +170,48 @@ func (d *St) QueryRow(ctx context.Context, sql string, args ...any) db.Row {
 
 	return &rowSt{Row: row, db: d}
 }
+
+func (d *St) queryRebindNamed(sql string, argMap map[string]any) (string, []any) {
+	resultQuery := sql
+	args := make([]any, 0, len(argMap))
+
+	for k, v := range argMap {
+		if strings.Contains(resultQuery, "${"+k+"}") {
+			args = append(args, v)
+			resultQuery = strings.ReplaceAll(resultQuery, "${"+k+"}", "$"+strconv.Itoa(len(args)))
+		}
+	}
+
+	if d.debug {
+		if strings.Index(resultQuery, "${") > -1 {
+			for _, x := range queryParamRegexp.FindAllString(resultQuery, 1) {
+				d.lg.Errorw(ErrPrefix+": missing param", nil, "param", x, "query", resultQuery)
+			}
+		}
+	}
+
+	return resultQuery, args
+}
+
+func (d *St) ExecM(ctx context.Context, sql string, argMap map[string]interface{}) error {
+	rbSql, args := d.queryRebindNamed(sql, argMap)
+
+	return d.Exec(ctx, rbSql, args...)
+}
+
+func (d *St) QueryM(ctx context.Context, sql string, argMap map[string]interface{}) (db.Rows, error) {
+	rbSql, args := d.queryRebindNamed(sql, argMap)
+
+	return d.Query(ctx, rbSql, args...)
+}
+
+func (d *St) QueryRowM(ctx context.Context, sql string, argMap map[string]interface{}) db.Row {
+	rbSql, args := d.queryRebindNamed(sql, argMap)
+
+	return d.QueryRow(ctx, rbSql, args...)
+}
+
+// handle error
 
 func (d *St) HErr(err error) error {
 	switch {

@@ -28,6 +28,10 @@ type Connection interface {
 	Exec(ctx context.Context, sql string, args ...any) error
 	Query(ctx context.Context, sql string, args ...any) (Rows, error)
 	QueryRow(ctx context.Context, sql string, args ...any) Row
+
+	ExecM(ctx context.Context, sql string, argMap map[string]interface{}) error
+	QueryM(ctx context.Context, sql string, argMap map[string]interface{}) (Rows, error)
+	QueryRowM(ctx context.Context, sql string, argMap map[string]interface{}) Row
 }
 
 type Transaction interface {

@@ -1,8 +1,9 @@
-DROP TABLE payment;
-DROP TABLE orders;
-DROP TABLE device;
-DROP TABLE city;
-DROP TABLE organization;
+DROP TABLE if exists payment;
+DROP TABLE if exists orders;
+DROP TABLE if exists device;
+DROP TABLE if exists city;
+DROP TABLE if exists organisation;
+DROP TABLE if exists organization;
 
 
 

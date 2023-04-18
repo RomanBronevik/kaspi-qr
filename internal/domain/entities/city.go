@@ -1,39 +1,21 @@
 package entities
 
-type CreateCityDTO struct {
-	Name            string `json:"name"`
-	OrganizationBin string `json:"organization_bin"`
-	Code            string `json:"code"`
+type CitySt struct {
+	Id   int64  `json:"id" db:"id"`
+	Name string `json:"name" db:"name"`
 }
 
-type City struct {
-	Name            string `json:"name"`
-	OrganizationBin string `json:"organization_bin"`
-	Code            string `json:"code"`
+type CityListSt struct {
+	CitySt
 }
 
-type CityUpdateReqOutput struct {
-	Result bool `json:"result"`
-	// Errors *Errors     `json:"errors"`
-	Data *Cities `json:"data"`
+type CityListParsSt struct {
+	dopTypes.ListParams
+
+	Ids  *[]int64 `json:"ids" form:"ids"`
+	Name *string  `json:"name" form:"name"`
 }
 
-type Cities struct {
-	Cities []CitiesData `json:"cities"`
-}
-
-type CitiesData struct {
-	Code        string       `json:"code"`
-	Name        string       `json:"name"`
-	Phones      []string     `json:"phones"`
-	Coordinates *Coordinates `json:"coordinates"`
-	Translit    string       `json:"translit"`
-}
-
-type Errors struct {
-}
-
-type Coordinates struct {
-	Lan float64 `json:"lan"`
-	Lon float64 `json:"lon"`
+type CityCUSt struct {
+	Name *string `json:"name" db:"name"`
 }

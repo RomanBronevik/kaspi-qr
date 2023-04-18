@@ -1,4 +1,4 @@
-package rest
+package server
 
 type ErrRep struct {
 	ErrorCode string `json:"error_code"`

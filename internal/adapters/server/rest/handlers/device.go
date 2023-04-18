@@ -1,4 +1,4 @@
-package h_gin
+package handlers
 
 import (
 	"net/http"

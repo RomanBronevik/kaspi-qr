@@ -4,7 +4,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-type confSt struct {
+type ConfSt struct {
 	Debug        bool   `mapstructure:"DEBUG"`
 	LogLevel     string `mapstructure:"LOG_LEVEL"`
 	HttpListen   string `mapstructure:"HTTP_LISTEN"`
@@ -16,8 +16,8 @@ type confSt struct {
 	CertPassword string `mapstructure:"CERTIFICATE_PASSWORD"`
 }
 
-func Load() *confSt {
-	result := &confSt{}
+func Load() *ConfSt {
+	result := &ConfSt{}
 
 	viper.SetDefault("DEBUG", "false")
 	viper.SetDefault("LOG_LEVEL", "info")

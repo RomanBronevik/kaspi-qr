@@ -1,57 +1,59 @@
-CREATE TABLE organization
+create table organisation
 (
-    bin  text
+    id   text not null
         primary key,
+    bin  text not null default '',
     name text not null default ''
 );
 
-CREATE TABLE city
+create table city
 (
-    code             text
+    id              text not null
         primary key,
-    name             text not null default '',
-    organization_bin text not null
-        constraint city_fk_organization_bin references organization (bin) on delete cascade on update cascade
+    code            text,
+    name            text not null default '',
+    organisation_id text not null
+        constraint city_fk_organisation_id references organisation (id) on delete cascade on update cascade
 );
 
-CREATE TABLE device
+create table device
 (
-    device_id        text
+    id              text
         primary key,
-    token            text not null default '',
-    organization_bin text not null
-        constraint device_fk_organization_bin references organization (bin) on delete cascade on update cascade
+    token           text not null default '',
+    organisation_id text not null
+        constraint device_fk_organisation_id references organisation (id) on delete cascade on update cascade
 );
 
-CREATE TABLE orders
+create table orders
 (
-    order_number     text
+    id              text
         primary key,
-    created          timestamptz not null default now(),
-    modified         timestamptz not null default now(),
-    organization_bin text        not null
-        constraint orders_fk_organization_bin references organization (bin) on delete cascade on update cascade,
-    status           text        not null
+    created         timestamptz not null default now(),
+    modified        timestamptz not null default now(),
+    organisation_id text        not null
+        constraint orders_fk_organisation_id references organisation (id) on delete cascade on update cascade,
+    status          text        not null
 );
 
-CREATE TABLE payment
+create table payment
 (
-    payment_id                   text
+    id             text
         primary key,
-    created                      timestamptz not null default now(),
-    modified                     timestamptz not null default now(),
-    order_number                 text
-        constraint payment_fk_order_number references orders (order_number) on delete cascade on update cascade,
-    status                       text        not null,
-    payment_method               text        not null,
-    amount                       numeric not null default 0
+    created        timestamptz not null default now(),
+    modified       timestamptz not null default now(),
+    order_id       text        not null
+        constraint payment_fk_order_id references orders (id) on delete cascade on update cascade,
+    status         text        not null,
+    payment_method text        not null,
+    amount         numeric     not null default 0
 );
 
 
-INSERT INTO organization (name, bin)
-VALUES ('Test', '160640004075');
-INSERT INTO city (name, organization_bin, code)
-VALUES ('Test', '160640004075', 'test');
+insert into organisation (id, name, bin)
+values ('test_org', 'test', '160640004075');
+insert into city (id, name, organisation_id, code)
+values ('test_city', 'test', 'test_org', 'test_city');
 
 
 
