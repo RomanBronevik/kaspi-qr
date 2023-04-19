@@ -5,17 +5,19 @@ import (
 )
 
 type St struct {
-	lg           logger.Full
-	kaspiUrl     string
-	certPath     string
-	certPassword string
+	lg         logger.Full
+	httpClient *httpClientSt
 }
 
-func New(lg logger.Full, kaspiUrl string, certPath string, certPassword string) *St {
-	return &St{
-		lg:           lg,
-		kaspiUrl:     kaspiUrl,
-		certPath:     certPath,
-		certPassword: certPassword,
+func New(lg logger.Full, kaspiUrl, certPath, certPassword string) (*St, error) {
+	httpClient, err := newHttpClient(lg, kaspiUrl, certPath, certPassword)
+	if err != nil {
+		lg.Errorw("generateCert", "err", err)
+		return nil, err
 	}
+
+	return &St{
+		lg:         lg,
+		httpClient: httpClient,
+	}, nil
 }
