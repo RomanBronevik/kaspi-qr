@@ -34,15 +34,17 @@ create table ord
 
 create table payment
 (
-    id             text
+    id                          text
         primary key,
-    created        timestamptz not null default now(),
-    modified       timestamptz not null default now(),
-    ord_id       text        not null
+    created                     timestamptz not null default now(),
+    modified                    timestamptz not null default now(),
+    ord_id                      text        not null
         constraint payment_fk_ord_id references ord (id) on delete cascade on update cascade,
-    status         text        not null,
-    payment_method text        not null,
-    amount         numeric     not null default 0
+    status                      text        not null,
+    payment_method              text        not null,
+    expire_dt                   timestamptz          default null,
+    qr_payment_behavior_options jsonb       not null default '{}',
+    amount                      numeric     not null default 0
 );
 
 

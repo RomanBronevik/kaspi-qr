@@ -5,48 +5,47 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"kaspi-qr/internal/adapters/provider"
 	"log"
 	"net/http"
-
-	"kaspi-qr/internal/domain/entities"
 )
 
-func (s *St) KaspiOperationDetails(input entities.OperationGetSt) (entities.OperationDetails, error) {
-	var bodyRequest entities.OperationDetails
+func (s *St) KaspiOperationDetails(input provider.OperationGetReqSt) (*provider.OperationDetailsSt, error) {
+	var bodyRequest provider.OperationGetRepSt
 
 	client, err := GetHttpClientTls(s.certPath, s.certPassword)
 
 	if err != nil {
-		return entities.OperationDetails{}, err
+		return nil, err
 	}
 
 	req, err := http.NewRequest("GET", s.kaspiUrl+"payment/details?QrPaymentId="+fmt.Sprint(input.QrPaymentId)+"&DeviceToken="+input.DeviceToken, nil)
 	if err != nil {
-		return entities.OperationDetails{}, err
+		return nil, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return entities.OperationDetails{}, err
+		return nil, err
 	}
 
 	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return entities.OperationDetails{}, err
+		return nil, err
 	}
 
 	errJson := json.Unmarshal(bytes, &bodyRequest)
 	if errJson != nil {
-		return entities.OperationDetails{}, err
+		return nil, err
 	}
 
-	return bodyRequest, nil
+	return &bodyRequest.Data, nil
 }
 
-func (s *St) KaspiReturnWithoutClient(input entities.ReturnRequestInput) (entities.ReturnSt, error) {
-	var bodyRequest entities.ReturnSt
+func (s *St) KaspiReturnWithoutClient(input provider.ReturnReqSt) (int64, error) {
+	var bodyRequest provider.ReturnRepSt
 
 	client, err := GetHttpClientTls(s.certPath, s.certPassword)
 
@@ -57,30 +56,30 @@ func (s *St) KaspiReturnWithoutClient(input entities.ReturnRequestInput) (entiti
 	requestBody, err := json.Marshal(input)
 
 	if err != nil {
-		return entities.ReturnSt{}, err
+		return 0, err
 	}
 
 	req, err := http.NewRequest("POST", s.kaspiUrl+"payment/return", bytes2.NewBuffer(requestBody))
 	if err != nil {
-		return entities.ReturnSt{}, err
+		return 0, err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return entities.ReturnSt{}, err
+		return 0, err
 	}
 
 	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return entities.ReturnSt{}, err
+		return 0, err
 	}
 
 	errJson := json.Unmarshal(bytes, &bodyRequest)
 	if errJson != nil {
-		return entities.ReturnSt{}, err
+		return 0, err
 	}
 
-	return bodyRequest, nil
+	return bodyRequest.ReturnOperationDataSt.ReturnOperationId, nil
 }

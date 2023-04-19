@@ -39,7 +39,7 @@ func main() {
 	app.lg = zap.New(conf.LogLevel, conf.Debug)
 
 	// db
-	app.db, err = dbPg.New(app.lg, dbPg.OptionsSt{
+	app.db, err = dbPg.New(conf.Debug, app.lg, dbPg.OptionsSt{
 		Dsn: conf.PgDsn,
 	})
 	if err != nil {

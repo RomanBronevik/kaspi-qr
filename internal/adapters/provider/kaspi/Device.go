@@ -4,126 +4,129 @@ import (
 	bytes2 "bytes"
 	"encoding/json"
 	"io"
+	"kaspi-qr/internal/adapters/provider"
+	"kaspi-qr/internal/domain/errs"
 	"log"
 	"net/http"
-
-	"kaspi-qr/internal/domain/entities"
 )
 
-func (s *St) GetAllTradePoints(organizationBIN string) (entities.TradePointSt, error) {
-
-	var bodyRequest entities.TradePointSt
+func (s *St) GetAllTradePoints(orgBin string) ([]*provider.TradePointSt, error) {
+	var bodyRequest provider.TradePointListRepSt
 
 	client, err := GetHttpClientTls(s.certPath, s.certPassword)
 
 	if err != nil {
 		log.Fatal(err.Error())
-		return entities.TradePointSt{}, err
+		return nil, err
 	}
 
-	req, err := http.NewRequest("GET", s.kaspiUrl+"partner/tradepoints/"+organizationBIN, nil)
+	req, err := http.NewRequest("GET", s.kaspiUrl+"partner/tradepoints/"+orgBin, nil)
 	if err != nil {
 		log.Fatal(err.Error())
-		return entities.TradePointSt{}, err
+		return nil, err
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Fatal(err.Error())
-		return entities.TradePointSt{}, err
+		return nil, err
 	}
 
 	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err.Error())
-		return entities.TradePointSt{}, err
+		return nil, err
 	}
 
 	errJson := json.Unmarshal(bytes, &bodyRequest)
 	if errJson != nil {
 		log.Fatal(err.Error())
-		return entities.TradePointSt{}, err
+		return nil, err
 	}
 
-	return bodyRequest, nil
+	return bodyRequest.Data, nil
 }
 
-func (s *St) DeviceRegistration(input entities.DeviceInputReg) (entities.DeviceOutputReg, error) {
-	var bodyRequest entities.DeviceOutputReg
+func (s *St) DeviceRegistration(input provider.DeviceCreateReqSt) (string, error) {
+	var bodyRequest provider.DeviceCreateRepSt
 
 	client, err := GetHttpClientTls(s.certPath, s.certPassword)
 
 	if err != nil {
-		return entities.DeviceOutputReg{}, err
+		return "", err
 	}
 
 	requestBody, err := json.Marshal(input)
 
 	if err != nil {
-		return entities.DeviceOutputReg{}, err
+		return "", err
 	}
 
 	req, err := http.NewRequest("POST", s.kaspiUrl+"device/register/", bytes2.NewBuffer(requestBody))
 	if err != nil {
-		return entities.DeviceOutputReg{}, err
+		return "", err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return entities.DeviceOutputReg{}, err
+		return "", err
 	}
 
 	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return entities.DeviceOutputReg{}, err
+		return "", err
 	}
 
 	errJson := json.Unmarshal(bytes, &bodyRequest)
 	if errJson != nil {
-		return entities.DeviceOutputReg{}, err
+		return "", err
 	}
 
-	return bodyRequest, nil
+	return bodyRequest.Data.DeviceToken, nil
 }
 
-func (s *St) DeviceDelete(input entities.DeviceInputDel) (entities.DeviceOutputDel, error) {
-	var bodyRequest entities.DeviceOutputDel
+func (s *St) DeviceDelete(input provider.DeviceRemoveReqSt) error {
+	var bodyRequest provider.BaseRepSt
 
 	client, err := GetHttpClientTls(s.certPath, s.certPassword)
 
 	if err != nil {
-		return entities.DeviceOutputDel{}, err
+		return err
 	}
 
 	requestBody, err := json.Marshal(input)
 
 	if err != nil {
-		return entities.DeviceOutputDel{}, err
+		return err
 	}
 
 	req, err := http.NewRequest("POST", s.kaspiUrl+"device/delete", bytes2.NewBuffer(requestBody))
 	if err != nil {
-		return entities.DeviceOutputDel{}, err
+		return err
 	}
 
 	req.Header.Add("Content-Type", "application/json")
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return entities.DeviceOutputDel{}, err
+		return err
 	}
 
 	bytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return entities.DeviceOutputDel{}, err
+		return err
 	}
 
 	err = json.Unmarshal(bytes, &bodyRequest)
 	if err != nil {
-		return entities.DeviceOutputDel{}, err
+		return err
 	}
 
-	return bodyRequest, nil
+	if bodyRequest.StatusCode != SuccessStatus {
+		return errs.ServiceNA
+	}
+
+	return nil
 }
