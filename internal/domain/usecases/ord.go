@@ -3,13 +3,11 @@ package usecases
 import (
 	"context"
 	"kaspi-qr/internal/domain/entities"
-
-	"github.com/rendau/dop/dopTools"
 )
 
-func (u *St) OrganisationList(ctx context.Context,
-	pars *entities.OrganisationListParsSt) ([]*entities.OrganisationSt, int64, error) {
-	var err error
+func (u *St) OrdList(ctx context.Context,
+	pars *entities.OrdListParsSt) ([]*entities.OrdSt, error) {
+	//var err error
 
 	// ses := u.SessionGetFromContext(ctx)
 	//
@@ -17,14 +15,10 @@ func (u *St) OrganisationList(ctx context.Context,
 	// 	return nil, 0, err
 	// }
 
-	if err = dopTools.RequirePageSize(pars.ListParams, cns.MaxPageSize); err != nil {
-		return nil, 0, err
-	}
-
-	return u.cr.Organisation.List(ctx, pars)
+	return u.cr.Ord.List(ctx, pars)
 }
 
-func (u *St) OrganisationGet(ctx context.Context, id string) (*entities.OrganisationSt, error) {
+func (u *St) OrdGet(ctx context.Context, id string) (*entities.OrdSt, error) {
 	// var err error
 
 	// ses := u.SessionGetFromContext(ctx)
@@ -33,11 +27,11 @@ func (u *St) OrganisationGet(ctx context.Context, id string) (*entities.Organisa
 	// 	return nil, 0, err
 	// }
 
-	return u.cr.Organisation.Get(ctx, id, true)
+	return u.cr.Ord.Get(ctx, id, true)
 }
 
-func (u *St) OrganisationCreate(ctx context.Context,
-	obj *entities.OrganisationCUSt) (string, error) {
+func (u *St) OrdCreate(ctx context.Context,
+	obj *entities.OrdCUSt) (string, error) {
 	var err error
 
 	// ses := u.SessionGetFromContext(ctx)
@@ -49,15 +43,15 @@ func (u *St) OrganisationCreate(ctx context.Context,
 	var result string
 
 	err = u.db.TransactionFn(ctx, func(ctx context.Context) error {
-		result, err = u.cr.Organisation.Create(ctx, obj)
+		result, err = u.cr.Ord.Create(ctx, obj)
 		return err
 	})
 
 	return result, err
 }
 
-func (u *St) OrganisationUpdate(ctx context.Context,
-	id string, obj *entities.OrganisationCUSt) error {
+func (u *St) OrdUpdate(ctx context.Context,
+	id string, obj *entities.OrdCUSt) error {
 	// ses := u.SessionGetFromContext(ctx)
 	//
 	// if err = u.SessionRequireAuth(ses); err != nil {
@@ -65,11 +59,11 @@ func (u *St) OrganisationUpdate(ctx context.Context,
 	// }
 
 	return u.db.TransactionFn(ctx, func(ctx context.Context) error {
-		return u.cr.Organisation.Update(ctx, id, obj)
+		return u.cr.Ord.Update(ctx, id, obj)
 	})
 }
 
-func (u *St) OrganisationDelete(ctx context.Context,
+func (u *St) OrdDelete(ctx context.Context,
 	id string) error {
 	// ses := u.SessionGetFromContext(ctx)
 	//
@@ -78,6 +72,6 @@ func (u *St) OrganisationDelete(ctx context.Context,
 	// }
 
 	return u.db.TransactionFn(ctx, func(ctx context.Context) error {
-		return u.cr.Organisation.Delete(ctx, id)
+		return u.cr.Ord.Delete(ctx, id)
 	})
 }

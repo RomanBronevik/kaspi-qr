@@ -1,8 +1,8 @@
 package rest
 
 import (
+	"context"
 	"kaspi-qr/internal/adapters/logger"
-	"kaspi-qr/internal/adapters/server/rest/handlers"
 	"kaspi-qr/internal/domain/usecases"
 	"net/http"
 
@@ -21,9 +21,9 @@ func GetHandler(lg logger.Lite, ucs *usecases.St, withCors bool) http.Handler {
 
 	// middlewares
 
-	r.Use(handlers.MwRecovery(lg, nil))
+	r.Use(MwRecovery(lg, nil))
 	if withCors {
-		r.Use(handlers.MwCors())
+		r.Use(MwCors())
 	}
 
 	// handlers
@@ -33,12 +33,37 @@ func GetHandler(lg logger.Lite, ucs *usecases.St, withCors bool) http.Handler {
 	// healthcheck
 	r.GET("/healthcheck", func(c *gin.Context) { c.Status(http.StatusOK) })
 
-	// organisation
-	r.GET("/organisation", s.hOrganisationList)
-	r.POST("/organisation", s.hOrganisationCreate)
-	r.GET("/organisation/:id", s.hOrganisationGet)
-	r.PUT("/organisation/:id", s.hOrganisationUpdate)
-	r.DELETE("/organisation/:id", s.hOrganisationDelete)
+	// city
+	r.GET("/city", s.hCityList)
+	r.POST("/city", s.hCityCreate)
+	r.GET("/city/:id", s.hCityGet)
+	r.PUT("/city/:id", s.hCityUpdate)
+	r.DELETE("/city/:id", s.hCityDelete)
+
+	// device
+	r.GET("/device", s.hDeviceList)
+	r.POST("/device", s.hDeviceCreate)
+	r.GET("/device/:id", s.hDeviceGet)
+	r.PUT("/device/:id", s.hDeviceUpdate)
+	r.DELETE("/device/:id", s.hDeviceDelete)
+
+	// ord
+	r.GET("/ord", s.hOrdList)
+	r.POST("/ord", s.hOrdCreate)
+	r.GET("/ord/:id", s.hOrdGet)
+	r.PUT("/ord/:id", s.hOrdUpdate)
+	r.DELETE("/ord/:id", s.hOrdDelete)
+
+	// payment
+	r.GET("/payment", s.hPaymentList)
+	r.POST("/payment", s.hPaymentCreate)
+	r.GET("/payment/:id", s.hPaymentGet)
+	r.PUT("/payment/:id", s.hPaymentUpdate)
+	r.DELETE("/payment/:id", s.hPaymentDelete)
 
 	return r
+}
+
+func (o *St) getRequestContext(c *gin.Context) context.Context {
+	return context.Background()
 }

@@ -3,143 +3,182 @@ package pg
 import (
 	"context"
 	"errors"
-	"fmt"
-	"github.com/jackc/pgconn"
-	"github.com/jackc/pgx/v4"
+	"kaspi-qr/internal/adapters/db"
 	"kaspi-qr/internal/domain/entities"
-	"time"
 )
 
-func (d *St) CreatePayment(ctx context.Context, payment *entities.CreatePaymentDTO) error {
-	q := `
-		INSERT INTO payment (created, modified, status, order_number, payment_id, payment_method, wait_timeout, polling_interval, payment_confirmation_timeout, amount)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`
+func (d *St) PaymentGet(ctx context.Context, id string) (*entities.PaymentSt, error) {
+	var result entities.PaymentSt
 
-	if err := d.db.Exec(ctx, q, payment.Created, payment.Modified, payment.Status, payment.OrderNumber, payment.PaymentId, payment.PaymentMethod, payment.WaitTimeout, payment.PollingInterval, payment.PaymentConfirmationTimeout, payment.Amount); err != nil {
-		return d.ErorrHandler(err)
+	err := d.db.QueryRow(ctx, `
+		select
+			t.id,
+			t.created,
+			t.modified,
+			t.ord_id,
+			t.status,
+			t.payment_method,
+			t.amount
+		from payment t
+		where t.id = $1
+	`, id).Scan(
+		&result.Id,
+		&result.Created,
+		&result.Modified,
+		&result.OrdId,
+		&result.Status,
+		&result.PaymentMethod,
+		&result.Amount,
+	)
+	if errors.Is(err, db.ErrNoRows) {
+		return nil, nil
 	}
 
-	return nil
+	return &result, err
 }
 
-func (d *St) FindAllPayments(ctx context.Context) (u []entities.Payment, err error) {
-	q := `
-		SELECT created, modified, status, order_number, payment_id, payment_method, wait_timeout, polling_interval, payment_confirmation_timeout, amount FROM public.payment`
-	rows, err := d.db.Query(ctx, q)
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) ([]*entities.PaymentSt, error) {
+	conds := make([]string, 0)
+	args := map[string]any{}
+
+	// filter
+	if pars.Ids != nil {
+		conds = append(conds, `t.id in (select * from unnest(${ids} :: text[]))`)
+		args["ids"] = *pars.Ids
+	}
+	if pars.OrdId != nil {
+		conds = append(conds, "t.ord_id = ${ord_id}")
+		args["ord_id"] = *pars.OrdId
+	}
+	if pars.Status != nil {
+		conds = append(conds, "t.status = ${status}")
+		args["status"] = *pars.Status
+	}
+	if pars.PaymentMethod != nil {
+		conds = append(conds, "t.payment_method = ${payment_method}")
+		args["payment_method"] = *pars.PaymentMethod
+	}
+
+	rows, err := d.db.Query(ctx, `
+		select
+			t.id,
+			t.created,
+			t.modified,
+			t.ord_id,
+			t.status,
+			t.payment_method,
+			t.amount
+		from payment t
+		`+d.tOptionalWhere(conds)+`
+		order by t.name`,
+		args,
+	)
+	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	payments := make([]entities.Payment, 0)
+	var result []*entities.PaymentSt
 
 	for rows.Next() {
-		payment := entities.Payment{}
+		item := &entities.PaymentSt{}
 
-		err := rows.Scan(&payment.Created, &payment.Modified, &payment.Status, &payment.OrderNumber, &payment.PaymentId, &payment.PaymentMethod, &payment.WaitTimeout, &payment.PollingInterval, &payment.PaymentConfirmationTimeout, &payment.Amount)
+		err = rows.Scan(
+			&item.Id,
+			&item.Created,
+			&item.Modified,
+			&item.OrdId,
+			&item.Status,
+			&item.PaymentMethod,
+			&item.Amount,
+		)
 		if err != nil {
 			return nil, err
 		}
 
-		payments = append(payments, payment)
+		result = append(result, item)
 	}
-	if err := rows.Err(); err != nil {
+	if err = rows.Err(); err != nil {
 		return nil, err
 	}
 
-	return payments, nil
+	return result, nil
 }
 
-func (d *St) FindOnePaymentByPaymentId(ctx context.Context, paymentId string) (entities.Payment, error) {
-	q := `
-		SELECT created, modified, status, order_number, payment_id, payment_method, wait_timeout, polling_interval, payment_confirmation_timeout, amount FROM payment WHERE payment_id = $1`
+func (d *St) PaymentIdExists(ctx context.Context, id string) (bool, error) {
+	var err error
+	var cnt int
 
-	//Trace
+	err = d.db.QueryRow(ctx, `
+		select count(*)
+		from payment
+		where id = $1
+	`, id).Scan(&cnt)
 
-	var payment entities.Payment
-	err := d.db.QueryRow(ctx, q, paymentId).Scan(&payment.Created, &payment.Modified, &payment.Status, &payment.OrderNumber, &payment.PaymentId, &payment.PaymentMethod, &payment.WaitTimeout, &payment.PollingInterval, &payment.PaymentConfirmationTimeout, &payment.Amount)
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return entities.Payment{}, err
-	}
-
-	return payment, nil
+	return cnt > 0, err
 }
 
-func (d *St) FindLastPaymentByDesc(ctx context.Context, orderNumber string) (entities.Payment, error) {
-	q := `
-		SELECT created, modified, Status, order_number, payment_id, payment_method, wait_timeout, polling_interval, payment_confirmation_timeout, amount 
-		FROM payment 
-		WHERE order_number = $1
-		ORDER BY wait_timeout DESC
-		LIMIT 1`
+func (d *St) PaymentCreate(ctx context.Context, obj *entities.PaymentCUSt) (string, error) {
+	fields := d.paymentGetCUFields(obj)
+	cols, values := d.tPrepareFieldsToCreate(fields)
 
-	//Trace
+	var newId string
 
-	var payment entities.Payment
-	err := d.db.QueryRow(ctx, q, orderNumber).Scan(&payment.Created, &payment.Modified, &payment.Status, &payment.OrderNumber, &payment.PaymentId, &payment.PaymentMethod, &payment.WaitTimeout, &payment.PollingInterval, &payment.PaymentConfirmationTimeout, &payment.Amount)
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return entities.Payment{}, err
-	}
+	err := d.db.QueryRowM(ctx, `
+		insert into payment (`+cols+`)
+		values (`+values+`)
+		returning id
+	`, fields).Scan(&newId)
 
-	return payment, nil
+	return newId, err
 }
 
-func (d *St) UpdatePaymentRecordsToFail(ctx context.Context, orderNumber string) error {
-	q := `
-		UPDATE payment SET status = 'Error', modified = $1 
-		               WHERE order_number = $2 and (status = 'Created' OR status = 'Wait');`
+func (d *St) PaymentUpdate(ctx context.Context, id string, obj *entities.PaymentCUSt) error {
+	fields := d.paymentGetCUFields(obj)
+	cols := d.tPrepareFieldsToUpdate(fields)
 
-	if err := d.db.Exec(ctx, q, time.Now().Local(), orderNumber); err != nil {
-		var pgErr *pgconn.PgError
-		if errors.Is(err, pgErr) {
-			pgErr = err.(*pgconn.PgError)
-			newErr := fmt.Errorf(fmt.Sprintf("SQL Error: %s, Detail: %s, Where: %s", pgErr.Message, pgErr.Detail, pgErr.Where))
-			fmt.Println(newErr)
-			return newErr
-		}
-		return err
-	}
-	return nil
+	fields["cond_id"] = id
+
+	return d.db.ExecM(ctx, `
+		update payment
+		set `+cols+`
+		where id = ${cond_id}
+	`, fields)
 }
 
-func (d *St) UpdatePaymentStatus(ctx context.Context, paymentId string, status string) error {
-	q := `
-		UPDATE payment SET status = $1, modified = $2 
-		               WHERE payment_id = $3;`
+func (d *St) paymentGetCUFields(obj *entities.PaymentCUSt) map[string]any {
+	result := map[string]any{}
 
-	if err := d.db.Exec(ctx, q, status, time.Now().Local(), paymentId); err != nil {
-		var pgErr *pgconn.PgError
-		if errors.Is(err, pgErr) {
-			pgErr = err.(*pgconn.PgError)
-			newErr := fmt.Errorf(fmt.Sprintf("SQL Error: %s, Detail: %s, Where: %s", pgErr.Message, pgErr.Detail, pgErr.Where))
-			fmt.Println(newErr)
-			return newErr
-		}
-		return err
+	if obj.Id != nil {
+		result["id"] = *obj.Id
 	}
-	return nil
+
+	if obj.Modified != nil {
+		result["modified"] = *obj.Modified
+	}
+
+	if obj.OrdId != nil {
+		result["ord_id"] = *obj.OrdId
+	}
+
+	if obj.Status != nil {
+		result["status"] = *obj.Status
+	}
+
+	if obj.PaymentMethod != nil {
+		result["payment_method"] = *obj.PaymentMethod
+	}
+
+	if obj.Amount != nil {
+		result["amount"] = *obj.Amount
+	}
+
+	return result
 }
 
-func (d *St) DeletePayment(ctx context.Context, orderNumber string) error {
-	q := `
-		DELETE FROM payment
-		WHERE order_number = $1;`
-
-	if err := d.db.Exec(ctx, q, orderNumber); err != nil {
-		return d.ErorrHandler(err)
-	}
-
-	return nil
-}
-
-func (d *St) FindOnePaymentByOrderNumber(ctx context.Context, orderNumber string) (entities.Payment, error) {
-	q := `
-		SELECT created, modified, status, order_number, payment_id, payment_method, wait_timeout, polling_interval, payment_confirmation_timeout, amount FROM payment WHERE order_number = $1`
-	var payment entities.Payment
-	err := d.db.QueryRow(ctx, q, orderNumber).Scan(&payment.Created, &payment.Modified, &payment.Status, &payment.OrderNumber, &payment.PaymentId, &payment.PaymentMethod, &payment.WaitTimeout, &payment.PollingInterval, &payment.PaymentConfirmationTimeout, &payment.Amount)
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return entities.Payment{}, err
-	}
-
-	return payment, nil
+func (d *St) PaymentDelete(ctx context.Context, id string) error {
+	return d.db.Exec(ctx, `
+		delete from payment
+		where id = $1
+	`, id)
 }

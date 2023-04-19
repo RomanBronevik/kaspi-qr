@@ -1,39 +1,19 @@
 package entities
 
-type Device struct {
-	DeviceId        string `json:"device_id"`
-	Token           string `json:"token"`
-	OrganizationBin string `json:"organization_bin"`
+type DeviceSt struct {
+	Id     string `json:"id" db:"id"`
+	Token  string `json:"token" db:"token"`
+	OrgBin string `json:"org_bin" db:"org_bin"`
 }
 
-type CreateDeviceDTO struct {
-	Token           string `json:"token"`
-	DeviceId        string `json:"device_id"`
-	OrganizationBin string `json:"organization_id"`
+type DeviceListParsSt struct {
+	Ids    *[]string `json:"ids" form:"ids"`
+	Token  *string   `json:"token" form:"token"`
+	OrgBin *string   `json:"org_bin" form:"org_bin"`
 }
 
-type DeviceInputReg struct {
-	DeviceId        string `json:"DeviceId"`
-	OrganizationBin string `json:"OrganizationBin"`
-	TradePointId    string `json:"TradePointId"`
-}
-
-type DeviceOutputReg struct {
-	Data       *DeviceToken `json:"Data"`
-	Message    string       `json:"Message"`
-	StatusCode int          `json:"StatusCode"`
-}
-
-type DeviceToken struct {
-	DeviceToken string `json:"DeviceToken"`
-}
-
-type DeviceInputDel struct {
-	OrganizationBin string `json:"OrganizationBin"`
-	DeviceToken     string `json:"DeviceToken"`
-}
-
-type DeviceOutputDel struct {
-	StatusCode int    `json:"StatusCode"`
-	Message    string `json:"Message"`
+type DeviceCUSt struct {
+	Id     *string `json:"id" db:"id"`
+	Token  *string `json:"token" db:"token"`
+	OrgBin *string `json:"org_bin" db:"org_bin"`
 }

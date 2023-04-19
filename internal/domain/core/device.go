@@ -2,55 +2,78 @@ package core
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
 	"kaspi-qr/internal/domain/entities"
+	"kaspi-qr/internal/domain/errs"
 )
 
-func (s *St) CreateDevice(ctx context.Context, obj *entities.CreateDeviceDTO) error {
-	err := s.repo.CreateDevice(ctx, obj)
-
-	return err
+type Device struct {
+	r *St
 }
 
-func (s *St) DeleteDevice(ctx *gin.Context, bin string, token string) error {
-	err := s.repo.DeleteDevice(ctx, bin, token)
-
-	return err
+func NewDevice(r *St) *Device {
+	return &Device{r: r}
 }
 
-func (s *St) DeviceAlredyExist(ctx context.Context, token string) (bool, error) {
-	device, err := s.repo.FindOneDevice(ctx, token)
+func (c *Device) ValidateCU(ctx context.Context, obj *entities.DeviceCUSt, id string) error {
+	// forCreate := id == ""
+
+	return nil
+}
+
+func (c *Device) List(ctx context.Context, pars *entities.DeviceListParsSt) ([]*entities.DeviceSt, error) {
+	items, err := c.r.repo.DeviceList(ctx, pars)
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
-	empty := entities.Device{}
-
-	if device == empty {
-		return false, nil
-	}
-
-	return true, nil
+	return items, nil
 }
 
-func (s *St) CreateDeviceRecord(ctx context.Context, input entities.DeviceInputReg, output entities.DeviceOutputReg) error {
-	exits, err := s.DeviceAlredyExist(ctx, output.Data.DeviceToken)
+func (c *Device) Get(ctx context.Context, id string, errNE bool) (*entities.DeviceSt, error) {
+	result, err := c.r.repo.DeviceGet(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if result == nil {
+		if errNE {
+			return nil, errs.ObjectNotFound
+		}
+		return nil, nil
+	}
 
+	return result, nil
+}
+
+func (c *Device) IdExists(ctx context.Context, id string) (bool, error) {
+	return c.r.repo.DeviceIdExists(ctx, id)
+}
+
+func (c *Device) Create(ctx context.Context, obj *entities.DeviceCUSt) (string, error) {
+	var err error
+
+	err = c.ValidateCU(ctx, obj, "")
+	if err != nil {
+		return "", err
+	}
+
+	// create
+	result, err := c.r.repo.DeviceCreate(ctx, obj)
+	if err != nil {
+		return "", err
+	}
+
+	return result, nil
+}
+
+func (c *Device) Update(ctx context.Context, id string, obj *entities.DeviceCUSt) error {
+	var err error
+
+	err = c.ValidateCU(ctx, obj, id)
 	if err != nil {
 		return err
 	}
 
-	if exits {
-		return nil
-	}
-
-	dtoSt := entities.CreateDeviceDTO{
-		Token:           output.Data.DeviceToken,
-		DeviceId:        input.DeviceId,
-		OrganizationBin: input.OrganizationBin,
-	}
-
-	err = s.CreateDevice(ctx, &dtoSt)
+	err = c.r.repo.DeviceUpdate(ctx, id, obj)
 	if err != nil {
 		return err
 	}
@@ -58,40 +81,6 @@ func (s *St) CreateDeviceRecord(ctx context.Context, input entities.DeviceInputR
 	return nil
 }
 
-//
-//func (s *St) UpdateDevice(ctx *gin.Context, obj *entities.Device) error {
-//	err := s.repo.UpdateDevice(ctx, obj.Token)
-//
-//	return err
-//}
-
-func (s *St) FindAllDevices(ctx *gin.Context) ([]entities.Device, error) {
-	devices, err := s.repo.FindAllDevices(ctx)
-
-	return devices, err
-}
-
-func (s *St) FindOneDevice(ctx *gin.Context, OrganizationBin string) (entities.Device, error) {
-	device, err := s.repo.FindOneDevice(ctx, OrganizationBin)
-
-	return device, err
-}
-
-func (s *St) CreateDeviceTwoSystems(input entities.DeviceInputReg) (*entities.DeviceOutputReg, error) {
-	output, err := s.DeviceRegistration(input)
-
-	if err != nil {
-		return nil, err
-	}
-
-	output.Message = s.SetMessageByStatusCode(output.StatusCode)
-
-	if output.StatusCode == 0 {
-		err = s.CreateDeviceRecord(context.Background(), input, output)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return &output, err
+func (c *Device) Delete(ctx context.Context, id string) error {
+	return c.r.repo.DeviceDelete(ctx, id)
 }

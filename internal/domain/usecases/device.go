@@ -3,47 +3,75 @@ package usecases
 import (
 	"context"
 	"kaspi-qr/internal/domain/entities"
-
-	"github.com/gin-gonic/gin"
 )
 
-func (u *St) CreateDevice(ctx *gin.Context, obj *entities.CreateDeviceDTO) error {
-	err := u.cr.CreateDevice(ctx, obj)
+func (u *St) DeviceList(ctx context.Context,
+	pars *entities.DeviceListParsSt) ([]*entities.DeviceSt, error) {
+	//var err error
 
-	return err
+	// ses := u.SessionGetFromContext(ctx)
+	//
+	// if err = u.SessionRequireAuth(ses); err != nil {
+	// 	return nil, 0, err
+	// }
+
+	return u.cr.Device.List(ctx, pars)
 }
 
-//	func (s *St) UpdateDevice(ctx *gin.Context, obj *entities.Device) error {
-//		err := s.cr.UpdateDevice(ctx, obj)
-//
-//		return err
-//	}
-func (u *St) DeleteDevice(ctx *gin.Context, bin string, token string) error {
-	err := u.cr.DeleteDevice(ctx, bin, token)
+func (u *St) DeviceGet(ctx context.Context, id string) (*entities.DeviceSt, error) {
+	// var err error
 
-	return err
+	// ses := u.SessionGetFromContext(ctx)
+	//
+	// if err = u.SessionRequireAuth(ses); err != nil {
+	// 	return nil, 0, err
+	// }
+
+	return u.cr.Device.Get(ctx, id, true)
 }
 
-func (u *St) FindAllDevices(ctx *gin.Context) ([]entities.Device, error) {
-	devices, err := u.cr.FindAllDevices(ctx)
+func (u *St) DeviceCreate(ctx context.Context,
+	obj *entities.DeviceCUSt) (string, error) {
+	var err error
 
-	return devices, err
+	// ses := u.SessionGetFromContext(ctx)
+	//
+	// if err = u.SessionRequireAuth(ses); err != nil {
+	// 	return "", err
+	// }
+
+	var result string
+
+	err = u.db.TransactionFn(ctx, func(ctx context.Context) error {
+		result, err = u.cr.Device.Create(ctx, obj)
+		return err
+	})
+
+	return result, err
 }
 
-func (u *St) FindOneDevice(ctx *gin.Context, OrganizationBin string) (entities.Device, error) {
-	device, err := u.cr.FindOneDevice(ctx, OrganizationBin)
+func (u *St) DeviceUpdate(ctx context.Context,
+	id string, obj *entities.DeviceCUSt) error {
+	// ses := u.SessionGetFromContext(ctx)
+	//
+	// if err = u.SessionRequireAuth(ses); err != nil {
+	// 	return err
+	// }
 
-	return device, err
+	return u.db.TransactionFn(ctx, func(ctx context.Context) error {
+		return u.cr.Device.Update(ctx, id, obj)
+	})
 }
 
-func (u *St) CreateDeviceRecord(ctx context.Context, input entities.DeviceInputReg, output entities.DeviceOutputReg) error {
-	err := u.cr.CreateDeviceRecord(ctx, input, output)
+func (u *St) DeviceDelete(ctx context.Context,
+	id string) error {
+	// ses := u.SessionGetFromContext(ctx)
+	//
+	// if err = u.SessionRequireAuth(ses); err != nil {
+	// 	return err
+	// }
 
-	return err
-}
-
-func (u *St) CreateDeviceTwoSystems(input entities.DeviceInputReg) (*entities.DeviceOutputReg, error) {
-	output, err := u.cr.CreateDeviceTwoSystems(input)
-
-	return output, err
+	return u.db.TransactionFn(ctx, func(ctx context.Context) error {
+		return u.cr.Device.Delete(ctx, id)
+	})
 }

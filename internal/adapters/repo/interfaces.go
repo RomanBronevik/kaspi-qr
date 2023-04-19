@@ -6,11 +6,35 @@ import (
 )
 
 type Repo interface {
-	// organisation
-	OrganisationGet(ctx context.Context, id string) (*entities.OrganisationSt, error)
-	OrganisationList(ctx context.Context, pars *entities.OrganisationListParsSt) ([]*entities.OrganisationSt, int64, error)
-	OrganisationIdExists(ctx context.Context, id string) (bool, error)
-	OrganisationCreate(ctx context.Context, obj *entities.OrganisationCUSt) (string, error)
-	OrganisationUpdate(ctx context.Context, id string, obj *entities.OrganisationCUSt) error
-	OrganisationDelete(ctx context.Context, id string) error
+	// city
+	CityGet(ctx context.Context, id string) (*entities.CitySt, error)
+	CityList(ctx context.Context, pars *entities.CityListParsSt) ([]*entities.CitySt, error)
+	CityIdExists(ctx context.Context, id string) (bool, error)
+	CityCreate(ctx context.Context, obj *entities.CityCUSt) (string, error)
+	CityUpdate(ctx context.Context, id string, obj *entities.CityCUSt) error
+	CityDelete(ctx context.Context, id string) error
+
+	// device
+	DeviceGet(ctx context.Context, id string) (*entities.DeviceSt, error)
+	DeviceList(ctx context.Context, pars *entities.DeviceListParsSt) ([]*entities.DeviceSt, error)
+	DeviceIdExists(ctx context.Context, id string) (bool, error)
+	DeviceCreate(ctx context.Context, obj *entities.DeviceCUSt) (string, error)
+	DeviceUpdate(ctx context.Context, id string, obj *entities.DeviceCUSt) error
+	DeviceDelete(ctx context.Context, id string) error
+
+	// ord
+	OrdGet(ctx context.Context, id string) (*entities.OrdSt, error)
+	OrdList(ctx context.Context, pars *entities.OrdListParsSt) ([]*entities.OrdSt, error)
+	OrdIdExists(ctx context.Context, id string) (bool, error)
+	OrdCreate(ctx context.Context, obj *entities.OrdCUSt) (string, error)
+	OrdUpdate(ctx context.Context, id string, obj *entities.OrdCUSt) error
+	OrdDelete(ctx context.Context, id string) error
+
+	// payment
+	PaymentGet(ctx context.Context, id string) (*entities.PaymentSt, error)
+	PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) ([]*entities.PaymentSt, error)
+	PaymentIdExists(ctx context.Context, id string) (bool, error)
+	PaymentCreate(ctx context.Context, obj *entities.PaymentCUSt) (string, error)
+	PaymentUpdate(ctx context.Context, id string, obj *entities.PaymentCUSt) error
+	PaymentDelete(ctx context.Context, id string) error
 }

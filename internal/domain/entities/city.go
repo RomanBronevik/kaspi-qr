@@ -1,21 +1,21 @@
 package entities
 
 type CitySt struct {
-	Id   int64  `json:"id" db:"id"`
-	Name string `json:"name" db:"name"`
-}
-
-type CityListSt struct {
-	CitySt
+	Id     string `json:"id" db:"id"`
+	Code   string `json:"code" db:"code"`
+	Name   string `json:"name" db:"name"`
+	OrgBin string `json:"org_bin" db:"org_bin"`
 }
 
 type CityListParsSt struct {
-	dopTypes.ListParams
-
-	Ids  *[]int64 `json:"ids" form:"ids"`
-	Name *string  `json:"name" form:"name"`
+	Ids    *[]string `json:"ids" form:"ids"`
+	Code   *string   `json:"code" form:"code"`
+	OrgBin *string   `json:"org_bin" form:"org_bin"`
 }
 
 type CityCUSt struct {
-	Name *string `json:"name" db:"name"`
+	Id     *string `json:"id" db:"id"`
+	Code   *string `json:"code" db:"code"`
+	Name   *string `json:"name" db:"name"`
+	OrgBin *string `json:"org_bin" db:"org_bin"`
 }

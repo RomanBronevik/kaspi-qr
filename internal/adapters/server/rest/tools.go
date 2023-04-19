@@ -1,13 +1,12 @@
-package handlers
+package rest
 
 import (
 	"errors"
 	"fmt"
-	"kaspi-qr/internal/adapters/server"
-	"net/http"
-
 	"kaspi-qr/internal/adapters/logger"
+	"kaspi-qr/internal/adapters/server"
 	"kaspi-qr/internal/domain/errs"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 	cors "github.com/rs/cors/wrapper/gin"
