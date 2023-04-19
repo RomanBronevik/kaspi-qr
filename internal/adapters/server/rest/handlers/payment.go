@@ -25,7 +25,6 @@ func (h *Handler) QR(c *gin.Context) {
 	}
 
 	cityDoesntExist := h.usc.IsEmptyCity(city)
-
 	if cityDoesntExist {
 		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadStatusCode, "City not found")
 		return
@@ -46,7 +45,6 @@ func (h *Handler) QR(c *gin.Context) {
 	}
 
 	output, err := h.usc.CreateQrToken(qrToken)
-
 	if err != nil {
 		errs.NewErrorResponse(c, http.StatusBadRequest, errs.BadStatusCode, err.Error())
 		return
