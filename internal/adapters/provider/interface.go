@@ -1,6 +1,6 @@
 package provider
 
-type St interface {
+type Provider interface {
 	TradePointList(orgBin string) ([]*TradePointSt, error)
 
 	DeviceCreate(reqObj DeviceCreateReqSt) (string, error)

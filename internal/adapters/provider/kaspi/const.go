@@ -1,6 +1,10 @@
 package kaspi
 
+import "time"
+
 const (
+	RequestTimeout = 15 * time.Second
+
 	SuccessStatus                         = 0
 	NoCertificateStatus                   = -10000
 	DeviceNotFoundStatus                  = -1501

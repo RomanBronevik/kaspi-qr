@@ -30,4 +30,5 @@ const (
 	PermissionDenied = Err("permission_denied")
 	ObjectNotFound   = Err("object_not_found")
 	BadStatusCode    = Err("bad_status_code")
+	OrgBinRequired   = Err("org_bin_required")
 )

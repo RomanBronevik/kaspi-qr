@@ -1,34 +1,36 @@
 package core
 
 import (
+	"kaspi-qr/internal/adapters/provider"
 	"sync"
 
-	"kaspi-qr/internal/adapters/provider/kaspi"
 	"kaspi-qr/internal/adapters/repo"
 	"kaspi-qr/internal/adapters/repo/pg"
 )
 
 type St struct {
-	repo  repo.Repo
-	kaspi *kaspi.St
+	repo repo.Repo
+	prv  provider.Provider
 
-	wg      sync.WaitGroup
-	City    *City
-	Device  *Device
-	Ord     *Ord
-	Payment *Payment
+	wg         sync.WaitGroup
+	City       *City
+	Device     *Device
+	Ord        *Ord
+	Payment    *Payment
+	TradePoint *TradePoint
 }
 
-func New(repo *pg.St, kaspi *kaspi.St) *St {
+func New(repo *pg.St, prv provider.Provider) *St {
 	c := &St{
-		repo:  repo,
-		kaspi: kaspi,
+		repo: repo,
+		prv:  prv,
 	}
 
 	c.City = NewCity(c)
 	c.Device = NewDevice(c)
 	c.Ord = NewOrd(c)
 	c.Payment = NewPayment(c)
+	c.TradePoint = NewTradePoint(c)
 
 	return c
 }

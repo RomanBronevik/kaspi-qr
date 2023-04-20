@@ -49,6 +49,7 @@ func newHttpClient(lg logger.Lite, uri string, certPath, certKey string) (*httpC
 		lg:  lg,
 		uri: strings.TrimRight(uri, "/") + "/",
 		client: &http.Client{
+			Timeout: RequestTimeout,
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{
 					Certificates:       []tls.Certificate{cert},
