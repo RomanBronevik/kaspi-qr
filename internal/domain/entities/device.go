@@ -15,6 +15,7 @@ type DeviceListParsSt struct {
 	Token        *string   `json:"token" form:"token"`
 	TradePointId *int64    `json:"trade_point_id" form:"trade_point_id"`
 	OrgBin       *string   `json:"org_bin" form:"org_bin"`
+	//CityId       *string   `json:"city_id" form:"city_id"`
 }
 
 type DeviceCUSt struct {

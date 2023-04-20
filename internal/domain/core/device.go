@@ -20,14 +20,14 @@ func (c *Device) ValidateCU(ctx context.Context, obj *entities.DeviceCUSt, id st
 
 	// Id
 	if forCreate && obj.Id == nil {
-		return errs.DeviceIdRequired
+		return errs.IdRequired
 	}
 	if obj.Id != nil {
 		if *obj.Id == "" {
-			return errs.DeviceIdRequired
+			return errs.IdRequired
 		}
 		if len([]rune(*obj.Id)) > 64 {
-			return errs.DeviceIdTooLong
+			return errs.IdTooLong
 		}
 	}
 

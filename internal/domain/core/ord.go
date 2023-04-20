@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"kaspi-qr/internal/cns"
 	"kaspi-qr/internal/domain/entities"
 	"kaspi-qr/internal/domain/errs"
 )
@@ -15,7 +16,68 @@ func NewOrd(r *St) *Ord {
 }
 
 func (c *Ord) ValidateCU(ctx context.Context, obj *entities.OrdCUSt, id string) error {
-	// forCreate := id == ""
+	forCreate := id == ""
+
+	// Id
+	if forCreate && obj.Id == nil {
+		return errs.IdRequired
+	}
+	if obj.Id != nil {
+		if *obj.Id == "" {
+			return errs.IdRequired
+		}
+		if len(*obj.Id) > 200 {
+			return errs.IdTooLong
+		}
+	}
+
+	// Src
+	if forCreate && obj.Src == nil {
+		return errs.SrcRequired
+	}
+	if obj.Src != nil {
+		if !cns.OrdSrcIsValid(*obj.Src) {
+			return errs.BadSrc
+		}
+	}
+
+	// CityCode
+	if forCreate && obj.CityCode == nil {
+		return errs.CityCodeRequired
+	}
+	if obj.CityCode != nil {
+		if *obj.CityCode == "" {
+			return errs.CityCodeRequired
+		}
+		cities, err := c.r.City.List(ctx, &entities.CityListParsSt{Code: obj.CityCode})
+		if err != nil {
+			return err
+		}
+		if len(cities) == 0 {
+			return errs.CityNotFound
+		}
+		obj.CityId = &cities[0].Id
+	}
+
+	// Amount
+	if forCreate && obj.Amount == nil {
+		return errs.AmountRequired
+	}
+	if obj.Amount != nil {
+		if *obj.Amount <= 0 {
+			return errs.AmountMustBePositive
+		}
+	}
+
+	// Platform
+	if forCreate && obj.Platform == nil {
+		return errs.PlatformRequired
+	}
+	if obj.Platform != nil {
+		if !cns.PlatformIsValid(*obj.Platform) {
+			return errs.BadPlatform
+		}
+	}
 
 	return nil
 }
