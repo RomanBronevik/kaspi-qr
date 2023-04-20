@@ -1,14 +1,14 @@
 package provider
 
 type St interface {
-	GetAllTradePoints(orgBin string) ([]*TradePointSt, error)
-	DeviceRegistration(input DeviceCreateReqSt) (string, error)
-	DeviceDelete(input DeviceRemoveReqSt) error
+	TradePointList(orgBin string) ([]*TradePointSt, error)
 
-	CreateQrToken(input PaymentCreateReqSt) (*PaymentSt, error)
-	CreatePaymentLink(input PaymentLinkCreateReqSt) (*PaymentLinkSt, error)
-	OperationStatus(QrPaymentId string) (string, error)
+	DeviceCreate(reqObj DeviceCreateReqSt) (string, error)
+	DeviceDelete(reqObj DeviceRemoveReqSt) error
 
-	KaspiOperationDetails(input OperationGetReqSt) (*OperationDetailsSt, error)
-	KaspiReturnWithoutClient(input ReturnReqSt) (int64, error)
+	PaymentCreate(reqObj PaymentCreateReqSt) (*PaymentSt, error)
+	PaymentLinkCreate(reqObj PaymentLinkCreateReqSt) (*PaymentLinkSt, error)
+	PaymentGetStatus(qrPaymentId string) (string, error)
+	PaymentGetDetails(paymentId int64, deviceToken string) (*PaymentDetailsSt, error)
+	PaymentReturn(reqObj PaymentReturnReqSt) (int64, error)
 }

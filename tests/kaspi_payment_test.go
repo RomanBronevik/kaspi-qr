@@ -20,7 +20,7 @@ package tests
 //		ExternalId:      "123",
 //	}
 //
-//	outputBody, err := kaspi.CreateQrToken(qrToken)
+//	outputBody, err := kaspi.PaymentCreate(qrToken)
 //	require.Nil(t, err)
 //	require.Equal(t, kaspi.SuccessStatus, outputBody.StatusCode)
 //	require.NotEmpty(t, outputBody.Data)
@@ -37,7 +37,7 @@ package tests
 //		ExternalId:      "123",
 //	}
 //
-//	outputBody, err := kaspi.CreatePaymentLink(qrToken)
+//	outputBody, err := kaspi.PaymentLinkCreate(qrToken)
 //	require.Nil(t, err)
 //	require.Equal(t, kaspi.SuccessStatus, outputBody.StatusCode)
 //	require.NotEmpty(t, outputBody.Data)
@@ -47,7 +47,7 @@ package tests
 //func TestOperationStatus(t *testing.T) {
 //	ViperAndOsConfig()
 //	QrPaymentId := strconv.Itoa(504710605)
-//	outputBody, err := kaspi.OperationStatus(QrPaymentId)
+//	outputBody, err := kaspi.PaymentGetStatus(QrPaymentId)
 //	require.Nil(t, err)
 //	require.Equal(t, kaspi.PurchaseNotFoundStatus, outputBody.StatusCode)
 //	require.Nil(t, outputBody.Data)

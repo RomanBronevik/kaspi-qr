@@ -32,7 +32,7 @@ package tests
 //		require.Nil(t, err)
 //	}()
 //
-//	outputBody, err := kaspi.KaspiOperationDetails(reader)
+//	outputBody, err := kaspi.PaymentGetDetails(reader)
 //	require.Nil(t, err)
 //	require.Nil(t, outputBody.Data)
 //	require.Equal(t, outputBody.StatusCode, kaspi.PurchaseNotFoundStatus)
@@ -47,7 +47,7 @@ package tests
 //		Amount:          200,
 //	}
 //
-//	outputBody, err := kaspi.KaspiReturnWithoutClient(input)
+//	outputBody, err := kaspi.PaymentReturn(input)
 //	require.Nil(t, err)
 //	require.Equal(t, outputBody.StatusCode, kaspi.WrongPurchaseStatus)
 //}

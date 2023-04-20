@@ -18,7 +18,7 @@ package tests
 //		TradePointId:    "19",
 //	}
 //
-//	outputBody, err := kaspi.DeviceRegistration(requestBody)
+//	outputBody, err := kaspi.DeviceCreate(requestBody)
 //	require.Nil(t, err)
 //	require.NotEmpty(t, outputBody.Data)
 //	require.Equal(t, 0, outputBody.StatusCode)
@@ -72,7 +72,7 @@ package tests
 //func TestGetTradePoints(t *testing.T) {
 //	ViperAndOsConfig()
 //
-//	tradePoints, err := kaspi.GetAllTradePoints(viper.GetString("testBin"))
+//	tradePoints, err := kaspi.TradePointList(viper.GetString("testBin"))
 //	require.Nil(t, err)
 //	require.NotEmpty(t, tradePoints.Data)
 //	require.Equal(t, 10, len(tradePoints.Data))

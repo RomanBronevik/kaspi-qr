@@ -3,14 +3,15 @@ package tests
 import (
 	"crypto/rand"
 	"errors"
-	"github.com/spf13/viper"
-	"github.com/stretchr/testify/require"
 	"kaspi-qr/internal/adapters/provider/kaspi"
 	"kaspi-qr/internal/domain/entities"
 	"math/big"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/spf13/viper"
+	"github.com/stretchr/testify/require"
 )
 
 func TestProcess(t *testing.T) {
@@ -53,7 +54,7 @@ func TestProcess(t *testing.T) {
 		DeviceToken:     outputBody.Data.DeviceToken,
 		Amount:          200,
 	}
-	output, err := app.kaspi.KaspiReturnWithoutClient(refundSt)
+	output, err := app.kaspi.PaymentReturn(refundSt)
 	require.Nil(t, err)
 	require.Equal(t, kaspi.PurchaseNotFoundStatus, output.StatusCode)
 
@@ -100,7 +101,7 @@ func TestProcessLink(t *testing.T) {
 		DeviceToken:     outputBody.Data.DeviceToken,
 		Amount:          200,
 	}
-	output, err := app.kaspi.KaspiReturnWithoutClient(refundSt)
+	output, err := app.kaspi.PaymentReturn(refundSt)
 	require.Nil(t, err)
 	require.Equal(t, kaspi.PurchaseNotFoundStatus, output.StatusCode)
 
