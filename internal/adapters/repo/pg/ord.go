@@ -15,16 +15,24 @@ func (d *St) OrdGet(ctx context.Context, id string) (*entities.OrdSt, error) {
 			t.id,
 			t.created,
 			t.modified,
-			t.org_bin,
-			t.status
+			t.src,
+			t.device_id,
+			t.city_id,
+			t.amount,
+			t.status,
+			t.platform
 		from ord t
 		where t.id = $1
 	`, id).Scan(
 		&result.Id,
 		&result.Created,
 		&result.Modified,
-		&result.OrgBin,
+		&result.Src,
+		&result.DeviceId,
+		&result.CityId,
+		&result.Amount,
 		&result.Status,
+		&result.Platform,
 	)
 	if errors.Is(err, db.ErrNoRows) {
 		return nil, nil
@@ -42,13 +50,25 @@ func (d *St) OrdList(ctx context.Context, pars *entities.OrdListParsSt) ([]*enti
 		conds = append(conds, `t.id in (select * from unnest(${ids} :: text[]))`)
 		args["ids"] = *pars.Ids
 	}
-	if pars.OrgBin != nil {
-		conds = append(conds, "t.org_bin = ${org_bin}")
-		args["org_bin"] = *pars.OrgBin
+	if pars.Src != nil {
+		conds = append(conds, "t.src = ${src}")
+		args["src"] = *pars.Src
+	}
+	if pars.DeviceId != nil {
+		conds = append(conds, "t.device_id = ${device_id}")
+		args["device_id"] = *pars.DeviceId
+	}
+	if pars.CityId != nil {
+		conds = append(conds, "t.city_id = ${city_id}")
+		args["city_id"] = *pars.CityId
 	}
 	if pars.Status != nil {
 		conds = append(conds, "t.status = ${status}")
 		args["status"] = *pars.Status
+	}
+	if pars.Platform != nil {
+		conds = append(conds, "t.platform = ${platform}")
+		args["platform"] = *pars.Platform
 	}
 
 	rows, err := d.db.Query(ctx, `
@@ -56,8 +76,12 @@ func (d *St) OrdList(ctx context.Context, pars *entities.OrdListParsSt) ([]*enti
 			t.id,
 			t.created,
 			t.modified,
-			t.org_bin,
-			t.status
+			t.src,
+			t.device_id,
+			t.city_id,
+			t.amount,
+			t.status,
+			t.platform
 		from ord t
 		`+d.tOptionalWhere(conds)+`
 		order by t.created`,
@@ -77,8 +101,12 @@ func (d *St) OrdList(ctx context.Context, pars *entities.OrdListParsSt) ([]*enti
 			&item.Id,
 			&item.Created,
 			&item.Modified,
-			&item.OrgBin,
+			&item.Src,
+			&item.DeviceId,
+			&item.CityId,
+			&item.Amount,
 			&item.Status,
+			&item.Platform,
 		)
 		if err != nil {
 			return nil, err
@@ -145,12 +173,28 @@ func (d *St) ordGetCUFields(obj *entities.OrdCUSt) map[string]any {
 		result["modified"] = *obj.Modified
 	}
 
-	if obj.OrgBin != nil {
-		result["org_bin"] = *obj.OrgBin
+	if obj.Src != nil {
+		result["src"] = *obj.Src
+	}
+
+	if obj.DeviceId != nil {
+		result["device_id"] = *obj.DeviceId
+	}
+
+	if obj.CityId != nil {
+		result["city_id"] = *obj.CityId
+	}
+
+	if obj.Amount != nil {
+		result["amount"] = *obj.Amount
 	}
 
 	if obj.Status != nil {
 		result["status"] = *obj.Status
+	}
+
+	if obj.Platform != nil {
+		result["platform"] = *obj.Platform
 	}
 
 	return result

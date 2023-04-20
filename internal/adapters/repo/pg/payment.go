@@ -17,8 +17,11 @@ func (d *St) PaymentGet(ctx context.Context, id string) (*entities.PaymentSt, er
 			t.modified,
 			t.ord_id,
 			t.status,
+			t.status_changed_at,
 			t.payment_method,
-			t.amount
+			t.amount,
+			t.expire_dt,
+			t.pbo
 		from payment t
 		where t.id = $1
 	`, id).Scan(
@@ -27,8 +30,11 @@ func (d *St) PaymentGet(ctx context.Context, id string) (*entities.PaymentSt, er
 		&result.Modified,
 		&result.OrdId,
 		&result.Status,
+		&result.StatusChangedAt,
 		&result.PaymentMethod,
 		&result.Amount,
+		&result.ExpireDt,
+		&result.Pbo,
 	)
 	if errors.Is(err, db.ErrNoRows) {
 		return nil, nil
@@ -66,8 +72,11 @@ func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) 
 			t.modified,
 			t.ord_id,
 			t.status,
+			t.status_changed_at,
 			t.payment_method,
-			t.amount
+			t.amount,
+			t.expire_dt,
+			t.pbo
 		from payment t
 		`+d.tOptionalWhere(conds)+`
 		order by t.name`,
@@ -89,8 +98,11 @@ func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) 
 			&item.Modified,
 			&item.OrdId,
 			&item.Status,
+			&item.StatusChangedAt,
 			&item.PaymentMethod,
 			&item.Amount,
+			&item.ExpireDt,
+			&item.Pbo,
 		)
 		if err != nil {
 			return nil, err
@@ -165,12 +177,24 @@ func (d *St) paymentGetCUFields(obj *entities.PaymentCUSt) map[string]any {
 		result["status"] = *obj.Status
 	}
 
+	if obj.StatusChangedAt != nil {
+		result["status_changed_at"] = *obj.StatusChangedAt
+	}
+
 	if obj.PaymentMethod != nil {
 		result["payment_method"] = *obj.PaymentMethod
 	}
 
 	if obj.Amount != nil {
 		result["amount"] = *obj.Amount
+	}
+
+	if obj.ExpireDt != nil {
+		result["expire_dt"] = *obj.ExpireDt
+	}
+
+	if obj.Pbo != nil {
+		result["pbo"] = *obj.Pbo
 	}
 
 	return result

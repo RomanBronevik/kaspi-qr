@@ -14,12 +14,14 @@ func (d *St) DeviceGet(ctx context.Context, id string) (*entities.DeviceSt, erro
 		select
 			t.id,
 			t.token,
+			t.trade_point_id,
 			t.org_bin
 		from device t
 		where t.id = $1
 	`, id).Scan(
 		&result.Id,
 		&result.Token,
+		&result.TradePointId,
 		&result.OrgBin,
 	)
 	if errors.Is(err, db.ErrNoRows) {
@@ -42,6 +44,10 @@ func (d *St) DeviceList(ctx context.Context, pars *entities.DeviceListParsSt) ([
 		conds = append(conds, "t.token = ${token}")
 		args["token"] = *pars.Token
 	}
+	if pars.TradePointId != nil {
+		conds = append(conds, "t.trade_point_id = ${trade_point_id}")
+		args["trade_point_id"] = *pars.TradePointId
+	}
 	if pars.OrgBin != nil {
 		conds = append(conds, "t.org_bin = ${org_bin}")
 		args["org_bin"] = *pars.OrgBin
@@ -51,6 +57,7 @@ func (d *St) DeviceList(ctx context.Context, pars *entities.DeviceListParsSt) ([
 		select
 			t.id,
 			t.token,
+			t.trade_point_id,
 			t.org_bin
 		from device t
 		`+d.tOptionalWhere(conds)+`
@@ -70,6 +77,7 @@ func (d *St) DeviceList(ctx context.Context, pars *entities.DeviceListParsSt) ([
 		err = rows.Scan(
 			&item.Id,
 			&item.Token,
+			&item.TradePointId,
 			&item.OrgBin,
 		)
 		if err != nil {
@@ -135,6 +143,10 @@ func (d *St) deviceGetCUFields(obj *entities.DeviceCUSt) map[string]any {
 
 	if obj.Token != nil {
 		result["token"] = *obj.Token
+	}
+
+	if obj.TradePointId != nil {
+		result["trade_point_id"] = *obj.TradePointId
 	}
 
 	if obj.OrgBin != nil {
