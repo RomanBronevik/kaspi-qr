@@ -49,7 +49,7 @@ func (d *St) CityList(ctx context.Context, pars *entities.CityListParsSt) ([]*en
 		args["org_bin"] = *pars.OrgBin
 	}
 
-	rows, err := d.db.Query(ctx, `
+	rows, err := d.db.QueryM(ctx, `
 		select
 			t.id,
 			t.code,
@@ -65,7 +65,7 @@ func (d *St) CityList(ctx context.Context, pars *entities.CityListParsSt) ([]*en
 	}
 	defer rows.Close()
 
-	var result []*entities.CitySt
+	result := make([]*entities.CitySt, 0)
 
 	for rows.Next() {
 		item := &entities.CitySt{}

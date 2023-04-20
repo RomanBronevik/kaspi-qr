@@ -27,9 +27,9 @@ type OrdCUSt struct {
 	Id       *string    `json:"id" db:"id"`
 	Modified *time.Time `json:"-" db:"modified"`
 	Src      *string    `json:"src" db:"src"`
-	DeviceId *string    `json:"device_id" db:"device_id"`
+	DeviceId *string    `json:"-" db:"device_id"`
 	CityId   *string    `json:"city_id" db:"city_id"`
 	Amount   *float64   `json:"amount" db:"amount"`
-	Status   *string    `json:"status" db:"status"`
+	Status   *string    `json:"-" db:"status"`
 	Platform *string    `json:"platform" db:"platform"`
 }

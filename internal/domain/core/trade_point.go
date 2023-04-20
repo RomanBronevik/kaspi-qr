@@ -21,7 +21,7 @@ func (c *TradePoint) List(ctx context.Context, pars *entities.TradePointListPars
 
 	items, err := c.r.prv.TradePointList(*pars.OrgBin)
 	if err != nil {
-		return nil, err
+		return nil, errs.Err(err.Error())
 	}
 
 	result := make([]*entities.TradePointSt, len(items))

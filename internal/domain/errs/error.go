@@ -30,5 +30,10 @@ const (
 	PermissionDenied = Err("permission_denied")
 	ObjectNotFound   = Err("object_not_found")
 	BadStatusCode    = Err("bad_status_code")
-	OrgBinRequired   = Err("org_bin_required")
+
+	OrgBinRequired       = Err("org_bin_required")
+	OrgBinTooLong        = Err("org_bin_too_long")
+	DeviceIdRequired     = Err("device_id_required")
+	DeviceIdTooLong      = Err("device_id_too_long")
+	TradePointIdRequired = Err("trade_point_id_required")
 )

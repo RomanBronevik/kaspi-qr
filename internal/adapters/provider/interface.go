@@ -4,7 +4,7 @@ type Provider interface {
 	TradePointList(orgBin string) ([]*TradePointSt, error)
 
 	DeviceCreate(reqObj DeviceCreateReqSt) (string, error)
-	DeviceDelete(reqObj DeviceRemoveReqSt) error
+	DeviceDelete(reqObj DeviceDeleteReqSt) error
 
 	PaymentCreate(reqObj PaymentCreateReqSt) (*PaymentSt, error)
 	PaymentLinkCreate(reqObj PaymentLinkCreateReqSt) (*PaymentLinkSt, error)

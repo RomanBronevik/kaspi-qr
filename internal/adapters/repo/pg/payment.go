@@ -65,7 +65,7 @@ func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) 
 		args["payment_method"] = *pars.PaymentMethod
 	}
 
-	rows, err := d.db.Query(ctx, `
+	rows, err := d.db.QueryM(ctx, `
 		select
 			t.id,
 			t.created,
@@ -87,7 +87,7 @@ func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) 
 	}
 	defer rows.Close()
 
-	var result []*entities.PaymentSt
+	result := make([]*entities.PaymentSt, 0)
 
 	for rows.Next() {
 		item := &entities.PaymentSt{}

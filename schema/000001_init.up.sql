@@ -18,9 +18,10 @@ create table device
 (
     id             text
         primary key,
-    token          text   not null default '',
-    trade_point_id bigint not null default 0,
-    org_bin        text   not null default ''
+    created        timestamptz not null default now(),
+    token          text        not null default '',
+    trade_point_id bigint      not null default 0,
+    org_bin        text        not null default ''
 );
 
 create table ord

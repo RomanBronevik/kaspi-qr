@@ -71,7 +71,7 @@ func (d *St) OrdList(ctx context.Context, pars *entities.OrdListParsSt) ([]*enti
 		args["platform"] = *pars.Platform
 	}
 
-	rows, err := d.db.Query(ctx, `
+	rows, err := d.db.QueryM(ctx, `
 		select
 			t.id,
 			t.created,
@@ -92,7 +92,7 @@ func (d *St) OrdList(ctx context.Context, pars *entities.OrdListParsSt) ([]*enti
 	}
 	defer rows.Close()
 
-	var result []*entities.OrdSt
+	result := make([]*entities.OrdSt, 0)
 
 	for rows.Next() {
 		item := &entities.OrdSt{}

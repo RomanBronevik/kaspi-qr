@@ -13,6 +13,7 @@ func (d *St) DeviceGet(ctx context.Context, id string) (*entities.DeviceSt, erro
 	err := d.db.QueryRow(ctx, `
 		select
 			t.id,
+			t.created,
 			t.token,
 			t.trade_point_id,
 			t.org_bin
@@ -20,6 +21,7 @@ func (d *St) DeviceGet(ctx context.Context, id string) (*entities.DeviceSt, erro
 		where t.id = $1
 	`, id).Scan(
 		&result.Id,
+		&result.Created,
 		&result.Token,
 		&result.TradePointId,
 		&result.OrgBin,
@@ -53,9 +55,10 @@ func (d *St) DeviceList(ctx context.Context, pars *entities.DeviceListParsSt) ([
 		args["org_bin"] = *pars.OrgBin
 	}
 
-	rows, err := d.db.Query(ctx, `
+	rows, err := d.db.QueryM(ctx, `
 		select
 			t.id,
+			t.created,
 			t.token,
 			t.trade_point_id,
 			t.org_bin
@@ -69,13 +72,14 @@ func (d *St) DeviceList(ctx context.Context, pars *entities.DeviceListParsSt) ([
 	}
 	defer rows.Close()
 
-	var result []*entities.DeviceSt
+	result := make([]*entities.DeviceSt, 0)
 
 	for rows.Next() {
 		item := &entities.DeviceSt{}
 
 		err = rows.Scan(
 			&item.Id,
+			&item.Created,
 			&item.Token,
 			&item.TradePointId,
 			&item.OrgBin,

@@ -5,10 +5,10 @@ package provider
 type DeviceCreateReqSt struct {
 	OrganizationBin string `json:"OrganizationBin"`
 	DeviceId        string `json:"DeviceId"`
-	TradePointId    string `json:"TradePointId"`
+	TradePointId    int64  `json:"TradePointId"`
 }
 
-type DeviceRemoveReqSt struct {
+type DeviceDeleteReqSt struct {
 	OrganizationBin string `json:"OrganizationBin"`
 	DeviceToken     string `json:"DeviceToken"`
 }

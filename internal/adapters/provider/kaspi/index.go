@@ -67,8 +67,8 @@ func (s *St) DeviceCreate(reqObj provider.DeviceCreateReqSt) (string, error) {
 	return repObj.Data.DeviceToken, nil
 }
 
-func (s *St) DeviceDelete(reqObj provider.DeviceRemoveReqSt) error {
-	uriPath := "device/delete/"
+func (s *St) DeviceDelete(reqObj provider.DeviceDeleteReqSt) error {
+	uriPath := "device/delete"
 
 	repObj := &provider.BaseRepSt{}
 
