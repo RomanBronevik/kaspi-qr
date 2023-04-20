@@ -1,134 +1,63 @@
 package kaspi
 
 import (
-	bytes2 "bytes"
-	"encoding/json"
-	"io"
 	"kaspi-qr/internal/adapters/provider"
-	"log"
-	"net/http"
+	"kaspi-qr/internal/domain/errs"
 )
 
-func (s *St) CreateQrToken(input provider.PaymentCreateReqSt) (*provider.PaymentSt, error) {
-	var bodyRequest *provider.PaymentCreateRepSt
+func (s *St) CreateQrToken(reqObj provider.PaymentCreateReqSt) (*provider.PaymentSt, error) {
+	uriPath := "qr/create"
 
-	client, err := GetHttpClientTls(s.certPath, s.certPassword)
+	repObj := &provider.PaymentCreateRepSt{}
 
+	resp, err := s.httpClient.sendRequest("POST", uriPath, reqObj, repObj)
 	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	requestBody, err := json.Marshal(input)
-
-	if err != nil {
-		log.Fatal(err.Error())
+		resp.LogError("CreateQrToken", err)
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", s.kaspiUrl+"qr/create", bytes2.NewBuffer(requestBody))
-	if err != nil {
-		log.Fatal(err.Error())
-		return nil, err
+	if repObj.StatusCode != SuccessStatus {
+		resp.LogError("CreateQrToken bad status-code", err)
+		return nil, errs.ServiceNA
 	}
 
-	req.Header.Add("Content-Type", "application/json")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err.Error())
-		return nil, err
-	}
-
-	bytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err.Error())
-		return nil, err
-	}
-	errJson := json.Unmarshal(bytes, &bodyRequest)
-	if errJson != nil {
-		log.Fatal(err.Error())
-		return nil, err
-	}
-
-	return &bodyRequest.Data, nil
+	return &repObj.Data, nil
 }
 
-func (s *St) CreatePaymentLink(input provider.PaymentLinkCreateReqSt) (*provider.PaymentLinkSt, error) {
-	var bodyRequest provider.PaymentLinkCreateRepSt
+func (s *St) CreatePaymentLink(reqObj provider.PaymentLinkCreateReqSt) (*provider.PaymentLinkSt, error) {
+	uriPath := "qr/create-link"
 
-	client, err := GetHttpClientTls(s.certPath, s.certPassword)
+	repObj := &provider.PaymentLinkCreateRepSt{}
 
+	resp, err := s.httpClient.sendRequest("POST", uriPath, reqObj, repObj)
 	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	requestBody, err := json.Marshal(input)
-
-	if err != nil {
-		log.Fatal(err.Error())
+		resp.LogError("CreatePaymentLink", err)
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", s.kaspiUrl+"qr/create-link", bytes2.NewBuffer(requestBody))
-	if err != nil {
-		log.Fatal(err.Error())
-		return nil, err
+	if repObj.StatusCode != SuccessStatus {
+		resp.LogError("CreatePaymentLink bad status-code", err)
+		return nil, errs.ServiceNA
 	}
 
-	req.Header.Add("Content-Type", "application/json")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	bytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	errJson := json.Unmarshal(bytes, &bodyRequest)
-	if errJson != nil {
-		return nil, err
-	}
-
-	return bodyRequest.Data, nil
+	return &repObj.Data, nil
 }
 
-func (s *St) OperationStatus(QrPaymentId string) (string, error) {
+func (s *St) OperationStatus(qrPaymentId string) (string, error) {
+	uriPath := "payment/status/" + qrPaymentId
 
-	var bodyRequest provider.OperationStatusRepSt
+	repObj := &provider.OperationStatusRepSt{}
 
-	client, err := GetHttpClientTls(s.certPath, s.certPassword)
-
+	resp, err := s.httpClient.sendRequest("GET", uriPath, nil, repObj)
 	if err != nil {
-		log.Fatal(err.Error())
+		resp.LogError("OperationStatus", err)
 		return "", err
 	}
 
-	req, err := http.NewRequest("GET", s.kaspiUrl+"payment/status/"+QrPaymentId, nil)
-	if err != nil {
-		log.Fatal(err.Error())
-		return "", err
+	if repObj.StatusCode != SuccessStatus {
+		resp.LogError("OperationStatus bad status-code", err)
+		return "", errs.ServiceNA
 	}
 
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatal(err.Error())
-		return "", err
-	}
-
-	bytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err.Error())
-		return "", err
-	}
-
-	errJson := json.Unmarshal(bytes, &bodyRequest)
-	if errJson != nil {
-		log.Fatal(err.Error())
-		return "", err
-	}
-
-	return bodyRequest.Data.Status, nil
+	return repObj.Data.Status, nil
 }

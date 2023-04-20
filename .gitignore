@@ -10,3 +10,4 @@ build/
 conf.yml
 .migrate_scripts
 /svc
+certfile.pfx

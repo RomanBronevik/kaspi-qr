@@ -14,7 +14,7 @@ type PaymentLinkCreateReqSt struct {
 
 type PaymentLinkCreateRepSt struct {
 	BaseRepSt
-	Data *PaymentLinkSt `json:"Data"`
+	Data PaymentLinkSt `json:"Data"`
 }
 
 // common

@@ -12,7 +12,7 @@ type St struct {
 func New(lg logger.Full, kaspiUrl, certPath, certPassword string) (*St, error) {
 	httpClient, err := newHttpClient(lg, kaspiUrl, certPath, certPassword)
 	if err != nil {
-		lg.Errorw("generateCert", "err", err)
+		lg.Errorw("newHttpClient", err)
 		return nil, err
 	}
 

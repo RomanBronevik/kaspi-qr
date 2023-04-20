@@ -1,85 +1,45 @@
 package kaspi
 
 import (
-	bytes2 "bytes"
-	"encoding/json"
-	"fmt"
-	"io"
 	"kaspi-qr/internal/adapters/provider"
-	"log"
-	"net/http"
+	"kaspi-qr/internal/domain/errs"
+	"strconv"
 )
 
-func (s *St) KaspiOperationDetails(input provider.OperationGetReqSt) (*provider.OperationDetailsSt, error) {
-	var bodyRequest provider.OperationGetRepSt
+func (s *St) KaspiOperationDetails(reqObj provider.OperationGetReqSt) (*provider.OperationDetailsSt, error) {
+	uriPath := "payment/details?QrPaymentId=" + strconv.FormatInt(reqObj.QrPaymentId, 10) + "&DeviceToken=" + reqObj.DeviceToken
 
-	client, err := GetHttpClientTls(s.certPath, s.certPassword)
+	repObj := &provider.OperationGetRepSt{}
 
+	resp, err := s.httpClient.sendRequest("GET", uriPath, nil, repObj)
 	if err != nil {
+		resp.LogError("OperationDetails", err)
 		return nil, err
 	}
 
-	req, err := http.NewRequest("GET", s.kaspiUrl+"payment/details?QrPaymentId="+fmt.Sprint(input.QrPaymentId)+"&DeviceToken="+input.DeviceToken, nil)
-	if err != nil {
-		return nil, err
+	if repObj.StatusCode != SuccessStatus {
+		resp.LogError("OperationDetails bad status-code", err)
+		return nil, errs.ServiceNA
 	}
 
-	req.Header.Add("Content-Type", "application/json")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	bytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	errJson := json.Unmarshal(bytes, &bodyRequest)
-	if errJson != nil {
-		return nil, err
-	}
-
-	return &bodyRequest.Data, nil
+	return &repObj.Data, nil
 }
 
 func (s *St) KaspiReturnWithoutClient(input provider.ReturnReqSt) (int64, error) {
-	var bodyRequest provider.ReturnRepSt
+	uriPath := "payment/return"
 
-	client, err := GetHttpClientTls(s.certPath, s.certPassword)
+	repObj := &provider.ReturnRepSt{}
 
+	resp, err := s.httpClient.sendRequest("POST", uriPath, input, repObj)
 	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	requestBody, err := json.Marshal(input)
-
-	if err != nil {
+		resp.LogError("ReturnWithoutClient", err)
 		return 0, err
 	}
 
-	req, err := http.NewRequest("POST", s.kaspiUrl+"payment/return", bytes2.NewBuffer(requestBody))
-	if err != nil {
-		return 0, err
+	if repObj.StatusCode != SuccessStatus {
+		resp.LogError("ReturnWithoutClient bad status-code", err)
+		return 0, errs.ServiceNA
 	}
 
-	req.Header.Add("Content-Type", "application/json")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return 0, err
-	}
-
-	bytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return 0, err
-	}
-
-	errJson := json.Unmarshal(bytes, &bodyRequest)
-	if errJson != nil {
-		return 0, err
-	}
-
-	return bodyRequest.ReturnOperationDataSt.ReturnOperationId, nil
+	return repObj.ReturnOperationDataSt.ReturnOperationId, nil
 }
