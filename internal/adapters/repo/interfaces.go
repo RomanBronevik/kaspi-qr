@@ -31,10 +31,10 @@ type Repo interface {
 	OrdDelete(ctx context.Context, id string) error
 
 	// payment
-	PaymentGet(ctx context.Context, id string) (*entities.PaymentSt, error)
+	PaymentGet(ctx context.Context, id int64) (*entities.PaymentSt, error)
 	PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) ([]*entities.PaymentSt, error)
-	PaymentIdExists(ctx context.Context, id string) (bool, error)
-	PaymentCreate(ctx context.Context, obj *entities.PaymentCUSt) (string, error)
-	PaymentUpdate(ctx context.Context, id string, obj *entities.PaymentCUSt) error
-	PaymentDelete(ctx context.Context, id string) error
+	PaymentIdExists(ctx context.Context, id int64) (bool, error)
+	PaymentCreate(ctx context.Context, obj *entities.PaymentCUSt) (int64, error)
+	PaymentUpdate(ctx context.Context, id int64, obj *entities.PaymentCUSt) error
+	PaymentDelete(ctx context.Context, id int64) error
 }

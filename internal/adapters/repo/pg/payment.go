@@ -7,7 +7,7 @@ import (
 	"kaspi-qr/internal/domain/entities"
 )
 
-func (d *St) PaymentGet(ctx context.Context, id string) (*entities.PaymentSt, error) {
+func (d *St) PaymentGet(ctx context.Context, id int64) (*entities.PaymentSt, error) {
 	var result entities.PaymentSt
 
 	err := d.db.QueryRow(ctx, `
@@ -16,9 +16,9 @@ func (d *St) PaymentGet(ctx context.Context, id string) (*entities.PaymentSt, er
 			t.created,
 			t.modified,
 			t.ord_id,
+			t.link,
 			t.status,
 			t.status_changed_at,
-			t.payment_method,
 			t.amount,
 			t.expire_dt,
 			t.pbo
@@ -29,9 +29,9 @@ func (d *St) PaymentGet(ctx context.Context, id string) (*entities.PaymentSt, er
 		&result.Created,
 		&result.Modified,
 		&result.OrdId,
+		&result.Link,
 		&result.Status,
 		&result.StatusChangedAt,
-		&result.PaymentMethod,
 		&result.Amount,
 		&result.ExpireDt,
 		&result.Pbo,
@@ -60,10 +60,6 @@ func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) 
 		conds = append(conds, "t.status = ${status}")
 		args["status"] = *pars.Status
 	}
-	if pars.PaymentMethod != nil {
-		conds = append(conds, "t.payment_method = ${payment_method}")
-		args["payment_method"] = *pars.PaymentMethod
-	}
 
 	rows, err := d.db.QueryM(ctx, `
 		select
@@ -71,9 +67,9 @@ func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) 
 			t.created,
 			t.modified,
 			t.ord_id,
+			t.link,
 			t.status,
 			t.status_changed_at,
-			t.payment_method,
 			t.amount,
 			t.expire_dt,
 			t.pbo
@@ -97,9 +93,9 @@ func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) 
 			&item.Created,
 			&item.Modified,
 			&item.OrdId,
+			&item.Link,
 			&item.Status,
 			&item.StatusChangedAt,
-			&item.PaymentMethod,
 			&item.Amount,
 			&item.ExpireDt,
 			&item.Pbo,
@@ -117,7 +113,7 @@ func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) 
 	return result, nil
 }
 
-func (d *St) PaymentIdExists(ctx context.Context, id string) (bool, error) {
+func (d *St) PaymentIdExists(ctx context.Context, id int64) (bool, error) {
 	var err error
 	var cnt int
 
@@ -130,11 +126,11 @@ func (d *St) PaymentIdExists(ctx context.Context, id string) (bool, error) {
 	return cnt > 0, err
 }
 
-func (d *St) PaymentCreate(ctx context.Context, obj *entities.PaymentCUSt) (string, error) {
+func (d *St) PaymentCreate(ctx context.Context, obj *entities.PaymentCUSt) (int64, error) {
 	fields := d.paymentGetCUFields(obj)
 	cols, values := d.tPrepareFieldsToCreate(fields)
 
-	var newId string
+	var newId int64
 
 	err := d.db.QueryRowM(ctx, `
 		insert into payment (`+cols+`)
@@ -145,7 +141,7 @@ func (d *St) PaymentCreate(ctx context.Context, obj *entities.PaymentCUSt) (stri
 	return newId, err
 }
 
-func (d *St) PaymentUpdate(ctx context.Context, id string, obj *entities.PaymentCUSt) error {
+func (d *St) PaymentUpdate(ctx context.Context, id int64, obj *entities.PaymentCUSt) error {
 	fields := d.paymentGetCUFields(obj)
 	cols := d.tPrepareFieldsToUpdate(fields)
 
@@ -173,16 +169,16 @@ func (d *St) paymentGetCUFields(obj *entities.PaymentCUSt) map[string]any {
 		result["ord_id"] = *obj.OrdId
 	}
 
+	if obj.Link != nil {
+		result["link"] = *obj.Link
+	}
+
 	if obj.Status != nil {
 		result["status"] = *obj.Status
 	}
 
 	if obj.StatusChangedAt != nil {
 		result["status_changed_at"] = *obj.StatusChangedAt
-	}
-
-	if obj.PaymentMethod != nil {
-		result["payment_method"] = *obj.PaymentMethod
 	}
 
 	if obj.Amount != nil {
@@ -200,7 +196,7 @@ func (d *St) paymentGetCUFields(obj *entities.PaymentCUSt) map[string]any {
 	return result
 }
 
-func (d *St) PaymentDelete(ctx context.Context, id string) error {
+func (d *St) PaymentDelete(ctx context.Context, id int64) error {
 	return d.db.Exec(ctx, `
 		delete from payment
 		where id = $1

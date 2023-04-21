@@ -52,15 +52,15 @@ create index ord_idx_platform
 
 create table payment
 (
-    id                text
+    id                bigint
         primary key,
     created           timestamptz not null default now(),
     modified          timestamptz not null default now(),
     ord_id            text        not null
         constraint payment_fk_ord_id references ord (id) on delete cascade on update cascade,
+    link              text        not null default '',
     status            text        not null,
     status_changed_at timestamptz not null default now(),
-    payment_method    text        not null,
     amount            numeric     not null default 0,
     expire_dt         timestamptz          default null,
     pbo               jsonb       not null default '{}'

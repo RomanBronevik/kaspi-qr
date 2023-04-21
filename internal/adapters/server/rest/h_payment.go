@@ -3,6 +3,7 @@ package rest
 import (
 	"kaspi-qr/internal/domain/entities"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -48,12 +49,12 @@ func (o *St) hPaymentCreate(c *gin.Context) {
 
 // @Router   /payment/:id [get]
 // @Tags     payment
-// @Param    id path string true "id"
+// @Param    id path integer true "id"
 // @Produce  json
 // @Success  200  {object}  entities.PaymentSt
 // @Failure  400  {object}  dopTypes.ErrRep
 func (o *St) hPaymentGet(c *gin.Context) {
-	id := c.Param("id")
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
 	result, err := o.ucs.PaymentGet(o.getRequestContext(c), id)
 	if Error(c, err) {
@@ -65,13 +66,13 @@ func (o *St) hPaymentGet(c *gin.Context) {
 
 // @Router   /payment/:id [put]
 // @Tags     payment
-// @Param    id path string true "id"
+// @Param    id path integer true "id"
 // @Param    body  body  entities.PaymentCUSt  false  "body"
 // @Produce  json
 // @Success  200
 // @Failure  400  {object}  dopTypes.ErrRep
 func (o *St) hPaymentUpdate(c *gin.Context) {
-	id := c.Param("id")
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
 	reqObj := &entities.PaymentCUSt{}
 	if !BindJSON(c, reqObj) {
@@ -83,11 +84,11 @@ func (o *St) hPaymentUpdate(c *gin.Context) {
 
 // @Router   /payment/:id [delete]
 // @Tags     payment
-// @Param    id path string true "id"
+// @Param    id path integer true "id"
 // @Success  200
 // @Failure  400  {object}  dopTypes.ErrRep
 func (o *St) hPaymentDelete(c *gin.Context) {
-	id := c.Param("id")
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
 	Error(c, o.ucs.PaymentDelete(o.getRequestContext(c), id))
 }

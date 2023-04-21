@@ -107,7 +107,7 @@ func (s *St) PaymentCreate(reqObj provider.PaymentCreateReqSt) (*provider.Paymen
 	return &repObj.Data, nil
 }
 
-func (s *St) PaymentLinkCreate(reqObj provider.PaymentLinkCreateReqSt) (*provider.PaymentLinkSt, error) {
+func (s *St) PaymentLinkCreate(reqObj provider.PaymentCreateReqSt) (*provider.PaymentLinkSt, error) {
 	uriPath := "qr/create-link"
 
 	repObj := &provider.PaymentLinkCreateRepSt{}

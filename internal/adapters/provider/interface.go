@@ -7,7 +7,7 @@ type Provider interface {
 	DeviceDelete(reqObj DeviceDeleteReqSt) error
 
 	PaymentCreate(reqObj PaymentCreateReqSt) (*PaymentSt, error)
-	PaymentLinkCreate(reqObj PaymentLinkCreateReqSt) (*PaymentLinkSt, error)
+	PaymentLinkCreate(reqObj PaymentCreateReqSt) (*PaymentLinkSt, error)
 	PaymentGetStatus(qrPaymentId string) (string, error)
 	PaymentGetDetails(paymentId int64, deviceToken string) (*PaymentDetailsSt, error)
 	PaymentReturn(reqObj PaymentReturnReqSt) (int64, error)

@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"kaspi-qr/internal/adapters/provider"
 	"kaspi-qr/internal/cns"
 	"kaspi-qr/internal/domain/entities"
 	"kaspi-qr/internal/domain/errs"
@@ -113,13 +114,65 @@ func (c *Ord) IdExists(ctx context.Context, id string) (bool, error) {
 func (c *Ord) Create(ctx context.Context, obj *entities.OrdCUSt) (string, error) {
 	var err error
 
+	ordStatus := cns.OrsStatusCreated
+	paymentStatus := cns.PaymentStatusCreated
+
+	obj.Status = &ordStatus
+
 	err = c.ValidateCU(ctx, obj, "")
 	if err != nil {
 		return "", err
 	}
 
-	// create
+	// find device
+	if obj.CityId == nil {
+		return "", errs.CityNotFound
+	}
+	devices, err := c.r.Device.List(ctx, &entities.DeviceListParsSt{
+		CityId: obj.CityId,
+	})
+	if err != nil {
+		return "", err
+	}
+	if len(devices) == 0 {
+		return "", errs.DeviceNotFound
+	}
+
+	device := devices[0]
+
+	obj.DeviceId = &device.Id
+
+	// create payment in provider
+	payment, err := c.r.prv.PaymentLinkCreate(provider.PaymentCreateReqSt{
+		ExternalId:      *obj.Id,
+		Amount:          *obj.Amount,
+		OrganizationBin: device.OrgBin,
+		DeviceToken:     device.Token,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	// create ord
 	result, err := c.r.repo.OrdCreate(ctx, obj)
+	if err != nil {
+		return "", err
+	}
+
+	// create payment
+	_, err = c.r.Payment.Create(ctx, &entities.PaymentCUSt{
+		Id:       &payment.PaymentId,
+		OrdId:    &result,
+		Link:     &payment.PaymentLink,
+		Status:   &paymentStatus,
+		Amount:   obj.Amount,
+		ExpireDt: &payment.ExpireDate,
+		Pbo: &entities.PaymentPboSt{
+			StatusPollingInterval:      payment.PaymentBehaviorOptions.StatusPollingInterval,
+			LinkActivationWaitTimeout:  payment.PaymentBehaviorOptions.LinkActivationWaitTimeout,
+			PaymentConfirmationTimeout: payment.PaymentBehaviorOptions.PaymentConfirmationTimeout,
+		},
+	})
 	if err != nil {
 		return "", err
 	}

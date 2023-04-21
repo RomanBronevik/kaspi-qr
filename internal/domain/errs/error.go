@@ -44,4 +44,5 @@ const (
 	AmountMustBePositive = Err("amount_must_be_positive")
 	PlatformRequired     = Err("platform_required")
 	BadPlatform          = Err("bad_platform")
+	DeviceNotFound       = Err("device_not_found")
 )

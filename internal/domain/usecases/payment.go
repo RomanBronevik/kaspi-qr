@@ -18,7 +18,7 @@ func (u *St) PaymentList(ctx context.Context,
 	return u.cr.Payment.List(ctx, pars)
 }
 
-func (u *St) PaymentGet(ctx context.Context, id string) (*entities.PaymentSt, error) {
+func (u *St) PaymentGet(ctx context.Context, id int64) (*entities.PaymentSt, error) {
 	// var err error
 
 	// ses := u.SessionGetFromContext(ctx)
@@ -31,7 +31,7 @@ func (u *St) PaymentGet(ctx context.Context, id string) (*entities.PaymentSt, er
 }
 
 func (u *St) PaymentCreate(ctx context.Context,
-	obj *entities.PaymentCUSt) (string, error) {
+	obj *entities.PaymentCUSt) (int64, error) {
 	var err error
 
 	// ses := u.SessionGetFromContext(ctx)
@@ -40,7 +40,7 @@ func (u *St) PaymentCreate(ctx context.Context,
 	// 	return "", err
 	// }
 
-	var result string
+	var result int64
 
 	err = u.db.TransactionFn(ctx, func(ctx context.Context) error {
 		result, err = u.cr.Payment.Create(ctx, obj)
@@ -51,7 +51,7 @@ func (u *St) PaymentCreate(ctx context.Context,
 }
 
 func (u *St) PaymentUpdate(ctx context.Context,
-	id string, obj *entities.PaymentCUSt) error {
+	id int64, obj *entities.PaymentCUSt) error {
 	// ses := u.SessionGetFromContext(ctx)
 	//
 	// if err = u.SessionRequireAuth(ses); err != nil {
@@ -64,7 +64,7 @@ func (u *St) PaymentUpdate(ctx context.Context,
 }
 
 func (u *St) PaymentDelete(ctx context.Context,
-	id string) error {
+	id int64) error {
 	// ses := u.SessionGetFromContext(ctx)
 	//
 	// if err = u.SessionRequireAuth(ses); err != nil {

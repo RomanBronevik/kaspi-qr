@@ -14,8 +14,8 @@ func NewPayment(r *St) *Payment {
 	return &Payment{r: r}
 }
 
-func (c *Payment) ValidateCU(ctx context.Context, obj *entities.PaymentCUSt, id string) error {
-	// forCreate := id == ""
+func (c *Payment) ValidateCU(ctx context.Context, obj *entities.PaymentCUSt, id int64) error {
+	// forCreate := id == 0
 
 	return nil
 }
@@ -29,7 +29,7 @@ func (c *Payment) List(ctx context.Context, pars *entities.PaymentListParsSt) ([
 	return items, nil
 }
 
-func (c *Payment) Get(ctx context.Context, id string, errNE bool) (*entities.PaymentSt, error) {
+func (c *Payment) Get(ctx context.Context, id int64, errNE bool) (*entities.PaymentSt, error) {
 	result, err := c.r.repo.PaymentGet(ctx, id)
 	if err != nil {
 		return nil, err
@@ -44,28 +44,28 @@ func (c *Payment) Get(ctx context.Context, id string, errNE bool) (*entities.Pay
 	return result, nil
 }
 
-func (c *Payment) IdExists(ctx context.Context, id string) (bool, error) {
+func (c *Payment) IdExists(ctx context.Context, id int64) (bool, error) {
 	return c.r.repo.PaymentIdExists(ctx, id)
 }
 
-func (c *Payment) Create(ctx context.Context, obj *entities.PaymentCUSt) (string, error) {
+func (c *Payment) Create(ctx context.Context, obj *entities.PaymentCUSt) (int64, error) {
 	var err error
 
-	err = c.ValidateCU(ctx, obj, "")
+	err = c.ValidateCU(ctx, obj, 0)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
 	// create
 	result, err := c.r.repo.PaymentCreate(ctx, obj)
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 
 	return result, nil
 }
 
-func (c *Payment) Update(ctx context.Context, id string, obj *entities.PaymentCUSt) error {
+func (c *Payment) Update(ctx context.Context, id int64, obj *entities.PaymentCUSt) error {
 	var err error
 
 	err = c.ValidateCU(ctx, obj, id)
@@ -81,6 +81,6 @@ func (c *Payment) Update(ctx context.Context, id string, obj *entities.PaymentCU
 	return nil
 }
 
-func (c *Payment) Delete(ctx context.Context, id string) error {
+func (c *Payment) Delete(ctx context.Context, id int64) error {
 	return c.r.repo.PaymentDelete(ctx, id)
 }

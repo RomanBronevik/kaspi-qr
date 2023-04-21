@@ -54,6 +54,10 @@ func (d *St) DeviceList(ctx context.Context, pars *entities.DeviceListParsSt) ([
 		conds = append(conds, "t.org_bin = ${org_bin}")
 		args["org_bin"] = *pars.OrgBin
 	}
+	if pars.CityId != nil {
+		conds = append(conds, "t.org_bin = (select org_bin from city where id = ${city_id})")
+		args["city_id"] = *pars.CityId
+	}
 
 	rows, err := d.db.QueryM(ctx, `
 		select
@@ -64,7 +68,7 @@ func (d *St) DeviceList(ctx context.Context, pars *entities.DeviceListParsSt) ([
 			t.org_bin
 		from device t
 		`+d.tOptionalWhere(conds)+`
-		order by t.token`,
+		order by t.created desc`,
 		args,
 	)
 	if err != nil {

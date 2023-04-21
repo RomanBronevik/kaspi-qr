@@ -1,23 +1,5 @@
 package cns
 
-const UnInteger = 1000
-
-const (
-	StatusCreated   = "Created"
-	StatusWait      = "Wait"
-	StatusProcessed = "Processed"
-	StatusSuccess   = "Success"
-	StatusError     = "Error"
-	StatusRefund    = "Refunded"
-)
-
-const (
-	PaymentMethodQr   = "Qr"
-	PaymentMethodLink = "PaymentLink"
-)
-
-const HoursQuantity = 72
-
 const (
 	OrdSrcSite = "site"
 )
@@ -38,4 +20,36 @@ func PlatformIsValid(v string) bool {
 		v == PlatformMSite ||
 		v == PlatformIOS ||
 		v == PlatformAndroid
+}
+
+const (
+	OrsStatusCreated       = "created"
+	OrsStatusLinkActivated = "link_activated"
+	OrsStatusPaid          = "paid"
+	OrsStatusError         = "error"
+	OrsStatusRefunded      = "refunded"
+)
+
+func OrsStatusIsValid(v string) bool {
+	return v == OrsStatusCreated ||
+		v == OrsStatusLinkActivated ||
+		v == OrsStatusPaid ||
+		v == OrsStatusError ||
+		v == OrsStatusRefunded
+}
+
+const (
+	PaymentStatusCreated       = "created"
+	PaymentStatusLinkActivated = "link_activated"
+	PaymentStatusPaid          = "paid"
+	PaymentStatusError         = "error"
+	PaymentStatusRefunded      = "refunded"
+)
+
+func PaymentStatusIsValid(v string) bool {
+	return v == PaymentStatusCreated ||
+		v == PaymentStatusLinkActivated ||
+		v == PaymentStatusPaid ||
+		v == PaymentStatusError ||
+		v == PaymentStatusRefunded
 }

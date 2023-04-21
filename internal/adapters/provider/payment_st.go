@@ -7,14 +7,10 @@ import (
 // request
 
 type PaymentCreateReqSt struct {
+	ExternalId      string  `json:"ExternalId"`
+	Amount          float64 `json:"Amount"`
 	OrganizationBin string  `json:"OrganizationBin"`
 	DeviceToken     string  `json:"DeviceToken"`
-	Amount          float64 `json:"Amount"`
-	ExternalId      string  `json:"ExternalId"`
-}
-
-type PaymentLinkCreateReqSt struct {
-	PaymentCreateReqSt
 }
 
 type PaymentReturnReqSt struct {
@@ -70,9 +66,9 @@ type PaymentSt struct {
 }
 
 type PaymentLinkSt struct {
+	PaymentId              int64     `json:"PaymentId"`
 	PaymentLink            string    `json:"PaymentLink"`
 	ExpireDate             time.Time `json:"ExpireDate"`
-	PaymentId              int64     `json:"PaymentId"`
 	PaymentMethods         []string  `json:"PaymentMethods"`
 	PaymentBehaviorOptions struct {
 		StatusPollingInterval      int `json:"StatusPollingInterval"`
