@@ -2,13 +2,13 @@ package tests
 
 import (
 	"context"
-	"github.com/joho/godotenv"
-	"github.com/spf13/viper"
 	"kaspi-qr/internal/adapters/provider/kaspi"
 	"kaspi-qr/internal/adapters/repo/pg"
 	"kaspi-qr/internal/domain/core"
 	"kaspi-qr/internal/domain/usecases"
 	"log"
+
+	"github.com/spf13/viper"
 )
 
 func initConfig() error {
@@ -20,10 +20,6 @@ func initConfig() error {
 func ViperAndOsConfig() {
 	if err := initConfig(); err != nil {
 		log.Fatalf("error initializing configs: %s", err.Error())
-	}
-
-	if err := godotenv.Load(); err != nil {
-		log.Fatalf("error loading env variables: %s", err.Error())
 	}
 
 	postgreSQLClient, err := pg.NewClient(context.TODO())

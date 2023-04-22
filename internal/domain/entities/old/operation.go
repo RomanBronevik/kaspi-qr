@@ -1,6 +1,8 @@
 package old
 
-import "github.com/golang-sql/civil"
+import (
+	"time"
+)
 
 type OperationGetSt struct {
 	QrPaymentId int    `json:"QrPaymentId"`
@@ -13,10 +15,10 @@ type OperationDetails struct {
 }
 
 type OperationDetailsSt struct {
-	QrPaymentId           int            `json:"QrPaymentId"`
-	TotalAmount           float64        `json:"TotalAmount"`
-	AvailableReturnAmount float64        `json:"AvailableReturnAmount"`
-	TransactionDate       civil.DateTime `json:"TransactionDate"`
+	QrPaymentId           int       `json:"QrPaymentId"`
+	TotalAmount           float64   `json:"TotalAmount"`
+	AvailableReturnAmount float64   `json:"AvailableReturnAmount"`
+	TransactionDate       time.Time `json:"TransactionDate"`
 }
 
 type OperationDetailsInput struct {

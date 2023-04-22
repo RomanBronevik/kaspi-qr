@@ -15,8 +15,6 @@ import (
 	"kaspi-qr/internal/adapters/server"
 	"kaspi-qr/internal/domain/core"
 	"kaspi-qr/internal/domain/usecases"
-
-	_ "github.com/lib/pq"
 )
 
 func main() {
