@@ -36,6 +36,7 @@ type OrdCUSt struct {
 }
 
 type OrdCreateRepSt struct {
-	QrUrl string `json:"qr_url"`
-	Link  string `json:"link"`
+	PaymentId int64  `json:"payment_id"`
+	QrUrl     string `json:"qr_url"`
+	QrCode    string `json:"qr_code"`
 }

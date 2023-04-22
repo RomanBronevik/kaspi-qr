@@ -73,3 +73,20 @@ func (o *St) hPaymentDelete(c *gin.Context) {
 
 	Error(c, o.ucs.PaymentDelete(o.getRequestContext(c), id))
 }
+
+// @Router   /payment/:id/qr_picture [get]
+// @Tags     payment
+// @Param    id path integer true "id"
+// @Produce  octet-stream
+// @Success  200
+// @Failure  400  {object}  dopTypes.ErrRep
+func (o *St) hPaymentGetQrPicture(c *gin.Context) {
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+
+	png, err := o.ucs.PaymentGetQrPicture(o.getRequestContext(c), id)
+	if Error(c, err) {
+		return
+	}
+
+	c.Data(http.StatusOK, "image/png", png)
+}

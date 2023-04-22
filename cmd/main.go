@@ -56,7 +56,7 @@ func main() {
 	app.repo = repoPg.New(app.lg, app.db)
 
 	// core
-	app.core = core.New(app.repo, app.kaspi)
+	app.core = core.New(app.lg, app.repo, app.kaspi, conf.QrUrlTemplate)
 
 	// usecases
 	app.ucs = usecases.New(app.lg, app.db, app.core)

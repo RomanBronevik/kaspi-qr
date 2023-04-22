@@ -206,7 +206,7 @@ func OperationStatus(PaymentId string) (entities.OperationStatus, error) {
 		StatusCode: kaspi.StatusSuccess,
 		Message:    "Good",
 		Data: &entities.StatusSt{
-			Status: kaspi.ProcessedStatus,
+			Status: kaspi.PaymentStatusProcessed,
 		},
 	}
 

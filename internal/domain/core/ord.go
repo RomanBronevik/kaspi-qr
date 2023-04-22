@@ -157,6 +157,10 @@ func (c *Ord) Create(ctx context.Context, obj *entities.OrdCUSt) (*entities.OrdC
 			uObj.Status = &ordStatusCreated
 		}
 
+		if ord.Src != *obj.Src {
+			uObj.Src = obj.Src
+		}
+
 		if ord.CityId != *obj.CityId {
 			uObj.CityId = obj.CityId
 
@@ -176,6 +180,10 @@ func (c *Ord) Create(ctx context.Context, obj *entities.OrdCUSt) (*entities.OrdC
 			uObj.Amount = obj.Amount
 		}
 
+		if ord.Platform != *obj.Platform {
+			uObj.Platform = obj.Platform
+		}
+
 		// update ord
 		if *uObj != (entities.OrdCUSt{}) {
 			err = c.Update(ctx, ord.Id, uObj)
@@ -192,8 +200,9 @@ func (c *Ord) Create(ctx context.Context, obj *entities.OrdCUSt) (*entities.OrdC
 	}
 
 	return &entities.OrdCreateRepSt{
-		QrUrl: "https://google.kz",
-		Link:  payment.Link,
+		PaymentId: payment.Id,
+		QrUrl:     c.r.Payment.createQrUrl(payment.Id),
+		QrCode:    payment.Link,
 	}, nil
 }
 

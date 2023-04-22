@@ -258,11 +258,11 @@ func (s *St) checkUnpaid(ctx *gin.Context, mutex *sync.Mutex, isLocked bool, ord
 		}
 
 		switch operationStatus {
-		case kaspi.WaitStatus:
+		case kaspi.PaymentStatusWait:
 			err = s.UpdatePaymentStatus(ctx, value.PaymentId, cns.StatusWait)
-		case kaspi.ProcessedStatus:
+		case kaspi.PaymentStatusProcessed:
 			err = s.UpdatePaymentStatus(ctx, value.PaymentId, cns.StatusProcessed)
-		case kaspi.ErrorStatus:
+		case kaspi.PaymentStatusError:
 			err = s.UpdatePaymentStatus(ctx, value.PaymentId, cns.StatusError)
 		default:
 			continue

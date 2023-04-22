@@ -33,6 +33,7 @@ type Repo interface {
 
 	// payment
 	PaymentGet(ctx context.Context, id int64) (*entities.PaymentSt, error)
+	PaymentGetLink(ctx context.Context, id int64) (string, error)
 	PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) ([]*entities.PaymentSt, error)
 	PaymentIdExists(ctx context.Context, id int64) (bool, error)
 	PaymentCreate(ctx context.Context, obj *entities.PaymentCUSt) (int64, error)

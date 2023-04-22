@@ -43,6 +43,18 @@ func (d *St) PaymentGet(ctx context.Context, id int64) (*entities.PaymentSt, err
 	return &result, err
 }
 
+func (d *St) PaymentGetLink(ctx context.Context, id int64) (string, error) {
+	var result string
+
+	err := d.db.QueryRow(ctx, `
+		select link
+		from payment
+		where id = $1
+	`, id).Scan(&result)
+
+	return result, err
+}
+
 func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) ([]*entities.PaymentSt, error) {
 	conds := make([]string, 0)
 	args := map[string]any{}

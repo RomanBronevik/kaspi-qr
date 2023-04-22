@@ -1,6 +1,7 @@
 package core
 
 import (
+	"kaspi-qr/internal/adapters/logger"
 	"kaspi-qr/internal/adapters/provider"
 	"sync"
 
@@ -9,8 +10,10 @@ import (
 )
 
 type St struct {
-	repo repo.Repo
-	prv  provider.Provider
+	lg            logger.Lite
+	repo          repo.Repo
+	prv           provider.Provider
+	qrUrlTemplate string
 
 	wg         sync.WaitGroup
 	City       *City
@@ -20,10 +23,12 @@ type St struct {
 	TradePoint *TradePoint
 }
 
-func New(repo *pg.St, prv provider.Provider) *St {
+func New(lg logger.Lite, repo *pg.St, prv provider.Provider, qrUrlTemplate string) *St {
 	c := &St{
-		repo: repo,
-		prv:  prv,
+		lg:            lg,
+		repo:          repo,
+		prv:           prv,
+		qrUrlTemplate: qrUrlTemplate,
 	}
 
 	c.City = NewCity(c)

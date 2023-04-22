@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"kaspi-qr/internal/adapters/logger"
 	"kaspi-qr/internal/adapters/provider"
+	"kaspi-qr/internal/cns"
 	"kaspi-qr/internal/domain/errs"
 	"strconv"
 	"strings"
@@ -133,8 +134,8 @@ func (s *St) PaymentLinkCreate(reqObj provider.PaymentCreateReqSt) (*provider.Pa
 	return &repObj.Data, nil
 }
 
-func (s *St) PaymentGetStatus(paymentId string) (string, error) {
-	uriPath := "payment/status" + paymentId
+func (s *St) PaymentGetStatus(paymentId int64) (string, error) {
+	uriPath := "payment/status" + strconv.FormatInt(paymentId, 10)
 
 	repObj := &provider.PaymentStatusRepSt{}
 
@@ -149,7 +150,7 @@ func (s *St) PaymentGetStatus(paymentId string) (string, error) {
 		return "", errs.ServiceNA
 	}
 
-	return repObj.Data.Status, nil
+	return s.PaymentStatusDecode(repObj.Data.Status), nil
 }
 
 func (s *St) PaymentGetDetails(paymentId int64, deviceToken string) (*provider.PaymentDetailsSt, error) {
@@ -188,4 +189,20 @@ func (s *St) PaymentReturn(reqObj provider.PaymentReturnReqSt) (int64, error) {
 	}
 
 	return repObj.ReturnOperationDataSt.ReturnOperationId, nil
+}
+
+func (s *St) PaymentStatusDecode(v string) string {
+	switch v {
+	case PaymentStatusQrTokenCreated:
+		return cns.PaymentStatusCreated
+	case PaymentStatusWait:
+		return cns.PaymentStatusLinkActivated
+	case PaymentStatusProcessed:
+		return cns.PaymentStatusPaid
+	case PaymentStatusError:
+		return cns.PaymentStatusError
+	default:
+		s.lg.Errorw("Unknown payment status", nil, "status", v)
+		return cns.PaymentStatusError
+	}
 }

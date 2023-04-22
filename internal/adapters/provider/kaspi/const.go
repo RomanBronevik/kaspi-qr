@@ -27,8 +27,8 @@ const (
 )
 
 const (
-	QrTokenCreatedStatus = "QrTokenCreated"
-	WaitStatus           = "Wait"
-	ProcessedStatus      = "Processed"
-	ErrorStatus          = "Error"
+	PaymentStatusQrTokenCreated = "QrTokenCreated"
+	PaymentStatusWait           = "Wait"
+	PaymentStatusProcessed      = "Processed"
+	PaymentStatusError          = "Error"
 )

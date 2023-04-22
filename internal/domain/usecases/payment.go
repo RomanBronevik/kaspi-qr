@@ -55,3 +55,14 @@ func (u *St) PaymentDelete(ctx context.Context,
 		return u.cr.Payment.Delete(ctx, id)
 	})
 }
+
+func (u *St) PaymentGetQrPicture(ctx context.Context,
+	id int64) ([]byte, error) {
+	// ses := u.SessionGetFromContext(ctx)
+	//
+	// if err = u.SessionRequireAuth(ses); err != nil {
+	// 	return err
+	// }
+
+	return u.cr.Payment.GetQrPicture(ctx, id)
+}
