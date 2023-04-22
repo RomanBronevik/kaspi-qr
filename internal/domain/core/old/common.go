@@ -11,7 +11,7 @@ import (
 
 func getKaspiStatusCodeDescription() map[int]string {
 	return map[int]string{
-		kaspi.SuccessStatus:                         "Успешный статус операции",
+		kaspi.StatusSuccess:                         "Успешный статус операции",
 		kaspi.NoCertificateStatus:                   "Отсутствует сертификат клиента",
 		kaspi.DeviceNotFoundStatus:                  "Устройство с заданным идентификатором не найдено",
 		kaspi.DeviceDeactivatedStatus:               "Устройство не активно (отключено или удалено)",

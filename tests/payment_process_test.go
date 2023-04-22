@@ -37,7 +37,7 @@ func TestProcess(t *testing.T) {
 
 	outputBodyQr, err := CreateQrToken(qrToken)
 	require.Nil(t, err)
-	require.Equal(t, kaspi.SuccessStatus, outputBody.StatusCode)
+	require.Equal(t, kaspi.StatusSuccess, outputBody.StatusCode)
 	require.NotEmpty(t, outputBody.Data)
 	require.Len(t, strconv.Itoa(outputBodyQr.Data.QrPaymentId), 9)
 
@@ -45,8 +45,7 @@ func TestProcess(t *testing.T) {
 
 	outputBodyOp, err := OperationStatus(PaymentId)
 	require.Nil(t, err)
-	require.Equal(t, kaspi.SuccessStatus, outputBodyOp.StatusCode)
-	//
+	require.Equal(t, kaspi.StatusSuccess, outputBodyOp.StatusCode)
 
 	refundSt := entities.ReturnRequestInput{
 		QrPaymentId:     outputBodyQr.Data.QrPaymentId,
@@ -83,7 +82,7 @@ func TestProcessLink(t *testing.T) {
 
 	outputBodyPayment, err := CreatePaymentLink(paymentLink)
 	require.Nil(t, err)
-	require.Equal(t, kaspi.SuccessStatus, outputBody.StatusCode)
+	require.Equal(t, kaspi.StatusSuccess, outputBody.StatusCode)
 	require.NotEmpty(t, outputBody.Data)
 	require.Len(t, strconv.Itoa(outputBodyPayment.Data.PaymentId), 9)
 
@@ -91,7 +90,7 @@ func TestProcessLink(t *testing.T) {
 
 	outputBodyOp, err := OperationStatus(PaymentId)
 	require.Nil(t, err)
-	require.Equal(t, kaspi.SuccessStatus, outputBodyOp.StatusCode)
+	require.Equal(t, kaspi.StatusSuccess, outputBodyOp.StatusCode)
 
 	//
 
@@ -139,7 +138,7 @@ func CreateQrToken(input entities.KaspiPaymentInput) (entities.QrTokenOutput, er
 	}
 
 	output := entities.QrTokenOutput{
-		StatusCode: kaspi.SuccessStatus,
+		StatusCode: kaspi.StatusSuccess,
 		Message:    "Good",
 		Data: &entities.QRStruct{
 			QRToken:        "57293259759247999078793654586228299243435",
@@ -174,7 +173,7 @@ func CreatePaymentLink(input entities.KaspiPaymentInput) (entities.PaymentLinkRe
 	}
 
 	output := entities.PaymentLinkRequestOutput{
-		StatusCode: kaspi.SuccessStatus,
+		StatusCode: kaspi.StatusSuccess,
 		Message:    "Good",
 		Data: &entities.PaymentLinkSt{
 			PaymentLink:    "57293259759247999078793654586228299243435",
@@ -204,7 +203,7 @@ func OperationStatus(PaymentId string) (entities.OperationStatus, error) {
 	}
 
 	output := entities.OperationStatus{
-		StatusCode: kaspi.SuccessStatus,
+		StatusCode: kaspi.StatusSuccess,
 		Message:    "Good",
 		Data: &entities.StatusSt{
 			Status: kaspi.ProcessedStatus,

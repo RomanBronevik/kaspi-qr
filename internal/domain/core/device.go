@@ -81,6 +81,22 @@ func (c *Device) Get(ctx context.Context, id string, errNE bool) (*entities.Devi
 	return result, nil
 }
 
+func (c *Device) GetIdForCityId(ctx context.Context, cityId string) (string, error) {
+	return c.r.repo.DeviceGetIdForCityId(ctx, cityId)
+}
+
+func (c *Device) GetForCityId(ctx context.Context, cityId string) (*entities.DeviceSt, error) {
+	id, err := c.r.repo.DeviceGetIdForCityId(ctx, cityId)
+	if err != nil {
+		return nil, err
+	}
+	if id == "" {
+		return nil, nil
+	}
+
+	return c.Get(ctx, id, false)
+}
+
 func (c *Device) IdExists(ctx context.Context, id string) (bool, error) {
 	return c.r.repo.DeviceIdExists(ctx, id)
 }
@@ -141,13 +157,13 @@ func (c *Device) Delete(ctx context.Context, id string) error {
 		return err
 	}
 
-	err = c.r.prv.DeviceDelete(provider.DeviceDeleteReqSt{
+	_ = c.r.prv.DeviceDelete(provider.DeviceDeleteReqSt{
 		OrganizationBin: item.OrgBin,
 		DeviceToken:     item.Token,
 	})
-	if err != nil {
-		return errs.Err(err.Error())
-	}
+	//if err != nil {
+	//	return errs.Err(err.Error())
+	//}
 
 	return c.r.repo.DeviceDelete(ctx, id)
 }

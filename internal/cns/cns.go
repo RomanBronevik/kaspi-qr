@@ -23,20 +23,11 @@ func PlatformIsValid(v string) bool {
 }
 
 const (
-	OrsStatusCreated       = "created"
-	OrsStatusLinkActivated = "link_activated"
-	OrsStatusPaid          = "paid"
-	OrsStatusError         = "error"
-	OrsStatusRefunded      = "refunded"
+	OrdStatusCreated  = "created"
+	OrdStatusPaid     = "paid"
+	OrdStatusError    = "error"
+	OrdStatusRefunded = "refunded"
 )
-
-func OrsStatusIsValid(v string) bool {
-	return v == OrsStatusCreated ||
-		v == OrsStatusLinkActivated ||
-		v == OrsStatusPaid ||
-		v == OrsStatusError ||
-		v == OrsStatusRefunded
-}
 
 const (
 	PaymentStatusCreated       = "created"
@@ -45,11 +36,3 @@ const (
 	PaymentStatusError         = "error"
 	PaymentStatusRefunded      = "refunded"
 )
-
-func PaymentStatusIsValid(v string) bool {
-	return v == PaymentStatusCreated ||
-		v == PaymentStatusLinkActivated ||
-		v == PaymentStatusPaid ||
-		v == PaymentStatusError ||
-		v == PaymentStatusRefunded
-}

@@ -28,25 +28,6 @@ func (o *St) hPaymentList(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// @Router   /payment [post]
-// @Tags     payment
-// @Param    body  body  entities.PaymentCUSt  false  "body"
-// @Success  200  {object}
-// @Failure  400  {object}  dopTypes.ErrRep
-func (o *St) hPaymentCreate(c *gin.Context) {
-	reqObj := &entities.PaymentCUSt{}
-	if !BindJSON(c, reqObj) {
-		return
-	}
-
-	result, err := o.ucs.PaymentCreate(o.getRequestContext(c), reqObj)
-	if Error(c, err) {
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"id": result})
-}
-
 // @Router   /payment/:id [get]
 // @Tags     payment
 // @Param    id path integer true "id"

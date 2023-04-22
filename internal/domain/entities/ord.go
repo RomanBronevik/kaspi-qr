@@ -34,3 +34,8 @@ type OrdCUSt struct {
 	Status   *string    `json:"-" db:"status"`
 	Platform *string    `json:"platform" db:"platform"`
 }
+
+type OrdCreateRepSt struct {
+	QrUrl string `json:"qr_url"`
+	Link  string `json:"link"`
+}

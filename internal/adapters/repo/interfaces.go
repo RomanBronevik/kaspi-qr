@@ -16,6 +16,7 @@ type Repo interface {
 
 	// device
 	DeviceGet(ctx context.Context, id string) (*entities.DeviceSt, error)
+	DeviceGetIdForCityId(ctx context.Context, cityId string) (string, error)
 	DeviceList(ctx context.Context, pars *entities.DeviceListParsSt) ([]*entities.DeviceSt, error)
 	DeviceIdExists(ctx context.Context, id string) (bool, error)
 	DeviceCreate(ctx context.Context, obj *entities.DeviceCUSt) (string, error)

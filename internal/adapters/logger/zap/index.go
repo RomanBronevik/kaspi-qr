@@ -20,6 +20,8 @@ func New(level string, dev bool) *St {
 
 	if dev {
 		cfg = zap.NewDevelopmentConfig()
+		cfg.Encoding = "console"
+		//cfg.EncoderConfig.ConsoleSeparator = "\n\t\t"
 	} else {
 		cfg = zap.NewProductionConfig()
 		cfg.Level.SetLevel(getZapLevel(level))

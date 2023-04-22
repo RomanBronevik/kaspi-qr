@@ -56,7 +56,6 @@ func GetHandler(lg logger.Lite, ucs *usecases.St, withCors bool) http.Handler {
 
 	// payment
 	r.GET("/payment", s.hPaymentList)
-	r.POST("/payment", s.hPaymentCreate)
 	r.GET("/payment/:id", s.hPaymentGet)
 	r.PUT("/payment/:id", s.hPaymentUpdate)
 	r.DELETE("/payment/:id", s.hPaymentDelete)

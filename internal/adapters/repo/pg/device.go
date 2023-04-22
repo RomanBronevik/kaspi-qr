@@ -33,6 +33,24 @@ func (d *St) DeviceGet(ctx context.Context, id string) (*entities.DeviceSt, erro
 	return &result, err
 }
 
+func (d *St) DeviceGetIdForCityId(ctx context.Context, cityId string) (string, error) {
+	var result string
+
+	err := d.db.QueryRow(ctx, `
+		select d.id
+		from device d
+			join city c on c.org_bin = d.org_bin
+		where c.id = $1
+		order by d.created desc
+		limit 1
+	`, cityId).Scan(&result)
+	if errors.Is(err, db.ErrNoRows) {
+		result, err = "", nil
+	}
+
+	return result, err
+}
+
 func (d *St) DeviceList(ctx context.Context, pars *entities.DeviceListParsSt) ([]*entities.DeviceSt, error) {
 	conds := make([]string, 0)
 	args := map[string]any{}

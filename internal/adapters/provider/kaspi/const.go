@@ -5,30 +5,30 @@ import "time"
 const (
 	RequestTimeout = 15 * time.Second
 
-	SuccessStatus                         = 0
-	NoCertificateStatus                   = -10000
-	DeviceNotFoundStatus                  = -1501
-	DeviceDeactivatedStatus               = -1502
-	DeviceAlreadyExistStatus              = -1503
-	PurchaseNotFoundStatus                = -1601
-	TradePointsDoesntExistStatus          = -14000002
-	TradePointNotFound                    = -99000002
-	RefundAmountGreaterStatus             = -99000005
-	RefundErrorStatus                     = -99000006
-	TradePointDeactivatedStatus           = 990000018
-	TradePointDoesntAcceptQrPaymentStatus = 990000026
-	WrongAmountStatus                     = 990000028
-	NoPaymentMethodsAvailableStatus       = 99000033
-	PurchaseUuidNotFoundStatus            = -99000001
-	TradePointDoesntMatchDeviceStatus     = -99000003
-	WrongPurchaseStatus                   = -99000011
-	PartialRefundNotAvailableStatus       = -99000020
-	ServiceNotAvailableStatus             = -999
+	StatusSuccess                         = 0
+	StatusNoCertificate                   = -10000
+	StatusDeviceNotFound                  = -1501
+	StatusDeviceDeactivated               = -1502
+	StatusDeviceAlreadyExist              = -1503
+	StatusPurchaseNotFound                = -1601
+	StatusTradePointsDoesntExist          = -14000002
+	tFoundTradePointNo                    = -99000002
+	StatusRefundAmountGreater             = -99000005
+	StatusRefundError                     = -99000006
+	StatusTradePointDeactivated           = 990000018
+	StatusTradePointDoesntAcceptQrPayment = 990000026
+	StatusWrongAmount                     = 990000028
+	StatusNoPaymentMethodsAvailable       = 99000033
+	StatusPurchaseUuidNotFound            = -99000001
+	StatusTradePointDoesntMatchDevice     = -99000003
+	StatusWrongPurchase                   = -99000011
+	StatusPartialRefundNotAvailable       = -99000020
+	StatusServiceNotAvailable             = -999
 )
 
 const (
-	//QrTokenCreatedStatus = "QrTokenCreated"
-	WaitStatus      = "Wait"
-	ProcessedStatus = "Processed"
-	ErrorStatus     = "Error"
+	QrTokenCreatedStatus = "QrTokenCreated"
+	WaitStatus           = "Wait"
+	ProcessedStatus      = "Processed"
+	ErrorStatus          = "Error"
 )

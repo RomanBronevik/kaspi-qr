@@ -45,4 +45,7 @@ const (
 	PlatformRequired     = Err("platform_required")
 	BadPlatform          = Err("bad_platform")
 	DeviceNotFound       = Err("device_not_found")
+	OrderAlreadyPaid     = Err("order_already_paid")
+	OrderIdRequired      = Err("order_id_required")
+	OrderNotFound        = Err("order_not_found")
 )

@@ -10,26 +10,19 @@ import (
 	"kaspi-qr/internal/adapters/logger"
 	"net/http"
 	"os"
-	"strings"
 
 	"golang.org/x/crypto/pkcs12"
 )
 
-type httpClientSt struct {
-	lg     logger.Lite
-	uri    string
-	client *http.Client
-}
-
-func newHttpClient(lg logger.Lite, uri string, certPath, certKey string) (*httpClientSt, error) {
+func createCert(certPath, certKey string) (tls.Certificate, error) {
 	pfxData, err := os.ReadFile(certPath)
 	if err != nil {
-		return nil, fmt.Errorf("os.ReadFile: %w", err)
+		return tls.Certificate{}, fmt.Errorf("os.ReadFile: %w", err)
 	}
 
 	blocks, err := pkcs12.ToPEM(pfxData, certKey)
 	if err != nil {
-		return nil, fmt.Errorf("pkcs12.ToPEM: %w", err)
+		return tls.Certificate{}, fmt.Errorf("pkcs12.ToPEM: %w", err)
 	}
 
 	var pemData []byte
@@ -39,30 +32,32 @@ func newHttpClient(lg logger.Lite, uri string, certPath, certKey string) (*httpC
 
 	cert, err := tls.X509KeyPair(pemData, pemData)
 	if err != nil {
-		return nil, fmt.Errorf("tls.X509KeyPair: %w", err)
+		return tls.Certificate{}, fmt.Errorf("tls.X509KeyPair: %w", err)
 	}
 
 	//caCertPool := x509.NewCertPool()
 	//caCertPool.AppendCertsFromPEM(pemData)
 
-	return &httpClientSt{
-		lg:  lg,
-		uri: strings.TrimRight(uri, "/") + "/",
-		client: &http.Client{
-			Timeout: RequestTimeout,
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					Certificates:       []tls.Certificate{cert},
-					InsecureSkipVerify: true,
-				},
-			},
-		},
-	}, nil
+	return cert, nil
 }
 
-func (c *httpClientSt) sendRequest(method, path string, reqObj, repObj any) (*httpRespSt, error) {
+func (s *St) newHttpClient() *http.Client {
+	return &http.Client{
+		Timeout: RequestTimeout,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				Certificates:       []tls.Certificate{s.cert},
+				InsecureSkipVerify: true,
+			},
+		},
+	}
+}
+
+func (s *St) sendRequest(method, path string, reqObj, repObj any) (*httpRespSt, error) {
+	httpClient := s.newHttpClient()
+
 	result := &httpRespSt{
-		lg:        c.lg,
+		lg:        s.lg,
 		reqMethod: method,
 		reqPath:   path,
 	}
@@ -78,7 +73,7 @@ func (c *httpClientSt) sendRequest(method, path string, reqObj, repObj any) (*ht
 		reqStream = bytes.NewBuffer(requestBody)
 	}
 
-	req, err := http.NewRequest(method, c.uri+path, reqStream)
+	req, err := http.NewRequest(method, s.uri+path, reqStream)
 	if err != nil {
 		return result, fmt.Errorf("http.NewRequest: %w", err)
 	}
@@ -87,7 +82,7 @@ func (c *httpClientSt) sendRequest(method, path string, reqObj, repObj any) (*ht
 		req.Header.Set("Content-Type", "application/json")
 	}
 
-	resp, err := c.client.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return result, fmt.Errorf("client.Do: %w", err)
 	}
@@ -129,6 +124,17 @@ type httpRespSt struct {
 func (r *httpRespSt) LogError(msg string, err error) {
 	r.lg.Errorw(
 		msg, err,
+		"reqMethod", r.reqMethod,
+		"reqPath", r.reqPath,
+		"reqBody", r.reqBody,
+		"repStatusCode", r.repStatusCode,
+		"repBody", r.repBody,
+	)
+}
+
+func (r *httpRespSt) LogInfo(msg string) {
+	r.lg.Infow(
+		msg,
 		"reqMethod", r.reqMethod,
 		"reqPath", r.reqPath,
 		"reqBody", r.reqBody,

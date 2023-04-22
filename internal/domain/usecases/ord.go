@@ -31,7 +31,7 @@ func (u *St) OrdGet(ctx context.Context, id string) (*entities.OrdSt, error) {
 }
 
 func (u *St) OrdCreate(ctx context.Context,
-	obj *entities.OrdCUSt) (string, error) {
+	obj *entities.OrdCUSt) (*entities.OrdCreateRepSt, error) {
 	var err error
 
 	// ses := u.SessionGetFromContext(ctx)
@@ -40,7 +40,7 @@ func (u *St) OrdCreate(ctx context.Context,
 	// 	return "", err
 	// }
 
-	var result string
+	var result *entities.OrdCreateRepSt
 
 	err = u.db.TransactionFn(ctx, func(ctx context.Context) error {
 		result, err = u.cr.Ord.Create(ctx, obj)

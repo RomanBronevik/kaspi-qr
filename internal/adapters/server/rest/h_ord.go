@@ -30,7 +30,7 @@ func (o *St) hOrdList(c *gin.Context) {
 // @Router   /ord [post]
 // @Tags     ord
 // @Param    body  body  entities.OrdCUSt  false  "body"
-// @Success  200  {object}
+// @Success  200  {object} entities.OrdCreateRepSt
 // @Failure  400  {object}  dopTypes.ErrRep
 func (o *St) hOrdCreate(c *gin.Context) {
 	reqObj := &entities.OrdCUSt{}
@@ -43,7 +43,7 @@ func (o *St) hOrdCreate(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"id": result})
+	c.JSON(http.StatusOK, result)
 }
 
 // @Router   /ord/:id [get]

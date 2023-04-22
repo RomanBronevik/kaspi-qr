@@ -1,44 +1,49 @@
 package kaspi
 
 import (
+	"crypto/tls"
 	"kaspi-qr/internal/adapters/logger"
 	"kaspi-qr/internal/adapters/provider"
 	"kaspi-qr/internal/domain/errs"
 	"strconv"
+	"strings"
 )
 
 type St struct {
-	lg         logger.Full
-	httpClient *httpClientSt
+	lg  logger.Full
+	uri string
+
+	cert tls.Certificate
 }
 
 func New(lg logger.Full, kaspiUrl, certPath, certPassword string) (*St, error) {
-	httpClient, err := newHttpClient(lg, kaspiUrl, certPath, certPassword)
+	cert, err := createCert(certPath, certPassword)
 	if err != nil {
 		lg.Errorw("newHttpClient", err)
 		return nil, err
 	}
 
 	return &St{
-		lg:         lg,
-		httpClient: httpClient,
+		lg:   lg,
+		uri:  strings.TrimRight(kaspiUrl, "/") + "/",
+		cert: cert,
 	}, nil
 }
 
 // TRADE POINT
 
 func (s *St) TradePointList(orgBin string) ([]*provider.TradePointSt, error) {
-	uriPath := "partner/tradepoints/" + orgBin
+	uriPath := "partner/tradepoints" + orgBin
 
 	repObj := &provider.TradePointListRepSt{}
 
-	resp, err := s.httpClient.sendRequest("GET", uriPath, nil, repObj)
+	resp, err := s.sendRequest("GET", uriPath, nil, repObj)
 	if err != nil {
 		resp.LogError("TradePointList", err)
 		return nil, err
 	}
 
-	if repObj.StatusCode != SuccessStatus {
+	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("TradePointList bad status-code", err)
 		return nil, errs.ServiceNA
 	}
@@ -49,17 +54,19 @@ func (s *St) TradePointList(orgBin string) ([]*provider.TradePointSt, error) {
 // DEVICE
 
 func (s *St) DeviceCreate(reqObj provider.DeviceCreateReqSt) (string, error) {
-	uriPath := "device/register/"
+	uriPath := "device/register"
 
 	repObj := &provider.DeviceCreateRepSt{}
 
-	resp, err := s.httpClient.sendRequest("POST", uriPath, reqObj, repObj)
+	resp, err := s.sendRequest("POST", uriPath, reqObj, repObj)
 	if err != nil {
 		resp.LogError("DeviceCreate", err)
 		return "", err
 	}
 
-	if repObj.StatusCode != SuccessStatus {
+	resp.LogInfo("DeviceCreate")
+
+	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("DeviceCreate bad status-code", err)
 		return "", errs.ServiceNA
 	}
@@ -72,13 +79,13 @@ func (s *St) DeviceDelete(reqObj provider.DeviceDeleteReqSt) error {
 
 	repObj := &provider.BaseRepSt{}
 
-	resp, err := s.httpClient.sendRequest("POST", uriPath, reqObj, repObj)
+	resp, err := s.sendRequest("POST", uriPath, reqObj, repObj)
 	if err != nil {
 		resp.LogError("DeviceDelete", err)
 		return err
 	}
 
-	if repObj.StatusCode != SuccessStatus {
+	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("DeviceDelete bad status-code", err)
 		return errs.ServiceNA
 	}
@@ -93,13 +100,13 @@ func (s *St) PaymentCreate(reqObj provider.PaymentCreateReqSt) (*provider.Paymen
 
 	repObj := &provider.PaymentCreateRepSt{}
 
-	resp, err := s.httpClient.sendRequest("POST", uriPath, reqObj, repObj)
+	resp, err := s.sendRequest("POST", uriPath, reqObj, repObj)
 	if err != nil {
 		resp.LogError("PaymentCreate", err)
 		return nil, err
 	}
 
-	if repObj.StatusCode != SuccessStatus {
+	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("PaymentCreate bad status-code", err)
 		return nil, errs.ServiceNA
 	}
@@ -112,13 +119,13 @@ func (s *St) PaymentLinkCreate(reqObj provider.PaymentCreateReqSt) (*provider.Pa
 
 	repObj := &provider.PaymentLinkCreateRepSt{}
 
-	resp, err := s.httpClient.sendRequest("POST", uriPath, reqObj, repObj)
+	resp, err := s.sendRequest("POST", uriPath, reqObj, repObj)
 	if err != nil {
 		resp.LogError("PaymentLinkCreate", err)
 		return nil, err
 	}
 
-	if repObj.StatusCode != SuccessStatus {
+	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("PaymentLinkCreate bad status-code", err)
 		return nil, errs.ServiceNA
 	}
@@ -127,17 +134,17 @@ func (s *St) PaymentLinkCreate(reqObj provider.PaymentCreateReqSt) (*provider.Pa
 }
 
 func (s *St) PaymentGetStatus(paymentId string) (string, error) {
-	uriPath := "payment/status/" + paymentId
+	uriPath := "payment/status" + paymentId
 
 	repObj := &provider.PaymentStatusRepSt{}
 
-	resp, err := s.httpClient.sendRequest("GET", uriPath, nil, repObj)
+	resp, err := s.sendRequest("GET", uriPath, nil, repObj)
 	if err != nil {
 		resp.LogError("PaymentGetStatus", err)
 		return "", err
 	}
 
-	if repObj.StatusCode != SuccessStatus {
+	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("PaymentGetStatus bad status-code", err)
 		return "", errs.ServiceNA
 	}
@@ -150,13 +157,13 @@ func (s *St) PaymentGetDetails(paymentId int64, deviceToken string) (*provider.P
 
 	repObj := &provider.PaymentDetailsRepSt{}
 
-	resp, err := s.httpClient.sendRequest("GET", uriPath, nil, repObj)
+	resp, err := s.sendRequest("GET", uriPath, nil, repObj)
 	if err != nil {
 		resp.LogError("PaymentDetails", err)
 		return nil, err
 	}
 
-	if repObj.StatusCode != SuccessStatus {
+	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("PaymentDetails bad status-code", err)
 		return nil, errs.ServiceNA
 	}
@@ -169,13 +176,13 @@ func (s *St) PaymentReturn(reqObj provider.PaymentReturnReqSt) (int64, error) {
 
 	repObj := &provider.PaymentReturnRepSt{}
 
-	resp, err := s.httpClient.sendRequest("POST", uriPath, reqObj, repObj)
+	resp, err := s.sendRequest("POST", uriPath, reqObj, repObj)
 	if err != nil {
 		resp.LogError("PaymentReturn", err)
 		return 0, err
 	}
 
-	if repObj.StatusCode != SuccessStatus {
+	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("PaymentReturn bad status-code", err)
 		return 0, errs.ServiceNA
 	}
