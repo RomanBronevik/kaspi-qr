@@ -26,6 +26,7 @@ const (
 	OrdStatusCreated  = "created"
 	OrdStatusPaid     = "paid"
 	OrdStatusError    = "error"
+	OrdStatusExpired  = "expired"
 	OrdStatusRefunded = "refunded"
 )
 
@@ -34,5 +35,6 @@ const (
 	PaymentStatusLinkActivated = "link_activated"
 	PaymentStatusPaid          = "paid"
 	PaymentStatusError         = "error"
+	PaymentStatusExpired       = "expired"
 	PaymentStatusRefunded      = "refunded"
 )

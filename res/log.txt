@@ -1,0 +1,6 @@
+POST https://mtokentest.kaspi.kz:8545/r3/v01/device/register
+     {"OrganizationBin":"160640004075","DeviceId":"GFC-456397","TradePointId":104039}
+     {"Data":{"DeviceToken":"d81fdaa6-5845-44ce-9619-a66453eb1d69"},"StatusCode":0}
+POST https://mtokentest.kaspi.kz:8545/r3/v01/qr/create-link
+     {"ExternalId":"tst_ord77","Amount":30000,"OrganizationBin":"160640004075","DeviceToken":"d81fdaa6-5845-44ce-9619-a66453eb1d69"}
+     {"Data":{"PaymentLink":"https://pay.kaspi.kz/pay/59124797555070531307541976950921491958401","ExpireDate":"2023-04-24T10:34:45.958+06:00","PaymentId":504720710,"PaymentMethods":["Red"],"PaymentBehaviorOptions":{"LinkActivationWaitTimeout":180,"PaymentConfirmationTimeout":65,"StatusPollingInterval":5}},"StatusCode":0}

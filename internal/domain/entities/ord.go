@@ -6,7 +6,7 @@ type OrdSt struct {
 	Id       string    `json:"id" db:"id"`
 	Created  time.Time `json:"created" db:"created"`
 	Modified time.Time `json:"modified" db:"modified"`
-	Src      string    `json:"src" db:"src"`
+	SrcId    string    `json:"src_id" db:"src_id"`
 	DeviceId string    `json:"device_id" db:"device_id"`
 	CityId   string    `json:"city_id" db:"city_id"`
 	Amount   float64   `json:"amount" db:"amount"`
@@ -15,18 +15,19 @@ type OrdSt struct {
 }
 
 type OrdListParsSt struct {
-	Ids      *[]string `json:"ids" form:"ids"`
-	Src      *string   `json:"src" form:"src"`
-	DeviceId *string   `json:"device_id" form:"device_id"`
-	CityId   *string   `json:"city_id" form:"city_id"`
-	Status   *string   `json:"status" form:"status"`
-	Platform *string   `json:"platform" form:"platform"`
+	Ids       *[]string `json:"ids" form:"ids"`
+	SrcId     *string   `json:"src_id" form:"src_id"`
+	DeviceId  *string   `json:"device_id" form:"device_id"`
+	PaymentId *int64    `json:"payment_id" form:"payment_id"`
+	CityId    *string   `json:"city_id" form:"city_id"`
+	Status    *string   `json:"status" form:"status"`
+	Platform  *string   `json:"platform" form:"platform"`
 }
 
 type OrdCUSt struct {
 	Id       *string    `json:"id" db:"id"`
 	Modified *time.Time `json:"-" db:"modified"`
-	Src      *string    `json:"src" db:"src"`
+	SrcId    *string    `json:"src_id" db:"src_id"`
 	DeviceId *string    `json:"-" db:"device_id"`
 	CityCode *string    `json:"city_code" db:"-"`
 	CityId   *string    `json:"-" db:"city_id"`

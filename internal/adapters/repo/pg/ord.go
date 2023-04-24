@@ -15,7 +15,7 @@ func (d *St) OrdGet(ctx context.Context, id string) (*entities.OrdSt, error) {
 			t.id,
 			t.created,
 			t.modified,
-			t.src,
+			t.src_id,
 			t.device_id,
 			t.city_id,
 			t.amount,
@@ -27,7 +27,7 @@ func (d *St) OrdGet(ctx context.Context, id string) (*entities.OrdSt, error) {
 		&result.Id,
 		&result.Created,
 		&result.Modified,
-		&result.Src,
+		&result.SrcId,
 		&result.DeviceId,
 		&result.CityId,
 		&result.Amount,
@@ -50,13 +50,17 @@ func (d *St) OrdList(ctx context.Context, pars *entities.OrdListParsSt) ([]*enti
 		conds = append(conds, `t.id in (select * from unnest(${ids} :: text[]))`)
 		args["ids"] = *pars.Ids
 	}
-	if pars.Src != nil {
-		conds = append(conds, "t.src = ${src}")
-		args["src"] = *pars.Src
+	if pars.SrcId != nil {
+		conds = append(conds, "t.src_id = ${src_id}")
+		args["src_id"] = *pars.SrcId
 	}
 	if pars.DeviceId != nil {
 		conds = append(conds, "t.device_id = ${device_id}")
 		args["device_id"] = *pars.DeviceId
+	}
+	if pars.PaymentId != nil {
+		conds = append(conds, "t.id = (select ord_id from payment where id = ${payment_id})")
+		args["payment_id"] = *pars.PaymentId
 	}
 	if pars.CityId != nil {
 		conds = append(conds, "t.city_id = ${city_id}")
@@ -76,7 +80,7 @@ func (d *St) OrdList(ctx context.Context, pars *entities.OrdListParsSt) ([]*enti
 			t.id,
 			t.created,
 			t.modified,
-			t.src,
+			t.src_id,
 			t.device_id,
 			t.city_id,
 			t.amount,
@@ -101,7 +105,7 @@ func (d *St) OrdList(ctx context.Context, pars *entities.OrdListParsSt) ([]*enti
 			&item.Id,
 			&item.Created,
 			&item.Modified,
-			&item.Src,
+			&item.SrcId,
 			&item.DeviceId,
 			&item.CityId,
 			&item.Amount,
@@ -173,8 +177,8 @@ func (d *St) ordGetCUFields(obj *entities.OrdCUSt) map[string]any {
 		result["modified"] = *obj.Modified
 	}
 
-	if obj.Src != nil {
-		result["src"] = *obj.Src
+	if obj.SrcId != nil {
+		result["src_id"] = *obj.SrcId
 	}
 
 	if obj.DeviceId != nil {

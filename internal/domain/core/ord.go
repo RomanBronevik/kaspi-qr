@@ -32,12 +32,12 @@ func (c *Ord) ValidateCU(ctx context.Context, obj *entities.OrdCUSt, id string) 
 		}
 	}
 
-	// Src
-	if forCreate && obj.Src == nil {
+	// SrcId
+	if forCreate && obj.SrcId == nil {
 		return errs.SrcRequired
 	}
-	if obj.Src != nil {
-		if !cns.OrdSrcIsValid(*obj.Src) {
+	if obj.SrcId != nil {
+		if !cns.OrdSrcIsValid(*obj.SrcId) {
 			return errs.BadSrc
 		}
 	}
@@ -157,8 +157,8 @@ func (c *Ord) Create(ctx context.Context, obj *entities.OrdCUSt) (*entities.OrdC
 			uObj.Status = &ordStatusCreated
 		}
 
-		if ord.Src != *obj.Src {
-			uObj.Src = obj.Src
+		if ord.SrcId != *obj.SrcId {
+			uObj.SrcId = obj.SrcId
 		}
 
 		if ord.CityId != *obj.CityId {

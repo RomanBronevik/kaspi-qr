@@ -7,11 +7,18 @@ $$;
 
 create table city
 (
-    id      text not null
+    id      text
         primary key,
     code    text not null default '',
     name    text not null default '',
     org_bin text not null default ''
+);
+
+create table src
+(
+    id         text
+        primary key,
+    notify_url text not null
 );
 
 create table device
@@ -30,7 +37,8 @@ create table ord
         primary key,
     created   timestamptz not null default now(),
     modified  timestamptz not null default now(),
-    src       text        not null,
+    src_id    text
+        constraint ord_fk_src_id references src (id) on delete cascade on update cascade,
     device_id text        not null
         constraint ord_fk_device_id references device (id) on delete set null on update cascade,
     city_id   text        not null
@@ -39,8 +47,8 @@ create table ord
     status    text        not null,
     platform  text        not null
 );
-create index ord_idx_src
-    on ord (src);
+create index ord_idx_src_id
+    on ord (src_id);
 create index ord_idx_device_id
     on ord (device_id);
 create index ord_idx_city_id

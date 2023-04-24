@@ -2,6 +2,7 @@ package kaspi
 
 import (
 	"crypto/tls"
+	"fmt"
 	"kaspi-qr/internal/adapters/logger"
 	"kaspi-qr/internal/adapters/provider"
 	"kaspi-qr/internal/cns"
@@ -34,7 +35,7 @@ func New(lg logger.Full, kaspiUrl, certPath, certPassword string) (*St, error) {
 // TRADE POINT
 
 func (s *St) TradePointList(orgBin string) ([]*provider.TradePointSt, error) {
-	uriPath := "partner/tradepoints" + orgBin
+	uriPath := "partner/tradepoints/" + orgBin
 
 	repObj := &provider.TradePointListRepSt{}
 
@@ -65,7 +66,11 @@ func (s *St) DeviceCreate(reqObj provider.DeviceCreateReqSt) (string, error) {
 		return "", err
 	}
 
-	resp.LogInfo("DeviceCreate")
+	//resp.LogInfo("DeviceCreate")
+
+	fmt.Println("POST", s.uri+uriPath)
+	fmt.Println("    ", resp.reqBody)
+	fmt.Println("    ", resp.repBody)
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("DeviceCreate bad status-code", err)
@@ -125,6 +130,10 @@ func (s *St) PaymentLinkCreate(reqObj provider.PaymentCreateReqSt) (*provider.Pa
 		resp.LogError("PaymentLinkCreate", err)
 		return nil, err
 	}
+
+	fmt.Println("POST", s.uri+uriPath)
+	fmt.Println("    ", resp.reqBody)
+	fmt.Println("    ", resp.repBody)
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("PaymentLinkCreate bad status-code", err)

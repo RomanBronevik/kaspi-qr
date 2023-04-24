@@ -5,8 +5,8 @@ import (
 	"kaspi-qr/internal/domain/entities"
 )
 
-func (u *St) OrdList(ctx context.Context,
-	pars *entities.OrdListParsSt) ([]*entities.OrdSt, error) {
+func (u *St) SrcList(ctx context.Context,
+	pars *entities.SrcListParsSt) ([]*entities.SrcSt, int64, error) {
 	//var err error
 
 	// ses := u.SessionGetFromContext(ctx)
@@ -15,11 +15,10 @@ func (u *St) OrdList(ctx context.Context,
 	// 	return nil, 0, err
 	// }
 
-	return u.cr.Ord.List(ctx, pars)
+	return u.cr.Src.List(ctx, pars)
 }
 
-func (u *St) OrdGet(ctx context.Context,
-	id string) (*entities.OrdSt, error) {
+func (u *St) SrcGet(ctx context.Context, id string) (*entities.SrcSt, error) {
 	// var err error
 
 	// ses := u.SessionGetFromContext(ctx)
@@ -28,11 +27,11 @@ func (u *St) OrdGet(ctx context.Context,
 	// 	return nil, 0, err
 	// }
 
-	return u.cr.Ord.Get(ctx, id, true)
+	return u.cr.Src.Get(ctx, id, true)
 }
 
-func (u *St) OrdCreate(ctx context.Context,
-	obj *entities.OrdCUSt) (*entities.OrdCreateRepSt, error) {
+func (u *St) SrcCreate(ctx context.Context,
+	obj *entities.SrcCUSt) (string, error) {
 	var err error
 
 	// ses := u.SessionGetFromContext(ctx)
@@ -41,18 +40,18 @@ func (u *St) OrdCreate(ctx context.Context,
 	// 	return "", err
 	// }
 
-	var result *entities.OrdCreateRepSt
+	var result string
 
 	err = u.db.TransactionFn(ctx, func(ctx context.Context) error {
-		result, err = u.cr.Ord.Create(ctx, obj)
+		result, err = u.cr.Src.Create(ctx, obj)
 		return err
 	})
 
 	return result, err
 }
 
-func (u *St) OrdUpdate(ctx context.Context,
-	id string, obj *entities.OrdCUSt) error {
+func (u *St) SrcUpdate(ctx context.Context,
+	id string, obj *entities.SrcCUSt) error {
 	// ses := u.SessionGetFromContext(ctx)
 	//
 	// if err = u.SessionRequireAuth(ses); err != nil {
@@ -60,11 +59,11 @@ func (u *St) OrdUpdate(ctx context.Context,
 	// }
 
 	return u.db.TransactionFn(ctx, func(ctx context.Context) error {
-		return u.cr.Ord.Update(ctx, id, obj)
+		return u.cr.Src.Update(ctx, id, obj)
 	})
 }
 
-func (u *St) OrdDelete(ctx context.Context,
+func (u *St) SrcDelete(ctx context.Context,
 	id string) error {
 	// ses := u.SessionGetFromContext(ctx)
 	//
@@ -73,6 +72,6 @@ func (u *St) OrdDelete(ctx context.Context,
 	// }
 
 	return u.db.TransactionFn(ctx, func(ctx context.Context) error {
-		return u.cr.Ord.Delete(ctx, id)
+		return u.cr.Src.Delete(ctx, id)
 	})
 }

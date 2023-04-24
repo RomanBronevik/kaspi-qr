@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"kaspi-qr/internal/adapters/notifier"
 	"kaspi-qr/internal/adapters/provider"
 	"kaspi-qr/internal/cns"
 	"kaspi-qr/internal/domain/entities"
@@ -148,40 +149,37 @@ func (c *Payment) GetStatus(ctx context.Context, id int64) (string, error) {
 		return "", err
 	}
 
-	// get status from provider
-	prvStatus, err := c.r.prv.PaymentGetStatus(payment.Id)
-	if err != nil {
-		return "", err
+	now := time.Now()
+	allowanceDuration := 10 * time.Second
+	newStatus := ""
+
+	if payment.ExpireDt.Add(allowanceDuration).Before(now) {
+		newStatus = cns.PaymentStatusExpired
+	} else if payment.Status == cns.PaymentStatusCreated &&
+		payment.StatusChangedAt.Add((time.Duration(payment.Pbo.LinkActivationWaitTimeout)*time.Second)+allowanceDuration).Before(now) {
+		newStatus = cns.PaymentStatusExpired
+	} else if payment.Status == cns.PaymentStatusLinkActivated &&
+		payment.StatusChangedAt.Add((time.Duration(payment.Pbo.PaymentConfirmationTimeout)*time.Second)+allowanceDuration).Before(now) {
+		newStatus = cns.PaymentStatusExpired
+	} else {
+		// get status from provider
+		newStatus, err = c.r.prv.PaymentGetStatus(payment.Id)
+		if err != nil {
+			return "", err
+		}
 	}
 
-	if prvStatus != payment.Status {
+	if newStatus != payment.Status {
 		// update payment
 		err = c.Update(ctx, id, &entities.PaymentCUSt{
-			Status: &prvStatus,
+			Status: &newStatus,
 		})
 		if err != nil {
 			return "", err
-		}
-
-		ordStatus := c.statusToOrdStatus(prvStatus)
-
-		// update ord
-		err = c.r.Ord.Update(ctx, payment.OrdId, &entities.OrdCUSt{
-			Status: &ordStatus,
-		})
-		if err != nil {
-			return "", err
-		}
-
-		switch prvStatus {
-		case cns.PaymentStatusPaid:
-			// todo send notification
-		case cns.PaymentStatusError:
-			// todo send notification
 		}
 	}
 
-	return prvStatus, nil
+	return newStatus, nil
 }
 
 func (c *Payment) statusToOrdStatus(v string) string {
@@ -229,6 +227,43 @@ func (c *Payment) Update(ctx context.Context, id int64, obj *entities.PaymentCUS
 	err = c.r.repo.PaymentUpdate(ctx, id, obj)
 	if err != nil {
 		return err
+	}
+
+	if obj.Status != nil {
+		payment, err := c.Get(ctx, id, true)
+		if err != nil {
+			return err
+		}
+
+		ordStatus := c.statusToOrdStatus(payment.Status)
+
+		// update ord
+		err = c.r.Ord.Update(ctx, payment.OrdId, &entities.OrdCUSt{
+			Status: &ordStatus,
+		})
+		if err != nil {
+			return err
+		}
+
+		ord, err := c.r.Ord.Get(ctx, payment.OrdId, true)
+		if err != nil {
+			return err
+		}
+
+		if ord.SrcId != "" {
+			src, err := c.r.Src.Get(ctx, ord.SrcId, false)
+			if err != nil {
+				return err
+			}
+			if src != nil && src.NotifyUrl != "" {
+				// notify
+				_ = c.r.notifier.NotifyOrderStatusChange(src.NotifyUrl, &notifier.OrderStatusChangeReqSt{
+					OrdId:     ord.Id,
+					PaymentId: payment.Id,
+					Status:    ord.Status,
+				})
+			}
+		}
 	}
 
 	return nil

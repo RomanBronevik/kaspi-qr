@@ -64,6 +64,13 @@ func GetHandler(lg logger.Lite, ucs *usecases.St, withCors bool) http.Handler {
 	// trade_point
 	r.GET("/trade_point", s.hTradePointList)
 
+	// src
+	r.GET("/src", s.hSrcList)
+	r.POST("/src", s.hSrcCreate)
+	r.GET("/src/:id", s.hSrcGet)
+	r.PUT("/src/:id", s.hSrcUpdate)
+	r.DELETE("/src/:id", s.hSrcDelete)
+
 	return r
 }
 

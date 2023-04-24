@@ -39,4 +39,12 @@ type Repo interface {
 	PaymentCreate(ctx context.Context, obj *entities.PaymentCUSt) (int64, error)
 	PaymentUpdate(ctx context.Context, id int64, obj *entities.PaymentCUSt) error
 	PaymentDelete(ctx context.Context, id int64) error
+
+	// src
+	SrcGet(ctx context.Context, id string) (*entities.SrcSt, error)
+	SrcList(ctx context.Context, pars *entities.SrcListParsSt) ([]*entities.SrcSt, int64, error)
+	SrcIdExists(ctx context.Context, id string) (bool, error)
+	SrcCreate(ctx context.Context, obj *entities.SrcCUSt) (string, error)
+	SrcUpdate(ctx context.Context, id string, obj *entities.SrcCUSt) error
+	SrcDelete(ctx context.Context, id string) error
 }
