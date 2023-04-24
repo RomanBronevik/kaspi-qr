@@ -96,7 +96,7 @@ func (s *St) sendRequest(method, path string, reqObj, repObj any) (*httpRespSt, 
 	}
 	result.repBody = string(repBody)
 
-	if repObj != nil {
+	if repObj != nil && len(repBody) > 0 {
 		err = json.Unmarshal(repBody, &repObj)
 		if err != nil {
 			return result, fmt.Errorf("json.Unmarshal: %w", err)
