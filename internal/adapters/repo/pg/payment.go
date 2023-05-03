@@ -51,6 +51,9 @@ func (d *St) PaymentGetLink(ctx context.Context, id int64) (string, error) {
 		from payment
 		where id = $1
 	`, id).Scan(&result)
+	if errors.Is(err, db.ErrNoRows) {
+		return "", nil
+	}
 
 	return result, err
 }
@@ -72,6 +75,10 @@ func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) 
 		conds = append(conds, "t.status = ${status}")
 		args["status"] = *pars.Status
 	}
+	if pars.Statuses != nil {
+		conds = append(conds, `t.status in (select * from unnest(${statuses} :: text[]))`)
+		args["statuses"] = *pars.Statuses
+	}
 
 	rows, err := d.db.QueryM(ctx, `
 		select
@@ -87,7 +94,7 @@ func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) 
 			t.pbo
 		from payment t
 		`+d.tOptionalWhere(conds)+`
-		order by t.name`,
+		order by t.created`,
 		args,
 	)
 	if err != nil {

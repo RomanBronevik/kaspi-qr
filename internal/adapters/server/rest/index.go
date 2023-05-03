@@ -61,6 +61,12 @@ func GetHandler(lg logger.Lite, ucs *usecases.St, withCors bool) http.Handler {
 	r.DELETE("/payment/:id", s.hPaymentDelete)
 	r.GET("/payment/:id/qr_picture", s.hPaymentGetQrPicture)
 
+	// emu
+	r.POST("/payment/:id/scan", s.hPaymentEmuPaymentScan)
+	r.POST("/payment/:id/scan_error", s.hPaymentEmuPaymentScanError)
+	r.POST("/payment/:id/confirm", s.hPaymentEmuPaymentConfirm)
+	r.POST("/payment/:id/confirm_error", s.hPaymentEmuPaymentConfirmError)
+
 	// trade_point
 	r.GET("/trade_point", s.hTradePointList)
 

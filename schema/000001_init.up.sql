@@ -79,3 +79,6 @@ create index payment_idx_status
     on payment (status);
 create index payment_idx_status_changed_at
     on payment (status_changed_at);
+
+insert into src (id, notify_url)
+values ('site', '');

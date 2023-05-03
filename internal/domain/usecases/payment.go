@@ -66,3 +66,25 @@ func (u *St) PaymentGetQrPicture(ctx context.Context,
 
 	return u.cr.Payment.GetQrPicture(ctx, id)
 }
+
+// for testing
+
+func (u *St) PaymentEmuPaymentScan(ctx context.Context,
+	id int64) error {
+	return u.cr.Payment.EmuPaymentScan(ctx, id)
+}
+
+func (u *St) PaymentEmuPaymentScanError(ctx context.Context,
+	id int64) error {
+	return u.cr.Payment.EmuPaymentScanError(ctx, id)
+}
+
+func (u *St) PaymentEmuPaymentConfirm(ctx context.Context,
+	id int64) error {
+	return u.cr.Payment.EmuPaymentConfirm(ctx, id)
+}
+
+func (u *St) PaymentEmuPaymentConfirmError(ctx context.Context,
+	id int64) error {
+	return u.cr.Payment.EmuPaymentConfirmError(ctx, id)
+}

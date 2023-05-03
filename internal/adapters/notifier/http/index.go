@@ -12,16 +12,22 @@ import (
 )
 
 type St struct {
-	lg logger.WarnAndError
+	lg logger.Lite
 }
 
-func New(lg logger.WarnAndError) *St {
+func New(lg logger.Lite) *St {
 	return &St{
 		lg: lg,
 	}
 }
 
 func (o *St) NotifyOrderStatusChange(uri string, obj *notifier.OrderStatusChangeReqSt) error {
+	o.lg.Infow("NotifyOrderStatusChange", "uri", uri, "obj", obj)
+
+	if uri == "" {
+		return nil
+	}
+
 	httpClient := http.Client{
 		Timeout:   5 * time.Second,
 		Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},

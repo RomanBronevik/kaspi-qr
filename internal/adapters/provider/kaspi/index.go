@@ -2,7 +2,6 @@ package kaspi
 
 import (
 	"crypto/tls"
-	"fmt"
 	"kaspi-qr/internal/adapters/logger"
 	"kaspi-qr/internal/adapters/provider"
 	"kaspi-qr/internal/cns"
@@ -66,12 +65,6 @@ func (s *St) DeviceCreate(reqObj provider.DeviceCreateReqSt) (string, error) {
 		return "", err
 	}
 
-	//resp.LogInfo("DeviceCreate")
-
-	fmt.Println("POST", s.uri+uriPath)
-	fmt.Println("    ", resp.reqBody)
-	fmt.Println("    ", resp.repBody)
-
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("DeviceCreate bad status-code", err)
 		return "", errs.ServiceNA
@@ -131,9 +124,7 @@ func (s *St) PaymentLinkCreate(reqObj provider.PaymentCreateReqSt) (*provider.Pa
 		return nil, err
 	}
 
-	fmt.Println("POST", s.uri+uriPath)
-	fmt.Println("    ", resp.reqBody)
-	fmt.Println("    ", resp.repBody)
+	//s.lg.Infow("PaymentLinkCreate", "rep_body", resp.repBody)
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("PaymentLinkCreate bad status-code", err)
@@ -144,7 +135,7 @@ func (s *St) PaymentLinkCreate(reqObj provider.PaymentCreateReqSt) (*provider.Pa
 }
 
 func (s *St) PaymentGetStatus(paymentId int64) (string, error) {
-	uriPath := "payment/status" + strconv.FormatInt(paymentId, 10)
+	uriPath := "payment/status/" + strconv.FormatInt(paymentId, 10)
 
 	repObj := &provider.PaymentStatusRepSt{}
 
@@ -153,6 +144,8 @@ func (s *St) PaymentGetStatus(paymentId int64) (string, error) {
 		resp.LogError("PaymentGetStatus", err)
 		return "", err
 	}
+
+	//s.lg.Infow("PaymentGetStatus", "uri_path", uriPath, "rep_body", resp.repBody)
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("PaymentGetStatus bad status-code", err)
@@ -201,6 +194,10 @@ func (s *St) PaymentReturn(reqObj provider.PaymentReturnReqSt) (int64, error) {
 }
 
 func (s *St) PaymentStatusDecode(v string) string {
+	if v == "" {
+		return ""
+	}
+
 	switch v {
 	case PaymentStatusQrTokenCreated:
 		return cns.PaymentStatusCreated
@@ -214,4 +211,98 @@ func (s *St) PaymentStatusDecode(v string) string {
 		s.lg.Errorw("Unknown payment status", nil, "status", v)
 		return cns.PaymentStatusError
 	}
+}
+
+// EMULATION
+
+func (s *St) EmuPaymentScan(paymentId int64) error {
+	uriPath := "test/payment/scan"
+
+	reqObj := map[string]any{
+		"qrPaymentId": strconv.FormatInt(paymentId, 10),
+	}
+
+	repObj := &provider.BaseRepSt{}
+
+	resp, err := s.sendRequest("POST", uriPath, reqObj, repObj)
+	if err != nil {
+		resp.LogError("EmuPaymentScan", err)
+		return err
+	}
+
+	if repObj.StatusCode != StatusSuccess {
+		resp.LogError("EmuPaymentScan bad status-code", err)
+		return errs.ServiceNA
+	}
+
+	return nil
+}
+
+func (s *St) EmuPaymentScanError(paymentId int64) error {
+	uriPath := "test/payment/scanerror"
+
+	reqObj := map[string]any{
+		"qrPaymentId": strconv.FormatInt(paymentId, 10),
+	}
+
+	repObj := &provider.BaseRepSt{}
+
+	resp, err := s.sendRequest("POST", uriPath, reqObj, repObj)
+	if err != nil {
+		resp.LogError("EmuPaymentScanError", err)
+		return err
+	}
+
+	if repObj.StatusCode != StatusSuccess {
+		resp.LogError("EmuPaymentScanError bad status-code", err)
+		return errs.ServiceNA
+	}
+
+	return nil
+}
+
+func (s *St) EmuPaymentConfirm(paymentId int64) error {
+	uriPath := "test/payment/confirm"
+
+	reqObj := map[string]any{
+		"qrPaymentId": strconv.FormatInt(paymentId, 10),
+	}
+
+	repObj := &provider.BaseRepSt{}
+
+	resp, err := s.sendRequest("POST", uriPath, reqObj, repObj)
+	if err != nil {
+		resp.LogError("EmuPaymentConfirm", err)
+		return err
+	}
+
+	if repObj.StatusCode != StatusSuccess {
+		resp.LogError("EmuPaymentConfirm bad status-code", err)
+		return errs.ServiceNA
+	}
+
+	return nil
+}
+
+func (s *St) EmuPaymentConfirmError(paymentId int64) error {
+	uriPath := "test/payment/confirmerror"
+
+	reqObj := map[string]any{
+		"qrPaymentId": strconv.FormatInt(paymentId, 10),
+	}
+
+	repObj := &provider.BaseRepSt{}
+
+	resp, err := s.sendRequest("POST", uriPath, reqObj, repObj)
+	if err != nil {
+		resp.LogError("EmuPaymentConfirmError", err)
+		return err
+	}
+
+	if repObj.StatusCode != StatusSuccess {
+		resp.LogError("EmuPaymentConfirmError bad status-code", err)
+		return errs.ServiceNA
+	}
+
+	return nil
 }

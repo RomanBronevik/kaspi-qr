@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/rendau/dop/dopTools"
+
 	qrcode "github.com/skip2/go-qrcode"
 )
 
@@ -128,6 +130,9 @@ func (c *Payment) GetQrPicture(ctx context.Context, id int64) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	if link == "" {
+		return nil, errs.ObjectNotFound
+	}
 
 	//link := "https://google.kz?asd=asd&zxc=asdaasd"
 
@@ -142,6 +147,8 @@ func (c *Payment) GetQrPicture(ctx context.Context, id int64) ([]byte, error) {
 
 func (c *Payment) GetStatus(ctx context.Context, id int64) (string, error) {
 	var err error
+
+	//c.r.lg.Infow("GetStatus", "id", id)
 
 	// get payment
 	payment, err := c.Get(ctx, id, true)
@@ -162,11 +169,15 @@ func (c *Payment) GetStatus(ctx context.Context, id int64) (string, error) {
 		payment.StatusChangedAt.Add((time.Duration(payment.Pbo.PaymentConfirmationTimeout)*time.Second)+allowanceDuration).Before(now) {
 		newStatus = cns.PaymentStatusExpired
 	} else {
-		// get status from provider
+		//get status from provider
 		newStatus, err = c.r.prv.PaymentGetStatus(payment.Id)
 		if err != nil {
 			return "", err
 		}
+	}
+
+	if newStatus == "" {
+		newStatus = payment.Status
 	}
 
 	if newStatus != payment.Status {
@@ -192,6 +203,8 @@ func (c *Payment) statusToOrdStatus(v string) string {
 		return cns.OrdStatusPaid
 	case cns.PaymentStatusError:
 		return cns.OrdStatusError
+	case cns.PaymentStatusExpired:
+		return cns.OrdStatusExpired
 	case cns.PaymentStatusRefunded:
 		return cns.OrdStatusRefunded
 	default:
@@ -255,7 +268,7 @@ func (c *Payment) Update(ctx context.Context, id int64, obj *entities.PaymentCUS
 			if err != nil {
 				return err
 			}
-			if src != nil && src.NotifyUrl != "" {
+			if src != nil {
 				// notify
 				_ = c.r.notifier.NotifyOrderStatusChange(src.NotifyUrl, &notifier.OrderStatusChangeReqSt{
 					OrdId:     ord.Id,
@@ -264,6 +277,8 @@ func (c *Payment) Update(ctx context.Context, id int64, obj *entities.PaymentCUS
 				})
 			}
 		}
+
+		//c.r.lg.Infow("payment status changed", "id", id, "status", payment.Status)
 	}
 
 	return nil
@@ -271,4 +286,72 @@ func (c *Payment) Update(ctx context.Context, id int64, obj *entities.PaymentCUS
 
 func (c *Payment) Delete(ctx context.Context, id int64) error {
 	return c.r.repo.PaymentDelete(ctx, id)
+}
+
+// for testing
+
+func (c *Payment) EmuPaymentScan(ctx context.Context, id int64) error {
+	return c.r.prv.EmuPaymentScan(id)
+}
+
+func (c *Payment) EmuPaymentScanError(ctx context.Context, id int64) error {
+	return c.r.prv.EmuPaymentScanError(id)
+}
+
+func (c *Payment) EmuPaymentConfirm(ctx context.Context, id int64) error {
+	return c.r.prv.EmuPaymentConfirm(id)
+}
+
+func (c *Payment) EmuPaymentConfirmError(ctx context.Context, id int64) error {
+	return c.r.prv.EmuPaymentConfirmError(id)
+}
+
+// jobs
+
+func (c *Payment) StatusChecker() {
+	// first time sleep
+	time.Sleep(10 * time.Second)
+
+	for {
+		if c.r.IsStopped() {
+			return
+		}
+
+		c.StatusCheck()
+
+		time.Sleep(7 * time.Second)
+	}
+}
+
+func (c *Payment) StatusCheck() {
+	defer dopTools.PanicRecover(c.r.lg, "statusCheck")
+
+	ctx := context.Background()
+
+	// get payments
+	payments, err := c.List(ctx, &entities.PaymentListParsSt{
+		Statuses: dopTools.NewSlicePtr(
+			cns.PaymentStatusCreated,
+			cns.PaymentStatusLinkActivated,
+		),
+	})
+	if err != nil {
+		return
+	}
+
+	for _, payment := range payments {
+		if c.r.IsStopped() {
+			return
+		}
+
+		c.r.wg.Add(1)
+		c.StatusCheckForPayment(ctx, payment)
+	}
+}
+
+func (c *Payment) StatusCheckForPayment(ctx context.Context, payment *entities.PaymentSt) {
+	defer c.r.wg.Done()
+	defer dopTools.PanicRecover(c.r.lg, "statusCheck")
+
+	_, _ = c.GetStatus(ctx, payment.Id)
 }

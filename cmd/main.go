@@ -91,6 +91,10 @@ func main() {
 		rest.GetHandler(app.lg, app.ucs, conf.HttpCors),
 	)
 
+	app.core.Start()
+
+	// LISTEN
+
 	var exitCode int
 
 	select {
@@ -109,7 +113,7 @@ func main() {
 
 	app.lg.Infow("Wait routines...")
 
-	app.core.WaitJobs()
+	app.core.StopAndWaitJobs()
 
 	app.lg.Infow("Exit")
 

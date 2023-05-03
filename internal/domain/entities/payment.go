@@ -22,9 +22,10 @@ type PaymentPboSt struct {
 }
 
 type PaymentListParsSt struct {
-	Ids    *[]int64 `json:"ids" form:"ids"`
-	OrdId  *string  `json:"ord_id" form:"ord_id"`
-	Status *string  `json:"status" form:"status"`
+	Ids      *[]int64  `json:"ids" form:"ids"`
+	OrdId    *string   `json:"ord_id" form:"ord_id"`
+	Status   *string   `json:"status" form:"status"`
+	Statuses *[]string `json:"statuses" form:"statuses"`
 }
 
 type PaymentCUSt struct {

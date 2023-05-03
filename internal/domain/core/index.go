@@ -17,7 +17,10 @@ type St struct {
 	notifier      notifier.Notifier
 	qrUrlTemplate string
 
-	wg         sync.WaitGroup
+	wg        sync.WaitGroup
+	stopped   bool
+	stoppedMu sync.RWMutex
+
 	City       *City
 	Device     *Device
 	Ord        *Ord
@@ -26,7 +29,13 @@ type St struct {
 	Src        *Src
 }
 
-func New(lg logger.Lite, repo *pg.St, prv provider.Provider, notifier notifier.Notifier, qrUrlTemplate string) *St {
+func New(
+	lg logger.Lite,
+	repo *pg.St,
+	prv provider.Provider,
+	notifier notifier.Notifier,
+	qrUrlTemplate string,
+) *St {
 	c := &St{
 		lg:            lg,
 		repo:          repo,
@@ -45,6 +54,20 @@ func New(lg logger.Lite, repo *pg.St, prv provider.Provider, notifier notifier.N
 	return c
 }
 
-func (s *St) WaitJobs() {
-	s.wg.Wait()
+func (c *St) Start() {
+	go c.Payment.StatusChecker()
+}
+
+func (c *St) IsStopped() bool {
+	c.stoppedMu.RLock()
+	defer c.stoppedMu.RUnlock()
+	return c.stopped
+}
+
+func (c *St) StopAndWaitJobs() {
+	c.stoppedMu.Lock()
+	c.stopped = true
+	c.stoppedMu.Unlock()
+
+	c.wg.Wait()
 }

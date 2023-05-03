@@ -90,3 +90,49 @@ func (o *St) hPaymentGetQrPicture(c *gin.Context) {
 
 	c.Data(http.StatusOK, "image/png", png)
 }
+
+// EMU
+
+// @Router   /emu/payment/:id/scan [post]
+// @Tags     emu
+// @Param    id path integer true "id"
+// @Success  200
+// @Failure  400  {object}  dopTypes.ErrRep
+func (o *St) hPaymentEmuPaymentScan(c *gin.Context) {
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+
+	Error(c, o.ucs.PaymentEmuPaymentScan(o.getRequestContext(c), id))
+}
+
+// @Router   /emu/payment/:id/scan_error [post]
+// @Tags     emu
+// @Param    id path integer true "id"
+// @Success  200
+// @Failure  400  {object}  dopTypes.ErrRep
+func (o *St) hPaymentEmuPaymentScanError(c *gin.Context) {
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+
+	Error(c, o.ucs.PaymentEmuPaymentScanError(o.getRequestContext(c), id))
+}
+
+// @Router   /emu/payment/:id/confirm [post]
+// @Tags     emu
+// @Param    id path integer true "id"
+// @Success  200
+// @Failure  400  {object}  dopTypes.ErrRep
+func (o *St) hPaymentEmuPaymentConfirm(c *gin.Context) {
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+
+	Error(c, o.ucs.PaymentEmuPaymentConfirm(o.getRequestContext(c), id))
+}
+
+// @Router   /emu/payment/:id/confirm_error [post]
+// @Tags     emu
+// @Param    id path integer true "id"
+// @Success  200
+// @Failure  400  {object}  dopTypes.ErrRep
+func (o *St) hPaymentEmuPaymentConfirmError(c *gin.Context) {
+	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
+
+	Error(c, o.ucs.PaymentEmuPaymentConfirmError(o.getRequestContext(c), id))
+}
