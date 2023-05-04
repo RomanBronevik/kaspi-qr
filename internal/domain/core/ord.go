@@ -151,6 +151,8 @@ func (c *Ord) Create(ctx context.Context, obj *entities.OrdCUSt) (*entities.OrdC
 			return nil, errs.OrderAlreadyPaid
 		}
 
+		// TODO finish previous payments
+
 		uObj := &entities.OrdCUSt{}
 
 		if ord.Status != cns.OrdStatusCreated {
