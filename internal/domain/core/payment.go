@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/rendau/dop/dopErrs"
 	qrcode "github.com/skip2/go-qrcode"
 )
 
@@ -44,7 +45,7 @@ func (c *Payment) Get(ctx context.Context, id int64, errNE bool) (*entities.Paym
 	}
 	if result == nil {
 		if errNE {
-			return nil, errs.ObjectNotFound
+			return nil, dopErrs.ObjectNotFound
 		}
 		return nil, nil
 	}
@@ -129,7 +130,7 @@ func (c *Payment) GetQrPicture(ctx context.Context, id int64) ([]byte, error) {
 		return nil, err
 	}
 	if link == "" {
-		return nil, errs.ObjectNotFound
+		return nil, dopErrs.ObjectNotFound
 	}
 
 	//link := "https://google.kz?asd=asd&zxc=asdaasd"
@@ -271,7 +272,7 @@ func (c *Payment) Update(ctx context.Context, id int64, obj *entities.PaymentCUS
 				_ = c.r.notifier.NotifyOrderStatusChange(src.NotifyUrl, &notifier.OrderStatusChangeReqSt{
 					OrdId:     ord.Id,
 					PaymentId: payment.Id,
-					Status:    ord.Status,
+					Status:    payment.Status,
 				})
 			}
 		}

@@ -20,6 +20,7 @@ func (d *St) PaymentGet(ctx context.Context, id int64) (*entities.PaymentSt, err
 		Args:   map[string]any{"id": id},
 	})
 	if errors.Is(err, dopErrs.NoRows) {
+		result = nil
 		err = nil
 	}
 

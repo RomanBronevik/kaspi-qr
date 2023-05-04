@@ -20,6 +20,7 @@ func (d *St) OrdGet(ctx context.Context, id string) (*entities.OrdSt, error) {
 		Args:   map[string]any{"id": id},
 	})
 	if errors.Is(err, dopErrs.NoRows) {
+		result = nil
 		err = nil
 	}
 

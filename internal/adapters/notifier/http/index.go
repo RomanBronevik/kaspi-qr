@@ -1,15 +1,21 @@
 package http
 
 import (
-	"bytes"
 	"crypto/tls"
-	"encoding/json"
-	"fmt"
 	"kaspi-qr/internal/adapters/notifier"
 	"net/http"
 	"time"
 
+	"github.com/rendau/dop/dopErrs"
+
+	"github.com/rendau/dop/adapters/client/httpc"
+	"github.com/rendau/dop/adapters/client/httpc/httpclient"
+
 	"github.com/rendau/dop/adapters/logger"
+)
+
+const (
+	RequestTimeout = 10 * time.Second
 )
 
 type St struct {
@@ -23,37 +29,28 @@ func New(lg logger.Lite) *St {
 }
 
 func (o *St) NotifyOrderStatusChange(uri string, obj *notifier.OrderStatusChangeReqSt) error {
-	o.lg.Infow("NotifyOrderStatusChange", "uri", uri, "obj", obj)
-
 	if uri == "" {
+		o.lg.Infow("NotifyOrderStatusChange", "uri", uri, "obj", obj)
 		return nil
 	}
 
-	httpClient := http.Client{
-		Timeout:   5 * time.Second,
-		Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
-	}
+	httpClient := httpclient.New(o.lg, &httpc.OptionsSt{
+		Client: &http.Client{
+			Timeout:   RequestTimeout,
+			Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
+		},
+		LogPrefix: "NotifyOrderStatusChange: ",
+	})
 
-	reqBody, err := json.Marshal(obj)
+	_, err := httpClient.Send(&httpc.OptionsSt{
+		Uri:    uri,
+		Method: "POST",
+		//LogFlags:  httpc.LogResponse,
+
+		ReqObj: obj,
+	})
 	if err != nil {
-		return fmt.Errorf("json.Marshal: %w", err)
-	}
-
-	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(reqBody))
-	if err != nil {
-		return fmt.Errorf("http.NewRequest: %w", err)
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("client.Do: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return fmt.Errorf("resp.StatusCode: %d", resp.StatusCode)
+		return dopErrs.ServiceNA
 	}
 
 	return nil

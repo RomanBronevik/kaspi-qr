@@ -19,6 +19,7 @@ func (d *St) CityGet(ctx context.Context, id string) (*entities.CitySt, error) {
 		Args:   map[string]any{"id": id},
 	})
 	if errors.Is(err, dopErrs.NoRows) {
+		result = nil
 		err = nil
 	}
 

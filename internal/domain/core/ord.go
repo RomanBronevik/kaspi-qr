@@ -6,6 +6,8 @@ import (
 	"kaspi-qr/internal/domain/entities"
 	"kaspi-qr/internal/domain/errs"
 	"time"
+
+	"github.com/rendau/dop/dopErrs"
 )
 
 type Ord struct {
@@ -99,7 +101,7 @@ func (c *Ord) Get(ctx context.Context, id string, errNE bool) (*entities.OrdSt, 
 	}
 	if result == nil {
 		if errNE {
-			return nil, errs.ObjectNotFound
+			return nil, dopErrs.ObjectNotFound
 		}
 		return nil, nil
 	}

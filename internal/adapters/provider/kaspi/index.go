@@ -4,11 +4,11 @@ import (
 	"crypto/tls"
 	"kaspi-qr/internal/adapters/provider"
 	"kaspi-qr/internal/cns"
-	"kaspi-qr/internal/domain/errs"
 	"strconv"
 	"strings"
 
 	"github.com/rendau/dop/adapters/logger"
+	"github.com/rendau/dop/dopErrs"
 )
 
 type St struct {
@@ -47,7 +47,7 @@ func (s *St) TradePointList(orgBin string) ([]*provider.TradePointSt, error) {
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("TradePointList bad status-code", err)
-		return nil, errs.ServiceNA
+		return nil, dopErrs.ServiceNA
 	}
 
 	return repObj.Data, nil
@@ -68,7 +68,7 @@ func (s *St) DeviceCreate(reqObj provider.DeviceCreateReqSt) (string, error) {
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("DeviceCreate bad status-code", err)
-		return "", errs.ServiceNA
+		return "", dopErrs.ServiceNA
 	}
 
 	return repObj.Data.DeviceToken, nil
@@ -87,7 +87,7 @@ func (s *St) DeviceDelete(reqObj provider.DeviceDeleteReqSt) error {
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("DeviceDelete bad status-code", err)
-		return errs.ServiceNA
+		return dopErrs.ServiceNA
 	}
 
 	return nil
@@ -108,7 +108,7 @@ func (s *St) PaymentCreate(reqObj provider.PaymentCreateReqSt) (*provider.Paymen
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("PaymentCreate bad status-code", err)
-		return nil, errs.ServiceNA
+		return nil, dopErrs.ServiceNA
 	}
 
 	return &repObj.Data, nil
@@ -129,7 +129,7 @@ func (s *St) PaymentLinkCreate(reqObj provider.PaymentCreateReqSt) (*provider.Pa
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("PaymentLinkCreate bad status-code", err)
-		return nil, errs.ServiceNA
+		return nil, dopErrs.ServiceNA
 	}
 
 	return &repObj.Data, nil
@@ -150,7 +150,7 @@ func (s *St) PaymentGetStatus(paymentId int64) (string, error) {
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("PaymentGetStatus bad status-code", err)
-		return "", errs.ServiceNA
+		return "", dopErrs.ServiceNA
 	}
 
 	return s.PaymentStatusDecode(repObj.Data.Status), nil
@@ -169,7 +169,7 @@ func (s *St) PaymentGetDetails(paymentId int64, deviceToken string) (*provider.P
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("PaymentDetails bad status-code", err)
-		return nil, errs.ServiceNA
+		return nil, dopErrs.ServiceNA
 	}
 
 	return &repObj.Data, nil
@@ -188,7 +188,7 @@ func (s *St) PaymentReturn(reqObj provider.PaymentReturnReqSt) (int64, error) {
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("PaymentReturn bad status-code", err)
-		return 0, errs.ServiceNA
+		return 0, dopErrs.ServiceNA
 	}
 
 	return repObj.ReturnOperationDataSt.ReturnOperationId, nil
@@ -233,7 +233,7 @@ func (s *St) EmuPaymentScan(paymentId int64) error {
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("EmuPaymentScan bad status-code", err)
-		return errs.ServiceNA
+		return dopErrs.ServiceNA
 	}
 
 	return nil
@@ -256,7 +256,7 @@ func (s *St) EmuPaymentScanError(paymentId int64) error {
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("EmuPaymentScanError bad status-code", err)
-		return errs.ServiceNA
+		return dopErrs.ServiceNA
 	}
 
 	return nil
@@ -279,7 +279,7 @@ func (s *St) EmuPaymentConfirm(paymentId int64) error {
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("EmuPaymentConfirm bad status-code", err)
-		return errs.ServiceNA
+		return dopErrs.ServiceNA
 	}
 
 	return nil
@@ -302,7 +302,7 @@ func (s *St) EmuPaymentConfirmError(paymentId int64) error {
 
 	if repObj.StatusCode != StatusSuccess {
 		resp.LogError("EmuPaymentConfirmError bad status-code", err)
-		return errs.ServiceNA
+		return dopErrs.ServiceNA
 	}
 
 	return nil

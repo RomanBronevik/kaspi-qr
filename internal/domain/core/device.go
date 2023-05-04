@@ -5,6 +5,8 @@ import (
 	"kaspi-qr/internal/adapters/provider"
 	"kaspi-qr/internal/domain/entities"
 	"kaspi-qr/internal/domain/errs"
+
+	"github.com/rendau/dop/dopErrs"
 )
 
 type Device struct {
@@ -73,7 +75,7 @@ func (c *Device) Get(ctx context.Context, id string, errNE bool) (*entities.Devi
 	}
 	if result == nil {
 		if errNE {
-			return nil, errs.ObjectNotFound
+			return nil, dopErrs.ObjectNotFound
 		}
 		return nil, nil
 	}
@@ -121,7 +123,7 @@ func (c *Device) Create(ctx context.Context, obj *entities.DeviceCUSt) (string, 
 		TradePointId:    *obj.TradePointId,
 	})
 	if err != nil {
-		return "", errs.Err(err.Error())
+		return "", dopErrs.Err(err.Error())
 	}
 
 	obj.Token = &token

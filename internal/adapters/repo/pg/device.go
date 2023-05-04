@@ -20,6 +20,7 @@ func (d *St) DeviceGet(ctx context.Context, id string) (*entities.DeviceSt, erro
 		Args:   map[string]any{"id": id},
 	})
 	if errors.Is(err, dopErrs.NoRows) {
+		result = nil
 		err = nil
 	}
 

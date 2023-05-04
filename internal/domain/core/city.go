@@ -3,7 +3,8 @@ package core
 import (
 	"context"
 	"kaspi-qr/internal/domain/entities"
-	"kaspi-qr/internal/domain/errs"
+
+	"github.com/rendau/dop/dopErrs"
 )
 
 type City struct {
@@ -36,7 +37,7 @@ func (c *City) Get(ctx context.Context, id string, errNE bool) (*entities.CitySt
 	}
 	if result == nil {
 		if errNE {
-			return nil, errs.ObjectNotFound
+			return nil, dopErrs.ObjectNotFound
 		}
 		return nil, nil
 	}
