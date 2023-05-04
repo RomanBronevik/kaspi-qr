@@ -5,44 +5,28 @@ import (
 	"errors"
 	"kaspi-qr/internal/domain/entities"
 
+	"github.com/rendau/dop/adapters/db"
+
 	"github.com/rendau/dop/dopErrs"
 )
 
 func (d *St) OrdGet(ctx context.Context, id string) (*entities.OrdSt, error) {
-	var result entities.OrdSt
+	result := &entities.OrdSt{}
 
-	err := d.DbQueryRow(ctx, `
-		select
-			t.id,
-			t.created,
-			t.modified,
-			t.src_id,
-			t.device_id,
-			t.city_id,
-			t.amount,
-			t.status,
-			t.platform
-		from ord t
-		where t.id = $1
-	`, id).Scan(
-		&result.Id,
-		&result.Created,
-		&result.Modified,
-		&result.SrcId,
-		&result.DeviceId,
-		&result.CityId,
-		&result.Amount,
-		&result.Status,
-		&result.Platform,
-	)
+	err := d.HfGet(ctx, db.RDBGetOptions{
+		Dst:    result,
+		Tables: []string{"ord"},
+		Conds:  []string{"id = ${id}"},
+		Args:   map[string]any{"id": id},
+	})
 	if errors.Is(err, dopErrs.NoRows) {
-		return nil, nil
+		err = nil
 	}
 
-	return &result, err
+	return result, err
 }
 
-func (d *St) OrdList(ctx context.Context, pars *entities.OrdListParsSt) ([]*entities.OrdSt, error) {
+func (d *St) OrdList(ctx context.Context, pars *entities.OrdListParsSt) ([]*entities.OrdSt, int64, error) {
 	conds := make([]string, 0)
 	args := map[string]any{}
 
@@ -76,54 +60,20 @@ func (d *St) OrdList(ctx context.Context, pars *entities.OrdListParsSt) ([]*enti
 		args["platform"] = *pars.Platform
 	}
 
-	rows, err := d.DbQueryM(ctx, `
-		select
-			t.id,
-			t.created,
-			t.modified,
-			t.src_id,
-			t.device_id,
-			t.city_id,
-			t.amount,
-			t.status,
-			t.platform
-		from ord t
-		`+d.tOptionalWhere(conds)+`
-		order by t.created`,
-		args,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
 	result := make([]*entities.OrdSt, 0)
 
-	for rows.Next() {
-		item := &entities.OrdSt{}
+	tCount, err := d.HfList(ctx, db.RDBListOptions{
+		Dst:    &result,
+		Tables: []string{`ord t`},
+		LPars:  pars.ListParams,
+		Conds:  conds,
+		Args:   args,
+		AllowedSorts: map[string]string{
+			"default": "t.created",
+		},
+	})
 
-		err = rows.Scan(
-			&item.Id,
-			&item.Created,
-			&item.Modified,
-			&item.SrcId,
-			&item.DeviceId,
-			&item.CityId,
-			&item.Amount,
-			&item.Status,
-			&item.Platform,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		result = append(result, item)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return result, tCount, err
 }
 
 func (d *St) OrdIdExists(ctx context.Context, id string) (bool, error) {
@@ -140,74 +90,31 @@ func (d *St) OrdIdExists(ctx context.Context, id string) (bool, error) {
 }
 
 func (d *St) OrdCreate(ctx context.Context, obj *entities.OrdCUSt) (string, error) {
-	fields := d.ordGetCUFields(obj)
-	cols, values := d.tPrepareFieldsToCreate(fields)
+	var result string
 
-	var newId string
+	err := d.HfCreate(ctx, db.RDBCreateOptions{
+		Table:  "ord",
+		Obj:    obj,
+		RetCol: "id",
+		RetV:   &result,
+	})
 
-	err := d.DbQueryRowM(ctx, `
-		insert into ord (`+cols+`)
-		values (`+values+`)
-		returning id
-	`, fields).Scan(&newId)
-
-	return newId, err
+	return result, err
 }
 
 func (d *St) OrdUpdate(ctx context.Context, id string, obj *entities.OrdCUSt) error {
-	fields := d.ordGetCUFields(obj)
-	cols := d.tPrepareFieldsToUpdate(fields)
-
-	fields["cond_id"] = id
-
-	return d.DbExecM(ctx, `
-		update ord
-		set `+cols+`
-		where id = ${cond_id}
-	`, fields)
-}
-
-func (d *St) ordGetCUFields(obj *entities.OrdCUSt) map[string]any {
-	result := map[string]any{}
-
-	if obj.Id != nil {
-		result["id"] = *obj.Id
-	}
-
-	if obj.Modified != nil {
-		result["modified"] = *obj.Modified
-	}
-
-	if obj.SrcId != nil {
-		result["src_id"] = *obj.SrcId
-	}
-
-	if obj.DeviceId != nil {
-		result["device_id"] = *obj.DeviceId
-	}
-
-	if obj.CityId != nil {
-		result["city_id"] = *obj.CityId
-	}
-
-	if obj.Amount != nil {
-		result["amount"] = *obj.Amount
-	}
-
-	if obj.Status != nil {
-		result["status"] = *obj.Status
-	}
-
-	if obj.Platform != nil {
-		result["platform"] = *obj.Platform
-	}
-
-	return result
+	return d.HfUpdate(ctx, db.RDBUpdateOptions{
+		Table: "ord",
+		Obj:   obj,
+		Conds: []string{"id = ${cond_id}"},
+		Args:  map[string]any{"cond_id": id},
+	})
 }
 
 func (d *St) OrdDelete(ctx context.Context, id string) error {
-	return d.DbExec(ctx, `
-		delete from ord
-		where id = $1
-	`, id)
+	return d.HfDelete(ctx, db.RDBDeleteOptions{
+		Table: "ord",
+		Conds: []string{"id = ${cond_id}"},
+		Args:  map[string]any{"cond_id": id},
+	})
 }

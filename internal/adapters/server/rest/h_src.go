@@ -13,7 +13,7 @@ import (
 // @Tags		src
 // @Param		query	query	entities.SrcListParsSt	false	"query"
 // @Produce	json
-// @Success	200	{object}	dopTypes.PaginatedListRep{results=[]entities.SrcSt}
+// @Success	200	{array}	entities.SrcSt
 // @Failure	400	{object}	dopTypes.ErrRep
 func (o *St) hSrcList(c *gin.Context) {
 	pars := &entities.SrcListParsSt{}
@@ -26,9 +26,7 @@ func (o *St) hSrcList(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, dopTypes.PaginatedListRep{
-		Results: result,
-	})
+	c.JSON(http.StatusOK, result)
 }
 
 // @Router		/src [post]

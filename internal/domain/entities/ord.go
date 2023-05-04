@@ -1,6 +1,10 @@
 package entities
 
-import "time"
+import (
+	"time"
+
+	"github.com/rendau/dop/dopTypes"
+)
 
 type OrdSt struct {
 	Id       string    `json:"id" db:"id"`
@@ -15,6 +19,8 @@ type OrdSt struct {
 }
 
 type OrdListParsSt struct {
+	dopTypes.ListParams
+
 	Ids       *[]string `json:"ids" form:"ids"`
 	SrcId     *string   `json:"src_id" form:"src_id"`
 	DeviceId  *string   `json:"device_id" form:"device_id"`

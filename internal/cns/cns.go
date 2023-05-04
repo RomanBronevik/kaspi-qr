@@ -1,6 +1,8 @@
 package cns
 
 const (
+	MaxPageSize = 500
+
 	OrdSrcSite = "site"
 )
 

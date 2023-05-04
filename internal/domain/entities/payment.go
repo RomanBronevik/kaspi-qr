@@ -1,6 +1,10 @@
 package entities
 
-import "time"
+import (
+	"time"
+
+	"github.com/rendau/dop/dopTypes"
+)
 
 type PaymentSt struct {
 	Id              int64        `json:"id" db:"id"`
@@ -22,6 +26,8 @@ type PaymentPboSt struct {
 }
 
 type PaymentListParsSt struct {
+	dopTypes.ListParams
+
 	Ids      *[]int64  `json:"ids" form:"ids"`
 	OrdId    *string   `json:"ord_id" form:"ord_id"`
 	Status   *string   `json:"status" form:"status"`

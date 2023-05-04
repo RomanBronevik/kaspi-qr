@@ -83,13 +83,13 @@ func (c *Ord) ValidateCU(ctx context.Context, obj *entities.OrdCUSt, id string) 
 	return nil
 }
 
-func (c *Ord) List(ctx context.Context, pars *entities.OrdListParsSt) ([]*entities.OrdSt, error) {
-	items, err := c.r.repo.OrdList(ctx, pars)
+func (c *Ord) List(ctx context.Context, pars *entities.OrdListParsSt) ([]*entities.OrdSt, int64, error) {
+	items, tCount, err := c.r.repo.OrdList(ctx, pars)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return items, nil
+	return items, tCount, nil
 }
 
 func (c *Ord) Get(ctx context.Context, id string, errNE bool) (*entities.OrdSt, error) {

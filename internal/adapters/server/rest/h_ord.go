@@ -4,6 +4,8 @@ import (
 	"kaspi-qr/internal/domain/entities"
 	"net/http"
 
+	"github.com/rendau/dop/dopTypes"
+
 	"github.com/gin-gonic/gin"
 	dopHttps "github.com/rendau/dop/adapters/server/https"
 )
@@ -20,12 +22,17 @@ func (o *St) hOrdList(c *gin.Context) {
 		return
 	}
 
-	result, err := o.ucs.OrdList(o.getRequestContext(c), pars)
+	result, tCount, err := o.ucs.OrdList(o.getRequestContext(c), pars)
 	if dopHttps.Error(c, err) {
 		return
 	}
 
-	c.JSON(http.StatusOK, result)
+	c.JSON(http.StatusOK, dopTypes.PaginatedListRep{
+		Page:       pars.Page,
+		PageSize:   pars.PageSize,
+		TotalCount: tCount,
+		Results:    result,
+	})
 }
 
 // @Router		/ord [post]

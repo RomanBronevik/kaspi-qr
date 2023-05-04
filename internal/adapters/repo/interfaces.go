@@ -25,7 +25,7 @@ type Repo interface {
 
 	// ord
 	OrdGet(ctx context.Context, id string) (*entities.OrdSt, error)
-	OrdList(ctx context.Context, pars *entities.OrdListParsSt) ([]*entities.OrdSt, error)
+	OrdList(ctx context.Context, pars *entities.OrdListParsSt) ([]*entities.OrdSt, int64, error)
 	OrdIdExists(ctx context.Context, id string) (bool, error)
 	OrdCreate(ctx context.Context, obj *entities.OrdCUSt) (string, error)
 	OrdUpdate(ctx context.Context, id string, obj *entities.OrdCUSt) error
@@ -34,7 +34,7 @@ type Repo interface {
 	// payment
 	PaymentGet(ctx context.Context, id int64) (*entities.PaymentSt, error)
 	PaymentGetLink(ctx context.Context, id int64) (string, error)
-	PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) ([]*entities.PaymentSt, error)
+	PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) ([]*entities.PaymentSt, int64, error)
 	PaymentIdExists(ctx context.Context, id int64) (bool, error)
 	PaymentCreate(ctx context.Context, obj *entities.PaymentCUSt) (int64, error)
 	PaymentUpdate(ctx context.Context, id int64, obj *entities.PaymentCUSt) error

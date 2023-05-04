@@ -43,7 +43,7 @@ func (c *PaymentCheck) StatusCheck() {
 	const workerCount = 10
 
 	// get payments
-	payments, err := c.r.Payment.List(context.Background(), &entities.PaymentListParsSt{
+	payments, _, err := c.r.Payment.List(context.Background(), &entities.PaymentListParsSt{
 		Statuses: dopTools.NewSlicePtr(
 			cns.PaymentStatusCreated,
 			cns.PaymentStatusLinkActivated,

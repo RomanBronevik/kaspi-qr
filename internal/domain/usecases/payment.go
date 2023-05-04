@@ -2,18 +2,25 @@ package usecases
 
 import (
 	"context"
+	"kaspi-qr/internal/cns"
 	"kaspi-qr/internal/domain/entities"
+
+	"github.com/rendau/dop/dopTools"
 )
 
 func (u *St) PaymentList(ctx context.Context,
-	pars *entities.PaymentListParsSt) ([]*entities.PaymentSt, error) {
-	//var err error
+	pars *entities.PaymentListParsSt) ([]*entities.PaymentSt, int64, error) {
+	var err error
 
 	// ses := u.SessionGetFromContext(ctx)
 	//
 	// if err = u.SessionRequireAuth(ses); err != nil {
 	// 	return nil, 0, err
 	// }
+
+	if err = dopTools.RequirePageSize(pars.ListParams, cns.MaxPageSize); err != nil {
+		return nil, 0, err
+	}
 
 	return u.cr.Payment.List(ctx, pars)
 }

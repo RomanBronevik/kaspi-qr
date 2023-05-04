@@ -4,7 +4,6 @@ import (
 	"kaspi-qr/internal/adapters/notifier"
 	"kaspi-qr/internal/adapters/provider"
 	"kaspi-qr/internal/adapters/repo"
-	"kaspi-qr/internal/adapters/repo/pg"
 	"sync"
 
 	"github.com/rendau/dop/adapters/logger"
@@ -32,7 +31,7 @@ type St struct {
 
 func New(
 	lg logger.Lite,
-	repo *pg.St,
+	repo repo.Repo,
 	prv provider.Provider,
 	notifier notifier.Notifier,
 	qrUrlTemplate string,

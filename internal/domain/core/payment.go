@@ -28,13 +28,13 @@ func (c *Payment) ValidateCU(ctx context.Context, obj *entities.PaymentCUSt, id 
 	return nil
 }
 
-func (c *Payment) List(ctx context.Context, pars *entities.PaymentListParsSt) ([]*entities.PaymentSt, error) {
-	items, err := c.r.repo.PaymentList(ctx, pars)
+func (c *Payment) List(ctx context.Context, pars *entities.PaymentListParsSt) ([]*entities.PaymentSt, int64, error) {
+	items, tCount, err := c.r.repo.PaymentList(ctx, pars)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
-	return items, nil
+	return items, tCount, nil
 }
 
 func (c *Payment) Get(ctx context.Context, id int64, errNE bool) (*entities.PaymentSt, error) {

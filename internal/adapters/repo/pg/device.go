@@ -5,33 +5,25 @@ import (
 	"errors"
 	"kaspi-qr/internal/domain/entities"
 
+	"github.com/rendau/dop/adapters/db"
+
 	"github.com/rendau/dop/dopErrs"
 )
 
 func (d *St) DeviceGet(ctx context.Context, id string) (*entities.DeviceSt, error) {
-	var result entities.DeviceSt
+	result := &entities.DeviceSt{}
 
-	err := d.DbQueryRow(ctx, `
-		select
-			t.id,
-			t.created,
-			t.token,
-			t.trade_point_id,
-			t.org_bin
-		from device t
-		where t.id = $1
-	`, id).Scan(
-		&result.Id,
-		&result.Created,
-		&result.Token,
-		&result.TradePointId,
-		&result.OrgBin,
-	)
+	err := d.HfGet(ctx, db.RDBGetOptions{
+		Dst:    result,
+		Tables: []string{"device"},
+		Conds:  []string{"id = ${id}"},
+		Args:   map[string]any{"id": id},
+	})
 	if errors.Is(err, dopErrs.NoRows) {
-		return nil, nil
+		err = nil
 	}
 
-	return &result, err
+	return result, err
 }
 
 func (d *St) DeviceGetIdForCityId(ctx context.Context, cityId string) (string, error) {
@@ -78,46 +70,19 @@ func (d *St) DeviceList(ctx context.Context, pars *entities.DeviceListParsSt) ([
 		args["city_id"] = *pars.CityId
 	}
 
-	rows, err := d.DbQueryM(ctx, `
-		select
-			t.id,
-			t.created,
-			t.token,
-			t.trade_point_id,
-			t.org_bin
-		from device t
-		`+d.tOptionalWhere(conds)+`
-		order by t.created desc`,
-		args,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
 	result := make([]*entities.DeviceSt, 0)
 
-	for rows.Next() {
-		item := &entities.DeviceSt{}
+	_, err := d.HfList(ctx, db.RDBListOptions{
+		Dst:    &result,
+		Tables: []string{`device t`},
+		Conds:  conds,
+		Args:   args,
+		AllowedSorts: map[string]string{
+			"default": "t.created desc",
+		},
+	})
 
-		err = rows.Scan(
-			&item.Id,
-			&item.Created,
-			&item.Token,
-			&item.TradePointId,
-			&item.OrgBin,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		result = append(result, item)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return result, err
 }
 
 func (d *St) DeviceIdExists(ctx context.Context, id string) (bool, error) {
@@ -134,58 +99,31 @@ func (d *St) DeviceIdExists(ctx context.Context, id string) (bool, error) {
 }
 
 func (d *St) DeviceCreate(ctx context.Context, obj *entities.DeviceCUSt) (string, error) {
-	fields := d.deviceGetCUFields(obj)
-	cols, values := d.tPrepareFieldsToCreate(fields)
+	var result string
 
-	var newId string
+	err := d.HfCreate(ctx, db.RDBCreateOptions{
+		Table:  "device",
+		Obj:    obj,
+		RetCol: "id",
+		RetV:   &result,
+	})
 
-	err := d.DbQueryRowM(ctx, `
-		insert into device (`+cols+`)
-		values (`+values+`)
-		returning id
-	`, fields).Scan(&newId)
-
-	return newId, err
+	return result, err
 }
 
 func (d *St) DeviceUpdate(ctx context.Context, id string, obj *entities.DeviceCUSt) error {
-	fields := d.deviceGetCUFields(obj)
-	cols := d.tPrepareFieldsToUpdate(fields)
-
-	fields["cond_id"] = id
-
-	return d.DbExecM(ctx, `
-		update device
-		set `+cols+`
-		where id = ${cond_id}
-	`, fields)
-}
-
-func (d *St) deviceGetCUFields(obj *entities.DeviceCUSt) map[string]any {
-	result := map[string]any{}
-
-	if obj.Id != nil {
-		result["id"] = *obj.Id
-	}
-
-	if obj.Token != nil {
-		result["token"] = *obj.Token
-	}
-
-	if obj.TradePointId != nil {
-		result["trade_point_id"] = *obj.TradePointId
-	}
-
-	if obj.OrgBin != nil {
-		result["org_bin"] = *obj.OrgBin
-	}
-
-	return result
+	return d.HfUpdate(ctx, db.RDBUpdateOptions{
+		Table: "device",
+		Obj:   obj,
+		Conds: []string{"id = ${cond_id}"},
+		Args:  map[string]any{"cond_id": id},
+	})
 }
 
 func (d *St) DeviceDelete(ctx context.Context, id string) error {
-	return d.DbExec(ctx, `
-		delete from device
-		where id = $1
-	`, id)
+	return d.HfDelete(ctx, db.RDBDeleteOptions{
+		Table: "device",
+		Conds: []string{"id = ${cond_id}"},
+		Args:  map[string]any{"cond_id": id},
+	})
 }

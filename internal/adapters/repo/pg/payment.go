@@ -5,43 +5,25 @@ import (
 	"errors"
 	"kaspi-qr/internal/domain/entities"
 
+	"github.com/rendau/dop/adapters/db"
+
 	"github.com/rendau/dop/dopErrs"
 )
 
 func (d *St) PaymentGet(ctx context.Context, id int64) (*entities.PaymentSt, error) {
-	var result entities.PaymentSt
+	result := &entities.PaymentSt{}
 
-	err := d.DbQueryRow(ctx, `
-		select
-			t.id,
-			t.created,
-			t.modified,
-			t.ord_id,
-			t.link,
-			t.status,
-			t.status_changed_at,
-			t.amount,
-			t.expire_dt,
-			t.pbo
-		from payment t
-		where t.id = $1
-	`, id).Scan(
-		&result.Id,
-		&result.Created,
-		&result.Modified,
-		&result.OrdId,
-		&result.Link,
-		&result.Status,
-		&result.StatusChangedAt,
-		&result.Amount,
-		&result.ExpireDt,
-		&result.Pbo,
-	)
+	err := d.HfGet(ctx, db.RDBGetOptions{
+		Dst:    result,
+		Tables: []string{"payment"},
+		Conds:  []string{"id = ${id}"},
+		Args:   map[string]any{"id": id},
+	})
 	if errors.Is(err, dopErrs.NoRows) {
-		return nil, nil
+		err = nil
 	}
 
-	return &result, err
+	return result, err
 }
 
 func (d *St) PaymentGetLink(ctx context.Context, id int64) (string, error) {
@@ -59,7 +41,7 @@ func (d *St) PaymentGetLink(ctx context.Context, id int64) (string, error) {
 	return result, err
 }
 
-func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) ([]*entities.PaymentSt, error) {
+func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) ([]*entities.PaymentSt, int64, error) {
 	conds := make([]string, 0)
 	args := map[string]any{}
 
@@ -81,56 +63,20 @@ func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) 
 		args["statuses"] = *pars.Statuses
 	}
 
-	rows, err := d.DbQueryM(ctx, `
-		select
-			t.id,
-			t.created,
-			t.modified,
-			t.ord_id,
-			t.link,
-			t.status,
-			t.status_changed_at,
-			t.amount,
-			t.expire_dt,
-			t.pbo
-		from payment t
-		`+d.tOptionalWhere(conds)+`
-		order by t.created`,
-		args,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
 	result := make([]*entities.PaymentSt, 0)
 
-	for rows.Next() {
-		item := &entities.PaymentSt{}
+	tCount, err := d.HfList(ctx, db.RDBListOptions{
+		Dst:    &result,
+		Tables: []string{`payment t`},
+		LPars:  pars.ListParams,
+		Conds:  conds,
+		Args:   args,
+		AllowedSorts: map[string]string{
+			"default": "t.created",
+		},
+	})
 
-		err = rows.Scan(
-			&item.Id,
-			&item.Created,
-			&item.Modified,
-			&item.OrdId,
-			&item.Link,
-			&item.Status,
-			&item.StatusChangedAt,
-			&item.Amount,
-			&item.ExpireDt,
-			&item.Pbo,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		result = append(result, item)
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	return result, tCount, err
 }
 
 func (d *St) PaymentIdExists(ctx context.Context, id int64) (bool, error) {
@@ -147,78 +93,31 @@ func (d *St) PaymentIdExists(ctx context.Context, id int64) (bool, error) {
 }
 
 func (d *St) PaymentCreate(ctx context.Context, obj *entities.PaymentCUSt) (int64, error) {
-	fields := d.paymentGetCUFields(obj)
-	cols, values := d.tPrepareFieldsToCreate(fields)
+	var result int64
 
-	var newId int64
+	err := d.HfCreate(ctx, db.RDBCreateOptions{
+		Table:  "payment",
+		Obj:    obj,
+		RetCol: "id",
+		RetV:   &result,
+	})
 
-	err := d.DbQueryRowM(ctx, `
-		insert into payment (`+cols+`)
-		values (`+values+`)
-		returning id
-	`, fields).Scan(&newId)
-
-	return newId, err
+	return result, err
 }
 
 func (d *St) PaymentUpdate(ctx context.Context, id int64, obj *entities.PaymentCUSt) error {
-	fields := d.paymentGetCUFields(obj)
-	cols := d.tPrepareFieldsToUpdate(fields)
-
-	fields["cond_id"] = id
-
-	return d.DbExecM(ctx, `
-		update payment
-		set `+cols+`
-		where id = ${cond_id}
-	`, fields)
-}
-
-func (d *St) paymentGetCUFields(obj *entities.PaymentCUSt) map[string]any {
-	result := map[string]any{}
-
-	if obj.Id != nil {
-		result["id"] = *obj.Id
-	}
-
-	if obj.Modified != nil {
-		result["modified"] = *obj.Modified
-	}
-
-	if obj.OrdId != nil {
-		result["ord_id"] = *obj.OrdId
-	}
-
-	if obj.Link != nil {
-		result["link"] = *obj.Link
-	}
-
-	if obj.Status != nil {
-		result["status"] = *obj.Status
-	}
-
-	if obj.StatusChangedAt != nil {
-		result["status_changed_at"] = *obj.StatusChangedAt
-	}
-
-	if obj.Amount != nil {
-		result["amount"] = *obj.Amount
-	}
-
-	if obj.ExpireDt != nil {
-		result["expire_dt"] = *obj.ExpireDt
-	}
-
-	if obj.Pbo != nil {
-		result["pbo"] = *obj.Pbo
-	}
-
-	return result
+	return d.HfUpdate(ctx, db.RDBUpdateOptions{
+		Table: "payment",
+		Obj:   obj,
+		Conds: []string{"id = ${cond_id}"},
+		Args:  map[string]any{"cond_id": id},
+	})
 }
 
 func (d *St) PaymentDelete(ctx context.Context, id int64) error {
-	return d.DbExec(ctx, `
-		delete from payment
-		where id = $1
-	`, id)
+	return d.HfDelete(ctx, db.RDBDeleteOptions{
+		Table: "payment",
+		Conds: []string{"id = ${cond_id}"},
+		Args:  map[string]any{"cond_id": id},
+	})
 }
