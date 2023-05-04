@@ -8,12 +8,12 @@ import (
 	dopHttps "github.com/rendau/dop/adapters/server/https"
 )
 
-// @Router   /ord [get]
-// @Tags     ord
-// @Param    query  query  entities.OrdListParsSt  false  "query"
-// @Produce  json
-// @Success  200  {object}  dopTypes.PaginatedListRep{results=[]entities.OrdSt}
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/ord [get]
+// @Tags		ord
+// @Param		query	query	entities.OrdListParsSt	false	"query"
+// @Produce	json
+// @Success	200	{object}	dopTypes.PaginatedListRep{results=[]entities.OrdSt}
+// @Failure	400	{object}	dopTypes.ErrRep
 func (o *St) hOrdList(c *gin.Context) {
 	pars := &entities.OrdListParsSt{}
 	if !dopHttps.BindQuery(c, pars) {
@@ -28,11 +28,11 @@ func (o *St) hOrdList(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// @Router   /ord [post]
-// @Tags     ord
-// @Param    body  body  entities.OrdCUSt  false  "body"
-// @Success  200  {object} entities.OrdCreateRepSt
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/ord [post]
+// @Tags		ord
+// @Param		body	body		entities.OrdCUSt	false	"body"
+// @Success	200		{object}	entities.OrdCreateRepSt
+// @Failure	400		{object}	dopTypes.ErrRep
 func (o *St) hOrdCreate(c *gin.Context) {
 	reqObj := &entities.OrdCUSt{}
 	if !dopHttps.BindJSON(c, reqObj) {
@@ -47,12 +47,12 @@ func (o *St) hOrdCreate(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// @Router   /ord/:id [get]
-// @Tags     ord
-// @Param    id path string true "id"
-// @Produce  json
-// @Success  200  {object}  entities.OrdSt
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/ord/:id [get]
+// @Tags		ord
+// @Param		id	path	string	true	"id"
+// @Produce	json
+// @Success	200	{object}	entities.OrdSt
+// @Failure	400	{object}	dopTypes.ErrRep
 func (o *St) hOrdGet(c *gin.Context) {
 	id := c.Param("id")
 
@@ -64,13 +64,13 @@ func (o *St) hOrdGet(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// @Router   /ord/:id [put]
-// @Tags     ord
-// @Param    id path string true "id"
-// @Param    body  body  entities.OrdCUSt  false  "body"
-// @Produce  json
-// @Success  200
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/ord/:id [put]
+// @Tags		ord
+// @Param		id		path	string				true	"id"
+// @Param		body	body	entities.OrdCUSt	false	"body"
+// @Produce	json
+// @Success	200
+// @Failure	400	{object}	dopTypes.ErrRep
 func (o *St) hOrdUpdate(c *gin.Context) {
 	id := c.Param("id")
 
@@ -82,11 +82,11 @@ func (o *St) hOrdUpdate(c *gin.Context) {
 	dopHttps.Error(c, o.ucs.OrdUpdate(o.getRequestContext(c), id, reqObj))
 }
 
-// @Router   /ord/:id [delete]
-// @Tags     ord
-// @Param    id path string true "id"
-// @Success  200
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/ord/:id [delete]
+// @Tags		ord
+// @Param		id	path	string	true	"id"
+// @Success	200
+// @Failure	400	{object}	dopTypes.ErrRep
 func (o *St) hOrdDelete(c *gin.Context) {
 	id := c.Param("id")
 

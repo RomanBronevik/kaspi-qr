@@ -9,12 +9,12 @@ import (
 	"github.com/rendau/dop/dopTypes"
 )
 
-// @Router   /src [get]
-// @Tags     src
-// @Param    query  query  entities.SrcListParsSt  false  "query"
-// @Produce  json
-// @Success  200  {object}  dopTypes.PaginatedListRep{results=[]entities.SrcSt}
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/src [get]
+// @Tags		src
+// @Param		query	query	entities.SrcListParsSt	false	"query"
+// @Produce	json
+// @Success	200	{object}	dopTypes.PaginatedListRep{results=[]entities.SrcSt}
+// @Failure	400	{object}	dopTypes.ErrRep
 func (o *St) hSrcList(c *gin.Context) {
 	pars := &entities.SrcListParsSt{}
 	if !dopHttps.BindQuery(c, pars) {
@@ -31,11 +31,11 @@ func (o *St) hSrcList(c *gin.Context) {
 	})
 }
 
-// @Router   /src [post]
-// @Tags     src
-// @Param    body  body  entities.SrcCUSt  false  "body"
-// @Success  200  {object} dopTypes.CreateRep{id=string}
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/src [post]
+// @Tags		src
+// @Param		body	body		entities.SrcCUSt	false	"body"
+// @Success	200		{object}	dopTypes.CreateRep{id=string}
+// @Failure	400		{object}	dopTypes.ErrRep
 func (o *St) hSrcCreate(c *gin.Context) {
 	reqObj := &entities.SrcCUSt{}
 	if !dopHttps.BindJSON(c, reqObj) {
@@ -50,12 +50,12 @@ func (o *St) hSrcCreate(c *gin.Context) {
 	c.JSON(http.StatusOK, dopTypes.CreateRep{Id: result})
 }
 
-// @Router   /src/:id [get]
-// @Tags     src
-// @Param    id path string true "id"
-// @Produce  json
-// @Success  200  {object}  entities.SrcSt
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/src/:id [get]
+// @Tags		src
+// @Param		id	path	string	true	"id"
+// @Produce	json
+// @Success	200	{object}	entities.SrcSt
+// @Failure	400	{object}	dopTypes.ErrRep
 func (o *St) hSrcGet(c *gin.Context) {
 	id := c.Param("id")
 
@@ -67,13 +67,13 @@ func (o *St) hSrcGet(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// @Router   /src/:id [put]
-// @Tags     src
-// @Param    id path string true "id"
-// @Param    body  body  entities.SrcCUSt  false  "body"
-// @Produce  json
-// @Success  200
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/src/:id [put]
+// @Tags		src
+// @Param		id		path	string				true	"id"
+// @Param		body	body	entities.SrcCUSt	false	"body"
+// @Produce	json
+// @Success	200
+// @Failure	400	{object}	dopTypes.ErrRep
 func (o *St) hSrcUpdate(c *gin.Context) {
 	id := c.Param("id")
 
@@ -85,11 +85,11 @@ func (o *St) hSrcUpdate(c *gin.Context) {
 	dopHttps.Error(c, o.ucs.SrcUpdate(o.getRequestContext(c), id, reqObj))
 }
 
-// @Router   /src/:id [delete]
-// @Tags     src
-// @Param    id path string true "id"
-// @Success  200
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/src/:id [delete]
+// @Tags		src
+// @Param		id	path	string	true	"id"
+// @Success	200
+// @Failure	400	{object}	dopTypes.ErrRep
 func (o *St) hSrcDelete(c *gin.Context) {
 	id := c.Param("id")
 

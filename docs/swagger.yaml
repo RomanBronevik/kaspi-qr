@@ -1,0 +1,851 @@
+definitions:
+  dopTypes.CreateRep:
+    properties:
+      id: {}
+    type: object
+  dopTypes.ErrRep:
+    properties:
+      desc:
+        type: string
+      error_code:
+        type: string
+      fields:
+        additionalProperties:
+          type: string
+        type: object
+    type: object
+  dopTypes.PaginatedListRep:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      results: {}
+      total_count:
+        type: integer
+    type: object
+  entities.CityCUSt:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      org_bin:
+        type: string
+    type: object
+  entities.CitySt:
+    properties:
+      code:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      org_bin:
+        type: string
+    type: object
+  entities.DeviceCUSt:
+    properties:
+      id:
+        type: string
+      org_bin:
+        type: string
+      trade_point_id:
+        type: integer
+    type: object
+  entities.DeviceSt:
+    properties:
+      created:
+        type: string
+      id:
+        type: string
+      org_bin:
+        type: string
+      token:
+        type: string
+      trade_point_id:
+        type: integer
+    type: object
+  entities.OrdCUSt:
+    properties:
+      amount:
+        type: number
+      city_code:
+        type: string
+      id:
+        type: string
+      platform:
+        type: string
+      src_id:
+        type: string
+    type: object
+  entities.OrdCreateRepSt:
+    properties:
+      payment_id:
+        type: integer
+      qr_code:
+        type: string
+      qr_url:
+        type: string
+    type: object
+  entities.OrdSt:
+    properties:
+      amount:
+        type: number
+      city_id:
+        type: string
+      created:
+        type: string
+      device_id:
+        type: string
+      id:
+        type: string
+      modified:
+        type: string
+      platform:
+        type: string
+      src_id:
+        type: string
+      status:
+        type: string
+    type: object
+  entities.PaymentCUSt:
+    properties:
+      amount:
+        type: number
+      expire_dt:
+        type: string
+      id:
+        type: integer
+      link:
+        type: string
+      ord_id:
+        type: string
+      pbo:
+        $ref: '#/definitions/entities.PaymentPboSt'
+      status:
+        type: string
+    type: object
+  entities.PaymentPboSt:
+    properties:
+      link_activation_wait_timeout:
+        type: integer
+      payment_confirmation_timeout:
+        type: integer
+      status_polling_interval:
+        type: integer
+    type: object
+  entities.PaymentSt:
+    properties:
+      amount:
+        type: number
+      created:
+        type: string
+      expire_dt:
+        type: string
+      id:
+        type: integer
+      link:
+        type: string
+      modified:
+        type: string
+      ord_id:
+        type: string
+      pbo:
+        $ref: '#/definitions/entities.PaymentPboSt'
+      status:
+        type: string
+      status_changed_at:
+        type: string
+    type: object
+  entities.SrcCUSt:
+    properties:
+      id:
+        type: string
+      notify_url:
+        type: string
+    type: object
+  entities.SrcSt:
+    properties:
+      id:
+        type: string
+      notify_url:
+        type: string
+    type: object
+  entities.TradePointSt:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /city:
+    get:
+      parameters:
+      - in: query
+        name: code
+        type: string
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: ids
+        type: array
+      - in: query
+        name: org_bin
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.CitySt'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - city
+    post:
+      parameters:
+      - description: body
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.CityCUSt'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - city
+  /city/:id:
+    delete:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - city
+    get:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.CitySt'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - city
+    put:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: body
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.CityCUSt'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - city
+  /device:
+    get:
+      parameters:
+      - in: query
+        name: city_id
+        type: string
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: ids
+        type: array
+      - in: query
+        name: org_bin
+        type: string
+      - in: query
+        name: token
+        type: string
+      - in: query
+        name: trade_point_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.DeviceSt'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - device
+    post:
+      parameters:
+      - description: body
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.DeviceCUSt'
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - device
+  /device/:id:
+    delete:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - device
+    get:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.DeviceSt'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - device
+    put:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: body
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.DeviceCUSt'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - device
+  /emu/payment/:id/confirm:
+    post:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - emu
+  /emu/payment/:id/confirm_error:
+    post:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - emu
+  /emu/payment/:id/scan:
+    post:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - emu
+  /emu/payment/:id/scan_error:
+    post:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - emu
+  /ord:
+    get:
+      parameters:
+      - in: query
+        name: city_id
+        type: string
+      - in: query
+        name: device_id
+        type: string
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: ids
+        type: array
+      - in: query
+        name: payment_id
+        type: integer
+      - in: query
+        name: platform
+        type: string
+      - in: query
+        name: src_id
+        type: string
+      - in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dopTypes.PaginatedListRep'
+            - properties:
+                results:
+                  items:
+                    $ref: '#/definitions/entities.OrdSt'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - ord
+    post:
+      parameters:
+      - description: body
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.OrdCUSt'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.OrdCreateRepSt'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - ord
+  /ord/:id:
+    delete:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - ord
+    get:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.OrdSt'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - ord
+    put:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: body
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.OrdCUSt'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - ord
+  /payment:
+    get:
+      parameters:
+      - collectionFormat: csv
+        in: query
+        items:
+          type: integer
+        name: ids
+        type: array
+      - in: query
+        name: ord_id
+        type: string
+      - in: query
+        name: status
+        type: string
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: statuses
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dopTypes.PaginatedListRep'
+            - properties:
+                results:
+                  items:
+                    $ref: '#/definitions/entities.PaymentSt'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - payment
+  /payment/:id:
+    delete:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - payment
+    get:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.PaymentSt'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - payment
+    put:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: body
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.PaymentCUSt'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - payment
+  /payment/:id/qr_picture:
+    get:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - payment
+  /src:
+    get:
+      parameters:
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: ids
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dopTypes.PaginatedListRep'
+            - properties:
+                results:
+                  items:
+                    $ref: '#/definitions/entities.SrcSt'
+                  type: array
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - src
+    post:
+      parameters:
+      - description: body
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.SrcCUSt'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/dopTypes.CreateRep'
+            - properties:
+                id:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - src
+  /src/:id:
+    delete:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - src
+    get:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.SrcSt'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - src
+    put:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: body
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.SrcCUSt'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - src
+  /trade_point:
+    get:
+      parameters:
+      - in: query
+        name: org_bin
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.TradePointSt'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dopTypes.ErrRep'
+      tags:
+      - trade_point
+swagger: "2.0"

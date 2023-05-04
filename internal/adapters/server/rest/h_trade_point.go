@@ -8,12 +8,12 @@ import (
 	dopHttps "github.com/rendau/dop/adapters/server/https"
 )
 
-// @Router   /trade_point [get]
-// @Tags     trade_point
-// @Param    query  query  entities.TradePointListParsSt  false  "query"
-// @Produce  json
-// @Success  200  {array}  entities.TradePointSt
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/trade_point [get]
+// @Tags		trade_point
+// @Param		query	query	entities.TradePointListParsSt	false	"query"
+// @Produce	json
+// @Success	200	{array}		entities.TradePointSt
+// @Failure	400	{object}	dopTypes.ErrRep
 func (o *St) hTradePointList(c *gin.Context) {
 	pars := &entities.TradePointListParsSt{}
 	if !dopHttps.BindQuery(c, pars) {

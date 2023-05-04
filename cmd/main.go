@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	notifierHttp "kaspi-qr/internal/adapters/notifier/http"
@@ -17,7 +17,7 @@ import (
 	"github.com/swaggo/swag/example/basic/docs"
 )
 
-func main() {
+func Start() {
 	var err error
 
 	app := struct {

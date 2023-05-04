@@ -8,12 +8,12 @@ import (
 	dopHttps "github.com/rendau/dop/adapters/server/https"
 )
 
-// @Router   /city [get]
-// @Tags     city
-// @Param    query  query  entities.CityListParsSt  false  "query"
-// @Produce  json
-// @Success  200  {array}  entities.CitySt
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/city [get]
+// @Tags		city
+// @Param		query	query	entities.CityListParsSt	false	"query"
+// @Produce	json
+// @Success	200	{array}		entities.CitySt
+// @Failure	400	{object}	dopTypes.ErrRep
 func (o *St) hCityList(c *gin.Context) {
 	pars := &entities.CityListParsSt{}
 	if !dopHttps.BindQuery(c, pars) {
@@ -28,11 +28,11 @@ func (o *St) hCityList(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// @Router   /city [post]
-// @Tags     city
-// @Param    body  body  entities.CityCUSt  false  "body"
-// @Success  200  {object}
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/city [post]
+// @Tags		city
+// @Param		body	body	entities.CityCUSt	false	"body"
+// @Success	200
+// @Failure	400		{object}	dopTypes.ErrRep
 func (o *St) hCityCreate(c *gin.Context) {
 	reqObj := &entities.CityCUSt{}
 	if !dopHttps.BindJSON(c, reqObj) {
@@ -47,12 +47,12 @@ func (o *St) hCityCreate(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"id": result})
 }
 
-// @Router   /city/:id [get]
-// @Tags     city
-// @Param    id path string true "id"
-// @Produce  json
-// @Success  200  {object}  entities.CitySt
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/city/:id [get]
+// @Tags		city
+// @Param		id	path	string	true	"id"
+// @Produce	json
+// @Success	200	{object}	entities.CitySt
+// @Failure	400	{object}	dopTypes.ErrRep
 func (o *St) hCityGet(c *gin.Context) {
 	id := c.Param("id")
 
@@ -64,13 +64,13 @@ func (o *St) hCityGet(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// @Router   /city/:id [put]
-// @Tags     city
-// @Param    id path string true "id"
-// @Param    body  body  entities.CityCUSt  false  "body"
-// @Produce  json
-// @Success  200
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/city/:id [put]
+// @Tags		city
+// @Param		id		path	string				true	"id"
+// @Param		body	body	entities.CityCUSt	false	"body"
+// @Produce	json
+// @Success	200
+// @Failure	400	{object}	dopTypes.ErrRep
 func (o *St) hCityUpdate(c *gin.Context) {
 	id := c.Param("id")
 
@@ -82,11 +82,11 @@ func (o *St) hCityUpdate(c *gin.Context) {
 	dopHttps.Error(c, o.ucs.CityUpdate(o.getRequestContext(c), id, reqObj))
 }
 
-// @Router   /city/:id [delete]
-// @Tags     city
-// @Param    id path string true "id"
-// @Success  200
-// @Failure  400  {object}  dopTypes.ErrRep
+// @Router		/city/:id [delete]
+// @Tags		city
+// @Param		id	path	string	true	"id"
+// @Success	200
+// @Failure	400	{object}	dopTypes.ErrRep
 func (o *St) hCityDelete(c *gin.Context) {
 	id := c.Param("id")
 
