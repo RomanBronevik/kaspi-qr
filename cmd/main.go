@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"kaspi-qr/docs"
 	notifierHttp "kaspi-qr/internal/adapters/notifier/http"
 	"kaspi-qr/internal/adapters/provider/kaspi"
 	repoPg "kaspi-qr/internal/adapters/repo/pg"
@@ -14,7 +15,6 @@ import (
 	dopLoggerZap "github.com/rendau/dop/adapters/logger/zap"
 	dopServerHttps "github.com/rendau/dop/adapters/server/https"
 	"github.com/rendau/dop/dopTools"
-	"github.com/swaggo/swag/example/basic/docs"
 )
 
 func Start() {

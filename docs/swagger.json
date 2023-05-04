@@ -473,6 +473,15 @@
                         "in": "query"
                     },
                     {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "cols",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "name": "device_id",
                         "in": "query"
@@ -487,6 +496,21 @@
                         "in": "query"
                     },
                     {
+                        "type": "boolean",
+                        "name": "only_count",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "name": "payment_id",
                         "in": "query"
@@ -497,6 +521,20 @@
                         "in": "query"
                     },
                     {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sort_name",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "name": "src_id",
                         "in": "query"
@@ -504,6 +542,11 @@
                     {
                         "type": "string",
                         "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "name": "with_total_count",
                         "in": "query"
                     }
                 ],
@@ -673,6 +716,15 @@
                     {
                         "type": "array",
                         "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "cols",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
                             "type": "integer"
                         },
                         "collectionFormat": "csv",
@@ -680,8 +732,37 @@
                         "in": "query"
                     },
                     {
+                        "type": "boolean",
+                        "name": "only_count",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "name": "ord_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sort_name",
                         "in": "query"
                     },
                     {
@@ -696,6 +777,11 @@
                         },
                         "collectionFormat": "csv",
                         "name": "statuses",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "name": "with_total_count",
                         "in": "query"
                     }
                 ],
@@ -877,22 +963,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dopTypes.PaginatedListRep"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "results": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/entities.SrcSt"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.SrcSt"
+                            }
                         }
                     },
                     "400": {

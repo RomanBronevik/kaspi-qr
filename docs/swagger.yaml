@@ -476,6 +476,12 @@ paths:
       - in: query
         name: city_id
         type: string
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: cols
+        type: array
       - in: query
         name: device_id
         type: string
@@ -486,10 +492,28 @@ paths:
         name: ids
         type: array
       - in: query
+        name: only_count
+        type: boolean
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: page_size
+        type: integer
+      - in: query
         name: payment_id
         type: integer
       - in: query
         name: platform
+        type: string
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: sort
+        type: array
+      - in: query
+        name: sort_name
         type: string
       - in: query
         name: src_id
@@ -497,6 +521,9 @@ paths:
       - in: query
         name: status
         type: string
+      - in: query
+        name: with_total_count
+        type: boolean
       produces:
       - application/json
       responses:
@@ -601,11 +628,35 @@ paths:
       - collectionFormat: csv
         in: query
         items:
+          type: string
+        name: cols
+        type: array
+      - collectionFormat: csv
+        in: query
+        items:
           type: integer
         name: ids
         type: array
       - in: query
+        name: only_count
+        type: boolean
+      - in: query
         name: ord_id
+        type: string
+      - in: query
+        name: page
+        type: integer
+      - in: query
+        name: page_size
+        type: integer
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: sort
+        type: array
+      - in: query
+        name: sort_name
         type: string
       - in: query
         name: status
@@ -616,6 +667,9 @@ paths:
           type: string
         name: statuses
         type: array
+      - in: query
+        name: with_total_count
+        type: boolean
       produces:
       - application/json
       responses:
@@ -730,14 +784,9 @@ paths:
         "200":
           description: OK
           schema:
-            allOf:
-            - $ref: '#/definitions/dopTypes.PaginatedListRep'
-            - properties:
-                results:
-                  items:
-                    $ref: '#/definitions/entities.SrcSt'
-                  type: array
-              type: object
+            items:
+              $ref: '#/definitions/entities.SrcSt'
+            type: array
         "400":
           description: Bad Request
           schema:

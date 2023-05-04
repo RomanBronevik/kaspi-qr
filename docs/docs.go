@@ -485,6 +485,15 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "cols",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "name": "device_id",
                         "in": "query"
@@ -499,6 +508,21 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "boolean",
+                        "name": "only_count",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
                         "type": "integer",
                         "name": "payment_id",
                         "in": "query"
@@ -509,6 +533,20 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sort_name",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "name": "src_id",
                         "in": "query"
@@ -516,6 +554,11 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "name": "with_total_count",
                         "in": "query"
                     }
                 ],
@@ -685,6 +728,15 @@ const docTemplate = `{
                     {
                         "type": "array",
                         "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "cols",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
                             "type": "integer"
                         },
                         "collectionFormat": "csv",
@@ -692,8 +744,37 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "boolean",
+                        "name": "only_count",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "name": "ord_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "collectionFormat": "csv",
+                        "name": "sort",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "name": "sort_name",
                         "in": "query"
                     },
                     {
@@ -708,6 +789,11 @@ const docTemplate = `{
                         },
                         "collectionFormat": "csv",
                         "name": "statuses",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "name": "with_total_count",
                         "in": "query"
                     }
                 ],
@@ -889,22 +975,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/dopTypes.PaginatedListRep"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "results": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/entities.SrcSt"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.SrcSt"
+                            }
                         }
                     },
                     "400": {
