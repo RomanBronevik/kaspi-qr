@@ -21,12 +21,13 @@ type St struct {
 	stopped   bool
 	stoppedMu sync.RWMutex
 
-	City       *City
-	Device     *Device
-	Ord        *Ord
-	Payment    *Payment
-	TradePoint *TradePoint
-	Src        *Src
+	City         *City
+	Device       *Device
+	Ord          *Ord
+	Payment      *Payment
+	PaymentCheck *PaymentCheck
+	TradePoint   *TradePoint
+	Src          *Src
 }
 
 func New(
@@ -48,6 +49,7 @@ func New(
 	c.Device = NewDevice(c)
 	c.Ord = NewOrd(c)
 	c.Payment = NewPayment(c)
+	c.PaymentCheck = NewPaymentCheck(c)
 	c.TradePoint = NewTradePoint(c)
 	c.Src = NewSrc(c)
 
@@ -55,7 +57,7 @@ func New(
 }
 
 func (c *St) Start() {
-	go c.Payment.StatusChecker()
+	go c.PaymentCheck.StatusChecker()
 }
 
 func (c *St) IsStopped() bool {

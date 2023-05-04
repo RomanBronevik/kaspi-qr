@@ -11,8 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/rendau/dop/dopTools"
-
 	qrcode "github.com/skip2/go-qrcode"
 )
 
@@ -304,54 +302,4 @@ func (c *Payment) EmuPaymentConfirm(ctx context.Context, id int64) error {
 
 func (c *Payment) EmuPaymentConfirmError(ctx context.Context, id int64) error {
 	return c.r.prv.EmuPaymentConfirmError(id)
-}
-
-// jobs
-
-func (c *Payment) StatusChecker() {
-	// first time sleep
-	time.Sleep(10 * time.Second)
-
-	for {
-		if c.r.IsStopped() {
-			return
-		}
-
-		c.StatusCheck()
-
-		time.Sleep(7 * time.Second)
-	}
-}
-
-func (c *Payment) StatusCheck() {
-	defer dopTools.PanicRecover(c.r.lg, "statusCheck")
-
-	ctx := context.Background()
-
-	// get payments
-	payments, err := c.List(ctx, &entities.PaymentListParsSt{
-		Statuses: dopTools.NewSlicePtr(
-			cns.PaymentStatusCreated,
-			cns.PaymentStatusLinkActivated,
-		),
-	})
-	if err != nil {
-		return
-	}
-
-	for _, payment := range payments {
-		if c.r.IsStopped() {
-			return
-		}
-
-		c.r.wg.Add(1)
-		c.StatusCheckForPayment(ctx, payment)
-	}
-}
-
-func (c *Payment) StatusCheckForPayment(ctx context.Context, payment *entities.PaymentSt) {
-	defer c.r.wg.Done()
-	defer dopTools.PanicRecover(c.r.lg, "statusCheck")
-
-	_, _ = c.GetStatus(ctx, payment.Id)
 }
