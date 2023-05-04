@@ -2,11 +2,14 @@ package rest
 
 import (
 	"context"
-	"kaspi-qr/internal/adapters/logger"
 	"kaspi-qr/internal/domain/usecases"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rendau/dop/adapters/logger"
+	dopHttps "github.com/rendau/dop/adapters/server/https"
+	swagFiles "github.com/swaggo/files"
+	ginSwag "github.com/swaggo/gin-swagger"
 )
 
 type St struct {
@@ -21,12 +24,18 @@ func GetHandler(lg logger.Lite, ucs *usecases.St, withCors bool) http.Handler {
 
 	// middlewares
 
-	r.Use(MwRecovery(lg, nil))
+	r.Use(dopHttps.MwRecovery(lg, nil))
 	if withCors {
-		r.Use(MwCors())
+		r.Use(dopHttps.MwCors())
 	}
 
 	// handlers
+
+	// doc
+	r.GET("/doc/*any", ginSwag.WrapHandler(swagFiles.Handler, func(c *ginSwag.Config) {
+		c.DefaultModelsExpandDepth = 0
+		c.DocExpansion = "none"
+	}))
 
 	s := &St{lg: lg, ucs: ucs}
 

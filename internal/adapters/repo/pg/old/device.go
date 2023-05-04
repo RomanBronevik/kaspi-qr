@@ -3,9 +3,10 @@ package old
 import (
 	"context"
 	"errors"
-	"kaspi-qr/internal/adapters/db"
 	_ "kaspi-qr/internal/adapters/repo"
 	"kaspi-qr/internal/domain/entities"
+
+	"github.com/rendau/dop/dopErrs"
 )
 
 func (d *St) CreateDevice(ctx context.Context, device *entities.CreateDeviceDTO) error {
@@ -13,7 +14,7 @@ func (d *St) CreateDevice(ctx context.Context, device *entities.CreateDeviceDTO)
 		INSERT INTO device (device_id, token, organization_bin) 
 		VALUES ($1, $2, $3)`
 
-	return d.db.Exec(ctx, q, device.DeviceId, device.Token, device.OrganizationBin)
+	return d.DbExec(ctx, q, device.DeviceId, device.Token, device.OrganizationBin)
 }
 
 func (d *St) FindAllDevices(ctx context.Context) ([]*entities.Device, error) {
@@ -21,7 +22,7 @@ func (d *St) FindAllDevices(ctx context.Context) ([]*entities.Device, error) {
 		SELECT device_id, token,  organization_bin
 		FROM device`
 
-	rows, err := d.db.Query(ctx, q)
+	rows, err := d.DbQuery(ctx, q)
 	if err != nil {
 		return nil, err
 	}
@@ -55,9 +56,9 @@ func (d *St) FindOneDevice(ctx context.Context, token string) (*entities.Device,
 
 	dev := &entities.Device{}
 
-	err := d.db.QueryRow(ctx, q, token).Scan(&dev.DeviceId, &dev.Token, &dev.OrganizationBin)
+	err := d.DbQueryRow(ctx, q, token).Scan(&dev.DeviceId, &dev.Token, &dev.OrganizationBin)
 	if err != nil {
-		if errors.Is(err, db.ErrNoRows) {
+		if errors.Is(err, dopErrs.NoRows) {
 			return nil, nil
 		}
 		return nil, err
@@ -71,5 +72,5 @@ func (d *St) DeleteDevice(ctx context.Context, bin string, token string) error {
 		DELETE FROM device
 		WHERE organization_bin = $1 AND token = $2;`
 
-	return d.db.Exec(ctx, q, bin, token)
+	return d.DbExec(ctx, q, bin, token)
 }

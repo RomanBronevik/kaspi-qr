@@ -5,22 +5,23 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	dopHttps "github.com/rendau/dop/adapters/server/https"
 )
 
 // @Router   /device [get]
 // @Tags     device
 // @Param    query  query  entities.DeviceListParsSt  false  "query"
 // @Produce  json
-// @Success  200  {object}  dopTypes.PaginatedListRep{results=[]entities.DeviceSt}
+// @Success  200  {array}  entities.DeviceSt
 // @Failure  400  {object}  dopTypes.ErrRep
 func (o *St) hDeviceList(c *gin.Context) {
 	pars := &entities.DeviceListParsSt{}
-	if !BindQuery(c, pars) {
+	if !dopHttps.BindQuery(c, pars) {
 		return
 	}
 
 	result, err := o.ucs.DeviceList(o.getRequestContext(c), pars)
-	if Error(c, err) {
+	if dopHttps.Error(c, err) {
 		return
 	}
 
@@ -34,12 +35,12 @@ func (o *St) hDeviceList(c *gin.Context) {
 // @Failure  400  {object}  dopTypes.ErrRep
 func (o *St) hDeviceCreate(c *gin.Context) {
 	reqObj := &entities.DeviceCUSt{}
-	if !BindJSON(c, reqObj) {
+	if !dopHttps.BindJSON(c, reqObj) {
 		return
 	}
 
 	result, err := o.ucs.DeviceCreate(o.getRequestContext(c), reqObj)
-	if Error(c, err) {
+	if dopHttps.Error(c, err) {
 		return
 	}
 
@@ -56,7 +57,7 @@ func (o *St) hDeviceGet(c *gin.Context) {
 	id := c.Param("id")
 
 	result, err := o.ucs.DeviceGet(o.getRequestContext(c), id)
-	if Error(c, err) {
+	if dopHttps.Error(c, err) {
 		return
 	}
 
@@ -74,11 +75,11 @@ func (o *St) hDeviceUpdate(c *gin.Context) {
 	id := c.Param("id")
 
 	reqObj := &entities.DeviceCUSt{}
-	if !BindJSON(c, reqObj) {
+	if !dopHttps.BindJSON(c, reqObj) {
 		return
 	}
 
-	Error(c, o.ucs.DeviceUpdate(o.getRequestContext(c), id, reqObj))
+	dopHttps.Error(c, o.ucs.DeviceUpdate(o.getRequestContext(c), id, reqObj))
 }
 
 // @Router   /device/:id [delete]
@@ -89,5 +90,5 @@ func (o *St) hDeviceUpdate(c *gin.Context) {
 func (o *St) hDeviceDelete(c *gin.Context) {
 	id := c.Param("id")
 
-	Error(c, o.ucs.DeviceDelete(o.getRequestContext(c), id))
+	dopHttps.Error(c, o.ucs.DeviceDelete(o.getRequestContext(c), id))
 }

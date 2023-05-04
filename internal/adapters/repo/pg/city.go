@@ -3,14 +3,15 @@ package pg
 import (
 	"context"
 	"errors"
-	"kaspi-qr/internal/adapters/db"
 	"kaspi-qr/internal/domain/entities"
+
+	"github.com/rendau/dop/dopErrs"
 )
 
 func (d *St) CityGet(ctx context.Context, id string) (*entities.CitySt, error) {
 	var result entities.CitySt
 
-	err := d.db.QueryRow(ctx, `
+	err := d.DbQueryRow(ctx, `
 		select
 			t.id,
 			t.code,
@@ -24,7 +25,7 @@ func (d *St) CityGet(ctx context.Context, id string) (*entities.CitySt, error) {
 		&result.Name,
 		&result.OrgBin,
 	)
-	if errors.Is(err, db.ErrNoRows) {
+	if errors.Is(err, dopErrs.NoRows) {
 		return nil, nil
 	}
 
@@ -49,7 +50,7 @@ func (d *St) CityList(ctx context.Context, pars *entities.CityListParsSt) ([]*en
 		args["org_bin"] = *pars.OrgBin
 	}
 
-	rows, err := d.db.QueryM(ctx, `
+	rows, err := d.DbQueryM(ctx, `
 		select
 			t.id,
 			t.code,
@@ -93,7 +94,7 @@ func (d *St) CityIdExists(ctx context.Context, id string) (bool, error) {
 	var err error
 	var cnt int
 
-	err = d.db.QueryRow(ctx, `
+	err = d.DbQueryRow(ctx, `
 		select count(*)
 		from city
 		where id = $1
@@ -108,7 +109,7 @@ func (d *St) CityCreate(ctx context.Context, obj *entities.CityCUSt) (string, er
 
 	var newId string
 
-	err := d.db.QueryRowM(ctx, `
+	err := d.DbQueryRowM(ctx, `
 		insert into city (`+cols+`)
 		values (`+values+`)
 		returning id
@@ -123,7 +124,7 @@ func (d *St) CityUpdate(ctx context.Context, id string, obj *entities.CityCUSt) 
 
 	fields["cond_id"] = id
 
-	return d.db.ExecM(ctx, `
+	return d.DbExecM(ctx, `
 		update city
 		set `+cols+`
 		where id = ${cond_id}
@@ -153,7 +154,7 @@ func (d *St) cityGetCUFields(obj *entities.CityCUSt) map[string]any {
 }
 
 func (d *St) CityDelete(ctx context.Context, id string) error {
-	return d.db.Exec(ctx, `
+	return d.DbExec(ctx, `
 		delete from city
 		where id = $1
 	`, id)

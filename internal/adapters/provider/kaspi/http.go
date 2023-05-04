@@ -7,10 +7,10 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io"
-	"kaspi-qr/internal/adapters/logger"
 	"net/http"
 	"os"
 
+	"github.com/rendau/dop/adapters/logger"
 	"golang.org/x/crypto/pkcs12"
 )
 

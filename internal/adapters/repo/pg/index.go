@@ -1,23 +1,19 @@
 package pg
 
 import (
-	"kaspi-qr/internal/adapters/db"
-	"kaspi-qr/internal/adapters/logger"
-
 	dopDb "github.com/rendau/dop/adapters/db"
+	"github.com/rendau/dop/adapters/logger"
 )
 
 type St struct {
 	dopDb.RDBConnectionWithHelpers
 
-	lg logger.WarnAndError
-	db db.DB
+	lg logger.Lite
 }
 
-func New(lg logger.WarnAndError, dopDb dopDb.RDBConnectionWithHelpers, db db.DB) *St {
+func New(lg logger.Lite, dopDb dopDb.RDBConnectionWithHelpers) *St {
 	return &St{
 		RDBConnectionWithHelpers: dopDb,
 		lg:                       lg,
-		db:                       db,
 	}
 }

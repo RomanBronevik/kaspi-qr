@@ -5,22 +5,23 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	dopHttps "github.com/rendau/dop/adapters/server/https"
 )
 
 // @Router   /city [get]
 // @Tags     city
 // @Param    query  query  entities.CityListParsSt  false  "query"
 // @Produce  json
-// @Success  200  {object}  dopTypes.PaginatedListRep{results=[]entities.CitySt}
+// @Success  200  {array}  entities.CitySt
 // @Failure  400  {object}  dopTypes.ErrRep
 func (o *St) hCityList(c *gin.Context) {
 	pars := &entities.CityListParsSt{}
-	if !BindQuery(c, pars) {
+	if !dopHttps.BindQuery(c, pars) {
 		return
 	}
 
 	result, err := o.ucs.CityList(o.getRequestContext(c), pars)
-	if Error(c, err) {
+	if dopHttps.Error(c, err) {
 		return
 	}
 
@@ -34,12 +35,12 @@ func (o *St) hCityList(c *gin.Context) {
 // @Failure  400  {object}  dopTypes.ErrRep
 func (o *St) hCityCreate(c *gin.Context) {
 	reqObj := &entities.CityCUSt{}
-	if !BindJSON(c, reqObj) {
+	if !dopHttps.BindJSON(c, reqObj) {
 		return
 	}
 
 	result, err := o.ucs.CityCreate(o.getRequestContext(c), reqObj)
-	if Error(c, err) {
+	if dopHttps.Error(c, err) {
 		return
 	}
 
@@ -56,7 +57,7 @@ func (o *St) hCityGet(c *gin.Context) {
 	id := c.Param("id")
 
 	result, err := o.ucs.CityGet(o.getRequestContext(c), id)
-	if Error(c, err) {
+	if dopHttps.Error(c, err) {
 		return
 	}
 
@@ -74,11 +75,11 @@ func (o *St) hCityUpdate(c *gin.Context) {
 	id := c.Param("id")
 
 	reqObj := &entities.CityCUSt{}
-	if !BindJSON(c, reqObj) {
+	if !dopHttps.BindJSON(c, reqObj) {
 		return
 	}
 
-	Error(c, o.ucs.CityUpdate(o.getRequestContext(c), id, reqObj))
+	dopHttps.Error(c, o.ucs.CityUpdate(o.getRequestContext(c), id, reqObj))
 }
 
 // @Router   /city/:id [delete]
@@ -89,5 +90,5 @@ func (o *St) hCityUpdate(c *gin.Context) {
 func (o *St) hCityDelete(c *gin.Context) {
 	id := c.Param("id")
 
-	Error(c, o.ucs.CityDelete(o.getRequestContext(c), id))
+	dopHttps.Error(c, o.ucs.CityDelete(o.getRequestContext(c), id))
 }

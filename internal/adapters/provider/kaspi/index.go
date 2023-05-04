@@ -2,12 +2,13 @@ package kaspi
 
 import (
 	"crypto/tls"
-	"kaspi-qr/internal/adapters/logger"
 	"kaspi-qr/internal/adapters/provider"
 	"kaspi-qr/internal/cns"
 	"kaspi-qr/internal/domain/errs"
 	"strconv"
 	"strings"
+
+	"github.com/rendau/dop/adapters/logger"
 )
 
 type St struct {

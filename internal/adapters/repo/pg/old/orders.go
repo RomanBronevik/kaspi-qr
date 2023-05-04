@@ -17,7 +17,7 @@ func (d *St) CreateOrder(ctx context.Context, order *entities.CreateOrderDTO) er
 		INSERT INTO orders (created, modified, order_number, organization_bin, status)
 		VALUES ($1, $2, $3, $4, $5)`
 
-	return d.db.Exec(ctx, q, order.Created, order.Modified, order.OrderNumber, order.OrganizationBin, order.Status)
+	return d.DbExec(ctx, q, order.Created, order.Modified, order.OrderNumber, order.OrganizationBin, order.Status)
 }
 
 func (d *St) FindAllOrders(ctx context.Context) (u []*entities.Order, err error) {
@@ -25,7 +25,7 @@ func (d *St) FindAllOrders(ctx context.Context) (u []*entities.Order, err error)
 		SELECT CREATED, MODIFIED, ORDER_NUMBER, ORGANIZATION_BIN, STATUS
 		FROM orders`
 
-	rows, err := d.db.Query(ctx, q)
+	rows, err := d.DbQuery(ctx, q)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (d *St) FindAllUnpaidOrders(ctx context.Context) ([]*entities.UnPaidOrder, 
 				   ON o.ORDER_NUMBER = p.ORDER_NUMBER
 		WHERE p.status = $1 OR p.status = $2`
 
-	rows, err := d.db.Query(ctx, q, cns.StatusCreated, cns.StatusWait)
+	rows, err := d.DbQuery(ctx, q, cns.StatusCreated, cns.StatusWait)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (d *St) FindAllPaidOrders(ctx context.Context) ([]*entities.PaidOrder, erro
 				   ON o.ORDER_NUMBER = p.ORDER_NUMBER
 		WHERE p.status = $1`
 
-	rows, err := d.db.Query(ctx, q, cns.StatusSuccess)
+	rows, err := d.DbQuery(ctx, q, cns.StatusSuccess)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func (d *St) FindOneOrder(ctx context.Context, orderNumber string) (entities.Ord
 	//Trace
 
 	var order entities.Order
-	err := d.db.QueryRow(ctx, q, orderNumber).Scan(&order.Created, &order.Modified, &order.OrderNumber, &order.OrganizationBin, &order.Status)
+	err := d.DbQueryRow(ctx, q, orderNumber).Scan(&order.Created, &order.Modified, &order.OrderNumber, &order.OrganizationBin, &order.Status)
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return entities.Order{}, err
 	}
@@ -140,7 +140,7 @@ func (d *St) UpdateOrderStatus(ctx context.Context, orderNumber string, status s
 		UPDATE orders SET status = $1, modified = $2 
 		               WHERE order_number = $3;`
 
-	if err := d.db.Exec(ctx, q, status, time.Now().Local(), orderNumber); err != nil {
+	if err := d.DbExec(ctx, q, status, time.Now().Local(), orderNumber); err != nil {
 		var pgErr *pgconn.PgError
 		if errors.Is(err, pgErr) {
 			pgErr = err.(*pgconn.PgError)
@@ -158,7 +158,7 @@ func (d *St) DeleteOrder(ctx context.Context, orderNumber string) error {
 		DELETE FROM orders
 		WHERE order_number = $1;`
 
-	if err := d.db.Exec(ctx, q, orderNumber); err != nil && !errors.Is(err, pgx.ErrNoRows) {
+	if err := d.DbExec(ctx, q, orderNumber); err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return d.ErorrHandler(err)
 	}
 

@@ -3,14 +3,15 @@ package pg
 import (
 	"context"
 	"errors"
-	"kaspi-qr/internal/adapters/db"
 	"kaspi-qr/internal/domain/entities"
+
+	"github.com/rendau/dop/dopErrs"
 )
 
 func (d *St) PaymentGet(ctx context.Context, id int64) (*entities.PaymentSt, error) {
 	var result entities.PaymentSt
 
-	err := d.db.QueryRow(ctx, `
+	err := d.DbQueryRow(ctx, `
 		select
 			t.id,
 			t.created,
@@ -36,7 +37,7 @@ func (d *St) PaymentGet(ctx context.Context, id int64) (*entities.PaymentSt, err
 		&result.ExpireDt,
 		&result.Pbo,
 	)
-	if errors.Is(err, db.ErrNoRows) {
+	if errors.Is(err, dopErrs.NoRows) {
 		return nil, nil
 	}
 
@@ -46,12 +47,12 @@ func (d *St) PaymentGet(ctx context.Context, id int64) (*entities.PaymentSt, err
 func (d *St) PaymentGetLink(ctx context.Context, id int64) (string, error) {
 	var result string
 
-	err := d.db.QueryRow(ctx, `
+	err := d.DbQueryRow(ctx, `
 		select link
 		from payment
 		where id = $1
 	`, id).Scan(&result)
-	if errors.Is(err, db.ErrNoRows) {
+	if errors.Is(err, dopErrs.NoRows) {
 		return "", nil
 	}
 
@@ -80,7 +81,7 @@ func (d *St) PaymentList(ctx context.Context, pars *entities.PaymentListParsSt) 
 		args["statuses"] = *pars.Statuses
 	}
 
-	rows, err := d.db.QueryM(ctx, `
+	rows, err := d.DbQueryM(ctx, `
 		select
 			t.id,
 			t.created,
@@ -136,7 +137,7 @@ func (d *St) PaymentIdExists(ctx context.Context, id int64) (bool, error) {
 	var err error
 	var cnt int
 
-	err = d.db.QueryRow(ctx, `
+	err = d.DbQueryRow(ctx, `
 		select count(*)
 		from payment
 		where id = $1
@@ -151,7 +152,7 @@ func (d *St) PaymentCreate(ctx context.Context, obj *entities.PaymentCUSt) (int6
 
 	var newId int64
 
-	err := d.db.QueryRowM(ctx, `
+	err := d.DbQueryRowM(ctx, `
 		insert into payment (`+cols+`)
 		values (`+values+`)
 		returning id
@@ -166,7 +167,7 @@ func (d *St) PaymentUpdate(ctx context.Context, id int64, obj *entities.PaymentC
 
 	fields["cond_id"] = id
 
-	return d.db.ExecM(ctx, `
+	return d.DbExecM(ctx, `
 		update payment
 		set `+cols+`
 		where id = ${cond_id}
@@ -216,7 +217,7 @@ func (d *St) paymentGetCUFields(obj *entities.PaymentCUSt) map[string]any {
 }
 
 func (d *St) PaymentDelete(ctx context.Context, id int64) error {
-	return d.db.Exec(ctx, `
+	return d.DbExec(ctx, `
 		delete from payment
 		where id = $1
 	`, id)

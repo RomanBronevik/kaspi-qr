@@ -1,13 +1,13 @@
 package core
 
 import (
-	"kaspi-qr/internal/adapters/logger"
 	"kaspi-qr/internal/adapters/notifier"
 	"kaspi-qr/internal/adapters/provider"
-	"sync"
-
 	"kaspi-qr/internal/adapters/repo"
 	"kaspi-qr/internal/adapters/repo/pg"
+	"sync"
+
+	"github.com/rendau/dop/adapters/logger"
 )
 
 type St struct {

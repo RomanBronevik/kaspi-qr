@@ -3,14 +3,15 @@ package pg
 import (
 	"context"
 	"errors"
-	"kaspi-qr/internal/adapters/db"
 	"kaspi-qr/internal/domain/entities"
+
+	"github.com/rendau/dop/dopErrs"
 )
 
 func (d *St) DeviceGet(ctx context.Context, id string) (*entities.DeviceSt, error) {
 	var result entities.DeviceSt
 
-	err := d.db.QueryRow(ctx, `
+	err := d.DbQueryRow(ctx, `
 		select
 			t.id,
 			t.created,
@@ -26,7 +27,7 @@ func (d *St) DeviceGet(ctx context.Context, id string) (*entities.DeviceSt, erro
 		&result.TradePointId,
 		&result.OrgBin,
 	)
-	if errors.Is(err, db.ErrNoRows) {
+	if errors.Is(err, dopErrs.NoRows) {
 		return nil, nil
 	}
 
@@ -36,7 +37,7 @@ func (d *St) DeviceGet(ctx context.Context, id string) (*entities.DeviceSt, erro
 func (d *St) DeviceGetIdForCityId(ctx context.Context, cityId string) (string, error) {
 	var result string
 
-	err := d.db.QueryRow(ctx, `
+	err := d.DbQueryRow(ctx, `
 		select d.id
 		from device d
 			join city c on c.org_bin = d.org_bin
@@ -44,7 +45,7 @@ func (d *St) DeviceGetIdForCityId(ctx context.Context, cityId string) (string, e
 		order by d.created desc
 		limit 1
 	`, cityId).Scan(&result)
-	if errors.Is(err, db.ErrNoRows) {
+	if errors.Is(err, dopErrs.NoRows) {
 		result, err = "", nil
 	}
 
@@ -77,7 +78,7 @@ func (d *St) DeviceList(ctx context.Context, pars *entities.DeviceListParsSt) ([
 		args["city_id"] = *pars.CityId
 	}
 
-	rows, err := d.db.QueryM(ctx, `
+	rows, err := d.DbQueryM(ctx, `
 		select
 			t.id,
 			t.created,
@@ -123,7 +124,7 @@ func (d *St) DeviceIdExists(ctx context.Context, id string) (bool, error) {
 	var err error
 	var cnt int
 
-	err = d.db.QueryRow(ctx, `
+	err = d.DbQueryRow(ctx, `
 		select count(*)
 		from device
 		where id = $1
@@ -138,7 +139,7 @@ func (d *St) DeviceCreate(ctx context.Context, obj *entities.DeviceCUSt) (string
 
 	var newId string
 
-	err := d.db.QueryRowM(ctx, `
+	err := d.DbQueryRowM(ctx, `
 		insert into device (`+cols+`)
 		values (`+values+`)
 		returning id
@@ -153,7 +154,7 @@ func (d *St) DeviceUpdate(ctx context.Context, id string, obj *entities.DeviceCU
 
 	fields["cond_id"] = id
 
-	return d.db.ExecM(ctx, `
+	return d.DbExecM(ctx, `
 		update device
 		set `+cols+`
 		where id = ${cond_id}
@@ -183,7 +184,7 @@ func (d *St) deviceGetCUFields(obj *entities.DeviceCUSt) map[string]any {
 }
 
 func (d *St) DeviceDelete(ctx context.Context, id string) error {
-	return d.db.Exec(ctx, `
+	return d.DbExec(ctx, `
 		delete from device
 		where id = $1
 	`, id)

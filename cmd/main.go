@@ -1,64 +1,52 @@
 package main
 
 import (
-	"kaspi-qr/internal/adapters/server/rest"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
-
-	"kaspi-qr/config"
-	dbPg "kaspi-qr/internal/adapters/db/pg"
-	"kaspi-qr/internal/adapters/logger/zap"
 	notifierHttp "kaspi-qr/internal/adapters/notifier/http"
 	"kaspi-qr/internal/adapters/provider/kaspi"
 	repoPg "kaspi-qr/internal/adapters/repo/pg"
-	"kaspi-qr/internal/adapters/server"
+	"kaspi-qr/internal/adapters/server/rest"
 	"kaspi-qr/internal/domain/core"
 	"kaspi-qr/internal/domain/usecases"
+	"os"
+	"time"
 
 	dopDbPg "github.com/rendau/dop/adapters/db/pg"
+	dopLoggerZap "github.com/rendau/dop/adapters/logger/zap"
+	dopServerHttps "github.com/rendau/dop/adapters/server/https"
+	"github.com/rendau/dop/dopTools"
+	"github.com/swaggo/swag/example/basic/docs"
 )
 
 func main() {
 	var err error
 
 	app := struct {
-		lg       *zap.St
-		db       *dopDbPg.St
-		dbRaw    *dbPg.St
-		repo     *repoPg.St
-		core     *core.St
-		ucs      *usecases.St
-		srv      *server.St
-		kaspi    *kaspi.St
-		notifier *notifierHttp.St
+		lg         *dopLoggerZap.St
+		db         *dopDbPg.St
+		repo       *repoPg.St
+		core       *core.St
+		ucs        *usecases.St
+		kaspi      *kaspi.St
+		notifier   *notifierHttp.St
+		restApiSrv *dopServerHttps.St
 	}{}
 
 	// load config
-	conf := config.Load()
+	conf := ConfLoad()
 
 	// logger
-	app.lg = zap.New(conf.LogLevel, conf.Debug)
+	app.lg = dopLoggerZap.New(conf.LogLevel, conf.Debug)
 
-	// db
 	app.db, err = dopDbPg.New(conf.Debug, app.lg, dopDbPg.OptionsSt{
-		Dsn: conf.PgDsn,
-	})
-	if err != nil {
-		app.lg.Fatal(err)
-	}
-
-	// dbRaw
-	app.dbRaw, err = dbPg.New(conf.Debug, app.lg, dbPg.OptionsSt{
-		Dsn: conf.PgDsn,
+		Dsn:      conf.PgDsn,
+		Timezone: "Asia/Almaty",
 	})
 	if err != nil {
 		app.lg.Fatal(err)
 	}
 
 	// repo
-	app.repo = repoPg.New(app.lg, app.db, app.dbRaw)
+	app.repo = repoPg.New(app.lg, app.db)
 
 	// kaspi
 	app.kaspi, err = kaspi.New(app.lg, conf.KaspiApiUrl, conf.CertPath, conf.CertPsw)
@@ -79,16 +67,25 @@ func main() {
 	)
 
 	// usecases
-	app.ucs = usecases.New(app.lg, app.dbRaw, app.core)
+	app.ucs = usecases.New(app.lg, app.db, app.core)
+
+	docs.SwaggerInfo.Host = conf.SwagHost
+	docs.SwaggerInfo.BasePath = conf.SwagBasePath
+	docs.SwaggerInfo.Schemes = []string{conf.SwagSchema}
+	docs.SwaggerInfo.Title = "Kaspi-QR"
 
 	// START
 
 	app.lg.Infow("Starting")
 
-	app.srv = server.Start(
-		app.lg,
+	app.restApiSrv = dopServerHttps.Start(
 		conf.HttpListen,
-		rest.GetHandler(app.lg, app.ucs, conf.HttpCors),
+		rest.GetHandler(
+			app.lg,
+			app.ucs,
+			conf.HttpCors,
+		),
+		app.lg,
 	)
 
 	app.core.Start()
@@ -98,8 +95,8 @@ func main() {
 	var exitCode int
 
 	select {
-	case <-stopSignal():
-	case <-app.srv.Wait():
+	case <-dopTools.StopSignal():
+	case <-app.restApiSrv.Wait():
 		exitCode = 1
 	}
 
@@ -107,7 +104,7 @@ func main() {
 
 	app.lg.Infow("Shutting down...")
 
-	if !app.srv.Shutdown(20 * time.Second) {
+	if !app.restApiSrv.Shutdown(20 * time.Second) {
 		exitCode = 1
 	}
 
@@ -118,10 +115,4 @@ func main() {
 	app.lg.Infow("Exit")
 
 	os.Exit(exitCode)
-}
-
-func stopSignal() <-chan os.Signal {
-	ch := make(chan os.Signal, 1)
-	signal.Notify(ch, os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
-	return ch
 }

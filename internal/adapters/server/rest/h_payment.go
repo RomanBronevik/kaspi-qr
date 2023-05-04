@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	dopHttps "github.com/rendau/dop/adapters/server/https"
 )
 
 // @Router   /payment [get]
@@ -16,12 +17,12 @@ import (
 // @Failure  400  {object}  dopTypes.ErrRep
 func (o *St) hPaymentList(c *gin.Context) {
 	pars := &entities.PaymentListParsSt{}
-	if !BindQuery(c, pars) {
+	if !dopHttps.BindQuery(c, pars) {
 		return
 	}
 
 	result, err := o.ucs.PaymentList(o.getRequestContext(c), pars)
-	if Error(c, err) {
+	if dopHttps.Error(c, err) {
 		return
 	}
 
@@ -38,7 +39,7 @@ func (o *St) hPaymentGet(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
 	result, err := o.ucs.PaymentGet(o.getRequestContext(c), id)
-	if Error(c, err) {
+	if dopHttps.Error(c, err) {
 		return
 	}
 
@@ -56,11 +57,11 @@ func (o *St) hPaymentUpdate(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
 	reqObj := &entities.PaymentCUSt{}
-	if !BindJSON(c, reqObj) {
+	if !dopHttps.BindJSON(c, reqObj) {
 		return
 	}
 
-	Error(c, o.ucs.PaymentUpdate(o.getRequestContext(c), id, reqObj))
+	dopHttps.Error(c, o.ucs.PaymentUpdate(o.getRequestContext(c), id, reqObj))
 }
 
 // @Router   /payment/:id [delete]
@@ -71,7 +72,7 @@ func (o *St) hPaymentUpdate(c *gin.Context) {
 func (o *St) hPaymentDelete(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
-	Error(c, o.ucs.PaymentDelete(o.getRequestContext(c), id))
+	dopHttps.Error(c, o.ucs.PaymentDelete(o.getRequestContext(c), id))
 }
 
 // @Router   /payment/:id/qr_picture [get]
@@ -84,7 +85,7 @@ func (o *St) hPaymentGetQrPicture(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
 	png, err := o.ucs.PaymentGetQrPicture(o.getRequestContext(c), id)
-	if Error(c, err) {
+	if dopHttps.Error(c, err) {
 		return
 	}
 
@@ -101,7 +102,7 @@ func (o *St) hPaymentGetQrPicture(c *gin.Context) {
 func (o *St) hPaymentEmuPaymentScan(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
-	Error(c, o.ucs.PaymentEmuPaymentScan(o.getRequestContext(c), id))
+	dopHttps.Error(c, o.ucs.PaymentEmuPaymentScan(o.getRequestContext(c), id))
 }
 
 // @Router   /emu/payment/:id/scan_error [post]
@@ -112,7 +113,7 @@ func (o *St) hPaymentEmuPaymentScan(c *gin.Context) {
 func (o *St) hPaymentEmuPaymentScanError(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
-	Error(c, o.ucs.PaymentEmuPaymentScanError(o.getRequestContext(c), id))
+	dopHttps.Error(c, o.ucs.PaymentEmuPaymentScanError(o.getRequestContext(c), id))
 }
 
 // @Router   /emu/payment/:id/confirm [post]
@@ -123,7 +124,7 @@ func (o *St) hPaymentEmuPaymentScanError(c *gin.Context) {
 func (o *St) hPaymentEmuPaymentConfirm(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
-	Error(c, o.ucs.PaymentEmuPaymentConfirm(o.getRequestContext(c), id))
+	dopHttps.Error(c, o.ucs.PaymentEmuPaymentConfirm(o.getRequestContext(c), id))
 }
 
 // @Router   /emu/payment/:id/confirm_error [post]
@@ -134,5 +135,5 @@ func (o *St) hPaymentEmuPaymentConfirm(c *gin.Context) {
 func (o *St) hPaymentEmuPaymentConfirmError(c *gin.Context) {
 	id, _ := strconv.ParseInt(c.Param("id"), 10, 64)
 
-	Error(c, o.ucs.PaymentEmuPaymentConfirmError(o.getRequestContext(c), id))
+	dopHttps.Error(c, o.ucs.PaymentEmuPaymentConfirmError(o.getRequestContext(c), id))
 }

@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	dopHttps "github.com/rendau/dop/adapters/server/https"
 )
 
 // @Router   /ord [get]
@@ -15,12 +16,12 @@ import (
 // @Failure  400  {object}  dopTypes.ErrRep
 func (o *St) hOrdList(c *gin.Context) {
 	pars := &entities.OrdListParsSt{}
-	if !BindQuery(c, pars) {
+	if !dopHttps.BindQuery(c, pars) {
 		return
 	}
 
 	result, err := o.ucs.OrdList(o.getRequestContext(c), pars)
-	if Error(c, err) {
+	if dopHttps.Error(c, err) {
 		return
 	}
 
@@ -34,12 +35,12 @@ func (o *St) hOrdList(c *gin.Context) {
 // @Failure  400  {object}  dopTypes.ErrRep
 func (o *St) hOrdCreate(c *gin.Context) {
 	reqObj := &entities.OrdCUSt{}
-	if !BindJSON(c, reqObj) {
+	if !dopHttps.BindJSON(c, reqObj) {
 		return
 	}
 
 	result, err := o.ucs.OrdCreate(o.getRequestContext(c), reqObj)
-	if Error(c, err) {
+	if dopHttps.Error(c, err) {
 		return
 	}
 
@@ -56,7 +57,7 @@ func (o *St) hOrdGet(c *gin.Context) {
 	id := c.Param("id")
 
 	result, err := o.ucs.OrdGet(o.getRequestContext(c), id)
-	if Error(c, err) {
+	if dopHttps.Error(c, err) {
 		return
 	}
 
@@ -74,11 +75,11 @@ func (o *St) hOrdUpdate(c *gin.Context) {
 	id := c.Param("id")
 
 	reqObj := &entities.OrdCUSt{}
-	if !BindJSON(c, reqObj) {
+	if !dopHttps.BindJSON(c, reqObj) {
 		return
 	}
 
-	Error(c, o.ucs.OrdUpdate(o.getRequestContext(c), id, reqObj))
+	dopHttps.Error(c, o.ucs.OrdUpdate(o.getRequestContext(c), id, reqObj))
 }
 
 // @Router   /ord/:id [delete]
@@ -89,5 +90,5 @@ func (o *St) hOrdUpdate(c *gin.Context) {
 func (o *St) hOrdDelete(c *gin.Context) {
 	id := c.Param("id")
 
-	Error(c, o.ucs.OrdDelete(o.getRequestContext(c), id))
+	dopHttps.Error(c, o.ucs.OrdDelete(o.getRequestContext(c), id))
 }

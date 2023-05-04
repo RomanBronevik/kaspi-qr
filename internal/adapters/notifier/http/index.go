@@ -5,10 +5,11 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"kaspi-qr/internal/adapters/logger"
 	"kaspi-qr/internal/adapters/notifier"
 	"net/http"
 	"time"
+
+	"github.com/rendau/dop/adapters/logger"
 )
 
 type St struct {
